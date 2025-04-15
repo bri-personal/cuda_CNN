@@ -37,7 +37,7 @@ void matrixTranpose(Matrix *a, Matrix **b, int arows, int acols);
 void squareLoss(Matrix *x, float *result, int rows, int cols);
 
 /** CONVOLUTION **/
-void deviceUnfoldMatrix(Matrix* img, Matrix** imgUnfolded, int kernelCols, int resRows, int resCols);
+void deviceUnfoldMatrix(Matrix* img, Matrix** imgUnfolded, int kernelRows, int kernelCols, int resRows, int resCols);
 void deviceConvolve(Matrix* img, Matrix* kernel, int stride, int padding);
 
 #endif
