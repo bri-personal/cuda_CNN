@@ -284,7 +284,7 @@ void deviceConvolve(Matrix* img, Matrix* kernel, int stride, int padding) {
 
     /* unfold image */
     Matrix* imgUnfolded;
-    deviceUnfoledMatrix(img, &imgUnfolded, kernel->cols, resRows, resCols);
+    deviceUnfoldMatrix(img, &imgUnfolded, kernel->cols, resRows, resCols);
 
     /* flatten kernel */
 
