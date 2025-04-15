@@ -265,7 +265,7 @@ __global__ void unfoldMatrix(Matrix* m, Matrix* mUnfolded, int imgCols, int kern
         int r = i / cols;
         int c = i % cols;
         int j = imgCols * (r / resCols + c / kernelCols) + r % resCols + c % kernelCols;
-        mUnfolded.data[i] = m.data[j];
+        mUnfolded->data[i] = m->data[j];
         i += gridDim.x;
     }
 }
