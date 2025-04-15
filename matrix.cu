@@ -255,3 +255,37 @@ void squareLoss(Matrix *x, float *result, int rows, int cols) {
   checkError("Loss");
   CERROR( cudaMemcpy(result, y, sizeof(float), cudaMemcpyDeviceToHost) );
 }
+
+
+__global__ void unfoldMatrix(Matrix* m, Matrix* mUnfolded, int imgCols, int kernelCols, int resCols) {
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    int rows = mUnfolded->rows, cols = mUnfolded->cols;
+
+    while (i < rows * cols) {
+        int r = i / cols;
+        int c = i % cols;
+        int j = imgCols * (r / resCols + c / kernelCols) + r % resCols + c % kernelCols;
+        mUnfolded.data[i] = m.data[j];
+        i += gridDim.x;
+    }
+}
+void deviceUnfoldMatrix(Matrix* img, Matrix** imgUnfolded, int kernelCols, int resRows, int resCols) {
+    int unfoldedRows = resRows * resCols;
+    int unfoldedCols = kernel->rows * kernel->cols;
+    initMatrix(imgUnfolded, unfoldedRows, unfoldedCols);
+    
+    unfoldMatrix<<<(unfoldedRows * unfoldedCols + 511) / 512, 512>>>(img, *imgUnfolded);
+}
+
+void deviceConvolve(Matrix* img, Matrix* kernel, int stride, int padding) {
+    /* im 2 col */
+    int resRows = (img.rows - kernel.rows + (padding << 1)) / stride + 1;
+    int resCols = (img.cols - kernel.cols + (padding << 1)) / stride + 1;
+
+    /* unfold image */
+    Matrix* imgUnfolded;
+    deviceUnfoledMatrix(img, &imgUnfolded, kernel->cols, resRows, resCols);
+
+    /* flatten kernel */
+
+}
