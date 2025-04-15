@@ -257,9 +257,10 @@ void squareLoss(Matrix *x, float *result, int rows, int cols) {
 }
 
 
-__global__ void unfoldMatrix(Matrix* m, Matrix* mUnfolded, int imgCols, int kernelCols, int resCols) {
+__global__ void unfoldMatrix(Matrix* m, Matrix* mUnfolded, int kernelCols, int resCols) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     int rows = mUnfolded->rows, cols = mUnfolded->cols;
+    int imgCols = m->cols;
 
     while (i < rows * cols) {
         int r = i / cols;
@@ -274,7 +275,7 @@ void deviceUnfoldMatrix(Matrix* img, Matrix** imgUnfolded, int kernelRows, int k
     int unfoldedCols = kernelRows * kernelCols;
     initMatrix(imgUnfolded, unfoldedRows, unfoldedCols);
     
-    unfoldMatrix<<<(unfoldedRows * unfoldedCols + 511) / 512, 512>>>(img, *imgUnfolded);
+    unfoldMatrix<<<(unfoldedRows * unfoldedCols + 511) / 512, 512>>>(img, *imgUnfolded, kernelRows, resCols);
 }
 
 void deviceConvolve(Matrix* img, Matrix* kernel, int stride, int padding) {
