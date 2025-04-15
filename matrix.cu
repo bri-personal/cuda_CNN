@@ -269,9 +269,9 @@ __global__ void unfoldMatrix(Matrix* m, Matrix* mUnfolded, int imgCols, int kern
         i += gridDim.x;
     }
 }
-void deviceUnfoldMatrix(Matrix* img, Matrix** imgUnfolded, int kernelCols, int resRows, int resCols) {
+void deviceUnfoldMatrix(Matrix* img, Matrix** imgUnfolded, int kernelRows, int kernelCols, int resRows, int resCols) {
     int unfoldedRows = resRows * resCols;
-    int unfoldedCols = kernel->rows * kernel->cols;
+    int unfoldedCols = kernelRows * kernelCols;
     initMatrix(imgUnfolded, unfoldedRows, unfoldedCols);
     
     unfoldMatrix<<<(unfoldedRows * unfoldedCols + 511) / 512, 512>>>(img, *imgUnfolded);
