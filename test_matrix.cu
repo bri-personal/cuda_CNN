@@ -234,7 +234,7 @@ void test_unfold() {
     int resRows = A->rows - K->rows + 1;
     int resCols = A->cols - K->cols + 1;
 
-    deviceUnfoldMatrix(A, &uA, K->cols, resRows, resCols);
+    deviceUnfoldMatrix(A, &uA, K->rows, K->cols, resRows, resCols);
   
     float ua[16];
     getDeviceMatrixData(ua, uA, 16);
