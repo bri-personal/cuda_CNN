@@ -215,24 +215,23 @@ void test_acrossRows() {
 }
 
 void test_unfold() {
-    Matrix *A, *K, *uA;
-    float a[9] = {
+    Matrix *Img, *Kernel, *uA;
+    float img[9] = {
       0,1,2,
       3,4,5,
       6,7,8
     };
-    initMatrix(&A, 3, 3);
-    setDeviceMatrixData(A, a, 9);
+    initMatrix(&Img, 3, 3);
+    setDeviceMatrixData(Img, img, 9);
 
-    float k[4] = {
+    float kernel[4] = {
         0, 1,
         2, 3
     };
-    initMatrix(&K, 2, 2);
+    initMatrix(&Kernel, 2, 2);
+    setDeviceMatrixData(Kernel, kernel, 4);
 
-/*
-    setDeviceMatrixData(K, k, 4);
-
+    /*
     int resRows = A->rows - K->rows + 1;
     int resCols = A->cols - K->cols + 1;
 
