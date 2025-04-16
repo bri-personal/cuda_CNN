@@ -231,10 +231,10 @@ void test_unfold() {
     initMatrix(&Kernel, 2, 2);
     setDeviceMatrixData(Kernel, kernel, 4);
 
-    /*
-    int resRows = A->rows - K->rows + 1;
-    int resCols = A->cols - K->cols + 1;
+    int resRows = Img->rows - Kernel->rows + 1;
+    int resCols = Img->cols - Kernel->cols + 1;
 
+    /*
     deviceUnfoldMatrix(A, &uA, K->rows, K->cols, resRows, resCols);
   
     float ua[16];
