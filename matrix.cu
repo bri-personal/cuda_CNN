@@ -288,8 +288,10 @@ void deviceConvolve(Matrix* img, Matrix* kernel, Matrix** result, int stride, in
     deviceUnfoldMatrix(img, &imgUnfolded, kernel->rows, kernel->cols, resRows, resCols);
 
     /* flatten kernel */
-    
+    kernel->rows = kernel->rows * kernel->cols;
+    kernel->cols = 1;
 
     /* convolve */
     initMatrix(result, resRows, resCols);
+    deviceMatrixMult(imgUnfolded, kernel, result, resRows * resCols);
 }

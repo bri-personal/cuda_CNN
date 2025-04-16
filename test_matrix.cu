@@ -310,6 +310,7 @@ int main() {
   test_transpose();
   test_acrossRows();
   test_unfold();
+  test_convolve();
 
   return 0;
 }
