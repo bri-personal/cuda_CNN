@@ -293,5 +293,5 @@ void deviceConvolve(Matrix* img, Matrix* kernel, Matrix** result, int stride, in
 
     /* convolve */
     initMatrix(result, resRows, resCols);
-    deviceMatrixMult(imgUnfolded, kernel, result, resRows * resCols);
+    deviceMatrixMult(imgUnfolded, kernel, *result, resRows * resCols);
 }
