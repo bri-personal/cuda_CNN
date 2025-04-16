@@ -257,8 +257,8 @@ void test_unfold() {
     */
     printf("\nPASSED\n\n");
   
-    freeMatrix(A);
-    freeMatrix(K);
+    freeMatrix(Img);
+    freeMatrix(Kernel);
     //freeMatrix(uA);
   }
 
