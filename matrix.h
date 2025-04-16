@@ -38,6 +38,6 @@ void squareLoss(Matrix *x, float *result, int rows, int cols);
 
 /** CONVOLUTION **/
 void deviceUnfoldMatrix(Matrix* img, Matrix** imgUnfolded, int kernelRows, int kernelCols, int resRows, int resCols);
-void deviceConvolve(Matrix* img, Matrix* kernel, int stride, int padding);
+void deviceConvolve(Matrix* img, Matrix* kernel, Matrix** result, int stride, int padding);
 
 #endif

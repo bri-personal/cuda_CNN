@@ -260,6 +260,49 @@ void test_unfold() {
     freeMatrix(Unfolded);
   }
 
+  void test_convolve() {
+    Matrix *Img, *Kernel, *Convolved;
+    float img[9] = {
+      0,1,2,
+      3,4,5,
+      6,7,8
+    };
+    initMatrix(&Img, 3, 3);
+    setDeviceMatrixData(Img, img, 9);
+
+    float kernel[4] = {
+        0, 1,
+        1, 0
+    };
+    initMatrix(&Kernel, 2, 2);
+    setDeviceMatrixData(Kernel, kernel, 4);
+
+    deviceConvolve(Img, Kernel, &Convolved, 1, 0);
+  
+    float convolved[4];
+    getDeviceMatrixData(convolved, Convolved, 4);
+  
+    char result[32];
+    char expected[32] = "4 6 10 12";
+    int offset = 0;
+    for (int i = 0; i < 4; ++i) {
+      offset += snprintf(result + offset, sizeof(result) - offset, "%d ", (int)convolved[i]);
+    }
+    printf("Testing matrix unfold\n");
+    printf("Result: %s\n", result);
+    printf("Expect: %s\n", expected);
+    if (strncmp(result, expected, strlen(expected)) != 0) {
+      printf("FAILED\n");
+      exit(EXIT_FAILURE);
+    }
+
+    printf("\nPASSED\n\n");
+  
+    freeMatrix(Img);
+    freeMatrix(Kernel);
+    freeMatrix(Convolved);
+  }
+
 int main() {
 
   test_matrixMult();
