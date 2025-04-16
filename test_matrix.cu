@@ -229,12 +229,12 @@ void test_unfold() {
         2, 3
     };
     initMatrix(&K, 2, 2);
+
+/*
     setDeviceMatrixData(K, k, 4);
 
     int resRows = A->rows - K->rows + 1;
     int resCols = A->cols - K->cols + 1;
-
-/*
 
     deviceUnfoldMatrix(A, &uA, K->rows, K->cols, resRows, resCols);
   
