@@ -223,7 +223,7 @@ void test_unfold() {
     };
     initMatrix(&A, 3, 3);
     setDeviceMatrixData(A, a, 9);
-/*
+
     float k[4] = {
         0, 1,
         2, 3
@@ -233,6 +233,8 @@ void test_unfold() {
 
     int resRows = A->rows - K->rows + 1;
     int resCols = A->cols - K->cols + 1;
+
+/*
 
     deviceUnfoldMatrix(A, &uA, K->rows, K->cols, resRows, resCols);
   
@@ -257,8 +259,8 @@ void test_unfold() {
     printf("\nPASSED\n\n");
   
     freeMatrix(A);
+    freeMatrix(K);
     //freeMatrix(uA);
-    //freeMatrix(K);
   }
 
 int main() {
