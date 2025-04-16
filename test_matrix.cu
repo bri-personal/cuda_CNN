@@ -215,7 +215,7 @@ void test_acrossRows() {
 }
 
 void test_unfold() {
-    Matrix *Img, *Kernel, *uA;
+    Matrix *Img, *Kernel, *Unfolded;
     float img[9] = {
       0,1,2,
       3,4,5,
@@ -231,20 +231,19 @@ void test_unfold() {
     initMatrix(&Kernel, 2, 2);
     setDeviceMatrixData(Kernel, kernel, 4);
 
-    int resRows = Img->rows - Kernel->rows + 1;
-    int resCols = Img->cols - Kernel->cols + 1;
+    int resRows = 3 - 2 + 1;
+    int resCols = 3 - 2 + 1;
 
-    /*
-    deviceUnfoldMatrix(A, &uA, K->rows, K->cols, resRows, resCols);
+    deviceUnfoldMatrix(Img, &Unfolded, 2, 2, resRows, resCols);
   
-    float ua[16];
-    getDeviceMatrixData(ua, uA, 16);
+    float unfolded[16];
+    getDeviceMatrixData(unfolded, Unfolded, 16);
   
-    char result[32];
-    char expected[32] = "0 1 3 4 1 2 4 5 3 4 6 7 4 5 7 8 ";
+    char result[64];
+    char expected[64] = "0 1 3 4 1 2 4 5 3 4 6 7 4 5 7 8";
     int offset = 0;
     for (int i = 0; i < 16; ++i) {
-      offset += snprintf(result + offset, sizeof(result) - offset, "%d ", (int)ua[i]);
+      offset += snprintf(result + offset, sizeof(result) - offset, "%d ", (int)unfolded[i]);
     }
     printf("Testing matrix unfold\n");
     printf("Result: %s\n", result);
@@ -254,12 +253,11 @@ void test_unfold() {
       exit(EXIT_FAILURE);
     }
 
-    */
     printf("\nPASSED\n\n");
   
     freeMatrix(Img);
     freeMatrix(Kernel);
-    //freeMatrix(uA);
+    freeMatrix(Unfolded);
   }
 
 int main() {
