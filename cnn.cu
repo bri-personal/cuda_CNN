@@ -19,7 +19,32 @@ ConvolutionalModel *initConvolutionalModel(int batchSize, float learningRate) {
     return model;
   }
 
-  ConvolutionalLayer* createConvolutionalLayer(int batch_size, int c_in, int k,
+void addInputLayer(ConvolutionalModel *model, int channels, int rows, int cols) {
+    model->input_c = channels;
+    model->input_h = rows;
+    model->input_w = cols;
+    model->output_c = channels;
+    model->output_h = rows;
+    model->output_w = cols;
+    ConvolutionalLayer* layer = createConvolutionalLayer(model->batchSize, 0, channels,
+        rows, cols, NULL);
+    model->network->input = layer;
+    model->network->layers = layer;
+    model->network->output = layer;
+}
+
+void addConvLayer(ConvolutionalModel *model, int channels, int rows, int cols) {
+    ConvolutionalLayer* prev = model->network->output;
+    ConvolutionalLayer* layer = createConvolutionalLayer(model->batchSize, prev->k, channels,
+        rows, cols, prev);
+    model->network->numLayers++;
+    model->network->output = layer;
+    model->output_c = channels;
+    model->output_h = rows;
+    model->output_w = cols;
+}
+
+ConvolutionalLayer* createConvolutionalLayer(int batch_size, int c_in, int k,
         int outputRows, int outputCols, ConvolutionalLayer* prev) {
     ConvolutionalLayer* layer = (ConvolutionalLayer*) calloc(1, sizeof(ConvolutionalLayer));
     if (!layer) {perror("malloc"); exit(1);}
@@ -67,7 +92,7 @@ ConvolutionalModel *initConvolutionalModel(int batchSize, float learningRate) {
     return layer;
   }
 
-  void layerForward(ConvolutionalLayer *layer, int sampleNo) {
+void layerForward(ConvolutionalLayer *layer, int sampleNo) {
     /* for each channel of this input sample, do forward pass */
 
     // TODO: change size when we have image and kernel dimensions
@@ -122,11 +147,11 @@ ConvolutionalModel *initConvolutionalModel(int batchSize, float learningRate) {
     freeMatrix(temp);
   }
   
-  /**
-   * :param input: list of input samples (size of minibatch).
-   * Each input sample is an image with c_in channels, or a list of c_in lists of floats.
-   */
-  void forward(ConvolutionalModel *model, float ***input) {
+/**
+ * :param input: list of input samples (size of minibatch).
+ * Each input sample is an image with c_in channels, or a list of c_in lists of floats.
+ */
+void forward(ConvolutionalModel *model, float ***input) {
     ConvolutionalNetwork net = *(model->network);
     int batchSize = model->batchSize;
     int inputChannels = model->input_c;

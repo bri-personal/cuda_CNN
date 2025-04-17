@@ -41,8 +41,6 @@ typedef struct {
   int input_h;
   int input_w;
 
-  int hidden;
-
   /* output image dimensions */
   int output_c;
   int output_h;
@@ -56,8 +54,8 @@ ConvolutionalModel *initModel(int batchSize, float learningRate);
 ConvolutionalLayer* createConvolutionalLayer(int batch_size, int c_in, int k,
   int outputRows, int outputCols, ConvolutionalLayer* prev);
 
-void addInputLayer(ConvolutionalModel *model, int size);
-void addDenseLayer(ConvolutionalModel *model, int size);
+void addInputLayer(ConvolutionalModel *model, int channels, int rows, int cols);
+void addConvLayer(ConvolutionalModel *model, int channels, int rows, int cols);
 
 void layerForward(ConvolutionalLayer *layer, int sampleNo);
 void forward(ConvolutionalModel *model, float ***input);
