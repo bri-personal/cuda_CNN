@@ -296,11 +296,60 @@ void test_layer_forward_2k_2c() {
     printf("\nPASSED\n\n");
 }
 
+void test_layer_forward_batch2() {
+    const int INPUT_SIZE = 9;
+    const int FILTER_SIZE = 4;
+    const int OUTPUT_SIZE = 4;
+
+    ConvolutionalLayer* input = createConvolutionalLayer(2, 0, 1, 3, 3, NULL);
+    float inputData[] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
+    setDeviceMatrixData((input->outputs)[0][0], inputData, INPUT_SIZE);
+    setDeviceMatrixData((input->outputs)[1][0], inputData, INPUT_SIZE);
+
+    ConvolutionalLayer* layer = createConvolutionalLayer(2, 1, 1, 2, 2, input);
+    float filterData[] = {1, 0, 0, 1};
+    setDeviceMatrixData((layer->filters)[0][0], filterData, FILTER_SIZE);
+    layer->biases[0] = 1;
+    
+    layerForward(layer, 0);
+    
+    float res0[OUTPUT_SIZE];
+    getDeviceMatrixData(res, (layer->outputs)[0][0], OUTPUT_SIZE);
+    float res1[OUTPUT_SIZE];
+    getDeviceMatrixData(res, (layer->outputs)[1][0], OUTPUT_SIZE);
+
+    float expected[OUTPUT_SIZE] = {
+        SIGMOID(1.6f), SIGMOID(1.8f), SIGMOID(2.2f), SIGMOID(2.4f)
+    };
+    
+    printf("Testing layer forward batchsize = 2\n");
+    for (int i = 0; i < OUTPUT_SIZE; i++) {
+        printf("Result: %f\n", res0[i]);
+        printf("Expect: %f\n", expected[i]);
+        if (fabs(res0[i] - expected[i]) > 0.000001) {
+            printf("FAILED\n");
+            exit(EXIT_FAILURE);
+          }
+    }
+
+    for (int i = 0; i < OUTPUT_SIZE; i++) {
+        printf("Result: %f\n", res1[i]);
+        printf("Expect: %f\n", expected[i]);
+        if (fabs(res1[i] - expected[i]) > 0.000001) {
+            printf("FAILED\n");
+            exit(EXIT_FAILURE);
+          }
+    }
+
+    printf("\nPASSED\n\n");
+}
+
 int main() {
     test_create_conv_layer();
     test_layer_forward();
     test_layer_forward_2k();
     test_layer_forward_2c();
     test_layer_forward_2k_2c();
+    test_layer_forward_batch2();
     return 0;
 }
