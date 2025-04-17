@@ -25,10 +25,10 @@ void test_create_conv_layer() {
         exit(EXIT_FAILURE);
     }
     Matrix temp;
-    CERROR(cudaMemcpy(&temp, input->filters[0][0], sizeof(Matrix), cudaMemcpyDeviceToHost));
+    CERROR(cudaMemcpy(&temp, input->outputs[0][0], sizeof(Matrix), cudaMemcpyDeviceToHost));
     printf("Testing create convolutional layer 1 matrix\n");
     printf("Output rows:\nExpect: %d\nActual: %d\n", INPUT_ROWS, temp.rows);
-    if (INPUT_ROWS != temp.cols) {
+    if (INPUT_ROWS != temp.rows) {
         printf("FAILED\n");
         exit(EXIT_FAILURE);
     }
