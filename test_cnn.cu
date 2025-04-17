@@ -119,7 +119,7 @@ void test_layer_forward() {
     getDeviceMatrixData(res, (layer->outputs)[0][0], OUTPUT_SIZE);
 
     float expected[OUTPUT_SIZE] = {
-        SIGMOID(6, SIGMOID(8), SIGMOID(12), SIGMOID(14))
+        SIGMOID(6), SIGMOID(8), SIGMOID(12), SIGMOID(14)
     };
     
     printf("Testing layer forward\n");
