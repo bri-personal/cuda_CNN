@@ -176,7 +176,7 @@ void test_layer_forward_2k() {
     }
 
     float res1[OUTPUT_SIZE];
-    getDeviceMatrixData(res1, (layer->outputs)[1][0], OUTPUT_SIZE);
+    getDeviceMatrixData(res1, (layer->outputs)[0][1], OUTPUT_SIZE);
 
     float expected1[OUTPUT_SIZE] = {
         SIGMOID(3.2f), SIGMOID(3.6f), SIGMOID(4.4f), SIGMOID(4.8f)
