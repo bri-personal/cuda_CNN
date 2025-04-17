@@ -223,6 +223,10 @@ void compileModel(ConvolutionalModel *model) {
     }
 }
 
+void layerBackward(ConvolutionalLayer* layer, ConvolutionalModel* model) {
+    return;
+}
+
 void layerUpdate(ConvolutionalLayer* layer, int batchSize) {
     return;
 }
