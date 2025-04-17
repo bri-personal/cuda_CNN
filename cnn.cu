@@ -245,7 +245,7 @@ void backward(ConvolutionalModel* model, float*** targets) {
         } 
     }
 
-    for (int i = 0; i < net.numLayers; ++i) {
+    for (int i = 0; i < net->numLayers; ++i) {
         if (!curr->prev) break;
         layerBackward(curr, model);
         curr = curr->prev;
