@@ -46,12 +46,12 @@ void test_create_conv_layer() {
         printf("FAILED\n");
         exit(EXIT_FAILURE);
     }
-    printf("Output rows:\nExpect: %d\nActual: %d\n", OUTPUT_ROWS, input->outputRows);
+    printf("Output rows:\nExpect: %d\nActual: %d\n", OUTPUT_ROWS, layer->outputRows);
     if (OUTPUT_ROWS != layer->outputRows) {
         printf("FAILED\n");
         exit(EXIT_FAILURE);
     }
-    printf("Output cols:\nExpect: %d\nActual: %d\n", OUTPUT_COLS, input->outputCols);
+    printf("Output cols:\nExpect: %d\nActual: %d\n", OUTPUT_COLS, layer->outputCols);
     if (OUTPUT_COLS != layer->outputCols) {
         printf("FAILED\n");
         exit(EXIT_FAILURE);
