@@ -117,13 +117,14 @@ void test_layer_forward() {
     float res[OUTPUT_SIZE];
     getDeviceMatrixData(res, (layer->outputs)[0][0], OUTPUT_SIZE);
 
-    /*
+    
     char result[64];
     char expected[64] = "6.00 8.00 12.00 14.00";
     int offset = 0;
     for (int i = 0; i < OUTPUT_SIZE; ++i) {
       offset += snprintf(result + offset, sizeof(result) - offset, "%f ", (float)res[i]);
     }
+    /*
     printf("Testing layer forward\n");
     printf("Result: %s\n", result);
     printf("Expect: %s\n", expected);
