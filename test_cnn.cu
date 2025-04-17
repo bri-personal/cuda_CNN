@@ -115,7 +115,7 @@ void test_layer_forward() {
     
     layerForward(layer, 0);
     
-    double res[OUTPUT_SIZE];
+    float res[OUTPUT_SIZE];
     getDeviceMatrixData(res, (layer->outputs)[0][0], OUTPUT_SIZE);
 
     double expected[OUTPUT_SIZE] = {
