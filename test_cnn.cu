@@ -355,14 +355,13 @@ void test_forward() {
     addInputLayer(model, 1, 3, 3);
     addConvLayer(model, 1, 2, 2);
 
-    float inputData[] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
-    setDeviceMatrixData((model->network->input->outputs)[0][0], inputData, INPUT_SIZE);
-
     float filterData[] = {1, 0, 0, 1};
     setDeviceMatrixData((model->network->output->filters)[0][0], filterData, FILTER_SIZE);
     layer->biases[0] = 1;
     
-    forward(model);
+    float inputData[] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
+    float * input = &inputData;
+    forward(model, &input);
     
     float res[OUTPUT_SIZE];
     getDeviceMatrixData(res, (model->network->output->outputs)[0][0], OUTPUT_SIZE);
