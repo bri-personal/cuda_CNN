@@ -106,13 +106,13 @@ void test_layer_forward() {
     const int OUTPUT_SIZE = 4;
 
     ConvolutionalLayer* input = createConvolutionalLayer(1, 0, 1, 3, 3, NULL);
-    float inputData[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    float inputData[] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
     setDeviceMatrixData((input->outputs)[0][0], inputData, INPUT_SIZE);
 
     ConvolutionalLayer* layer = createConvolutionalLayer(1, 1, 1, 2, 2, input);
     float filterData[] = {1, 0, 0, 1};
     setDeviceMatrixData((layer->filters)[0][0], filterData, FILTER_SIZE);
-    layer->biases[0] = 10;
+    layer->biases[0] = 1;
     
     layerForward(layer, 0);
     
@@ -120,7 +120,7 @@ void test_layer_forward() {
     getDeviceMatrixData(res, (layer->outputs)[0][0], OUTPUT_SIZE);
 
     float expected[OUTPUT_SIZE] = {
-        SIGMOID(16.0f), SIGMOID(18.0f), SIGMOID(22.0f), SIGMOID(24.0f)
+        SIGMOID(1.6f), SIGMOID(1.8f), SIGMOID(2.2f), SIGMOID(2.4f)
     };
     
     printf("Testing layer forward\n");
@@ -142,19 +142,19 @@ void test_layer_forward_2k() {
     const int OUTPUT_SIZE = 4;
 
     ConvolutionalLayer* input = createConvolutionalLayer(1, 0, 1, 3, 3, NULL);
-    float inputData[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    float inputData[] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
     setDeviceMatrixData((input->outputs)[0][0], inputData, INPUT_SIZE);
 
     ConvolutionalLayer* layer = createConvolutionalLayer(1, 1, 2, 2, 2, input);
     float filterData[] = {1, 0, 0, 1};
     setDeviceMatrixData((layer->filters)[0][0], filterData, FILTER_SIZE);
-    layer->biases[0] = 10;
+    layer->biases[0] = 1;
     filterData[0] = 0;
     filterData[1] = 2;
     filterData[2] = 2;
     filterData[3] = 0;
     setDeviceMatrixData((layer->filters)[1][0], filterData, FILTER_SIZE);
-    layer->biases[1] = 20;
+    layer->biases[1] = 2;
     
     layerForward(layer, 0);
     
@@ -162,7 +162,7 @@ void test_layer_forward_2k() {
     getDeviceMatrixData(res0, (layer->outputs)[0][0], OUTPUT_SIZE);
 
     float expected0[OUTPUT_SIZE] = {
-        SIGMOID(16.0f), SIGMOID(18.0f), SIGMOID(22.0f), SIGMOID(24.0f)
+        SIGMOID(1.6f), SIGMOID(1.8f), SIGMOID(2.2f), SIGMOID(2.4f)
     };
     
     printf("Testing layer forward\n");
@@ -179,7 +179,7 @@ void test_layer_forward_2k() {
     getDeviceMatrixData(res1, (layer->outputs)[1][0], OUTPUT_SIZE);
 
     float expected1[OUTPUT_SIZE] = {
-        SIGMOID(32.0f), SIGMOID(36.0f), SIGMOID(44.0f), SIGMOID(48.0f)
+        SIGMOID(3.2f), SIGMOID(3.6f), SIGMOID(4.4f), SIGMOID(4.8f)
     };
 
     for (int i = 0; i < OUTPUT_SIZE; i++) {
@@ -195,7 +195,8 @@ void test_layer_forward_2k() {
 }
 
 int main() {
-    //test_create_conv_layer();
+    test_create_conv_layer();
     test_layer_forward();
+    test_layer_forward_2k();
     return 0;
 }
