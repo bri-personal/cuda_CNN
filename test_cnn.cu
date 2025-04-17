@@ -112,6 +112,7 @@ void test_layer_forward() {
     ConvolutionalLayer* layer = createConvolutionalLayer(1, 1, 1, 2, 2, input);
     float filterData[] = {1, 0, 0, 1};
     setDeviceMatrixData((layer->filters)[0][0], filterData, FILTER_SIZE);
+    layer->biases[0] = 10;
     
     layerForward(layer, 0);
     
@@ -119,7 +120,7 @@ void test_layer_forward() {
     getDeviceMatrixData(res, (layer->outputs)[0][0], OUTPUT_SIZE);
 
     float expected[OUTPUT_SIZE] = {
-        SIGMOID(6.0f), SIGMOID(8.0f), SIGMOID(12.0f), SIGMOID(14.0f)
+        SIGMOID(16.0f), SIGMOID(18.0f), SIGMOID(22.0f), SIGMOID(24.0f)
     };
     
     printf("Testing layer forward\n");
@@ -127,6 +128,64 @@ void test_layer_forward() {
         printf("Result: %f\n", res[i]);
         printf("Expect: %f\n", expected[i]);
         if (fabs(res[i] - expected[i]) > 0.000001) {
+            printf("FAILED\n");
+            exit(EXIT_FAILURE);
+          }
+    }
+
+    printf("\nPASSED\n\n");
+}
+
+void test_layer_forward_2k() {
+    const int INPUT_SIZE = 9;
+    const int FILTER_SIZE = 4;
+    const int OUTPUT_SIZE = 4;
+
+    ConvolutionalLayer* input = createConvolutionalLayer(1, 0, 1, 3, 3, NULL);
+    float inputData[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    setDeviceMatrixData((input->outputs)[0][0], inputData, INPUT_SIZE);
+
+    ConvolutionalLayer* layer = createConvolutionalLayer(1, 1, 2, 2, 2, input);
+    float filterData[] = {1, 0, 0, 1};
+    setDeviceMatrixData((layer->filters)[0][0], filterData, FILTER_SIZE);
+    layer->biases[0] = 10;
+    filterData[0] = 0;
+    filterData[1] = 2;
+    filterData[2] = 2;
+    filterData[3] = 0;
+    setDeviceMatrixData((layer->filters)[1][0], filterData, FILTER_SIZE);
+    layer->biases[1] = 20;
+    
+    layerForward(layer, 0);
+    
+    float res0[OUTPUT_SIZE];
+    getDeviceMatrixData(res, (layer->outputs)[0][0], OUTPUT_SIZE);
+
+    float expected0[OUTPUT_SIZE] = {
+        SIGMOID(16.0f), SIGMOID(18.0f), SIGMOID(22.0f), SIGMOID(24.0f)
+    };
+    
+    printf("Testing layer forward\n");
+    for (int i = 0; i < OUTPUT_SIZE; i++) {
+        printf("Result: %f\n", res0[i]);
+        printf("Expect: %f\n", expected0[i]);
+        if (fabs(res0[i] - expected0[i]) > 0.000001) {
+            printf("FAILED\n");
+            exit(EXIT_FAILURE);
+          }
+    }
+
+    float res1[OUTPUT_SIZE];
+    getDeviceMatrixData(res, (layer->outputs)[1][0], OUTPUT_SIZE);
+
+    float expected1[OUTPUT_SIZE] = {
+        SIGMOID(32.0f), SIGMOID(36.0f), SIGMOID(44.0f), SIGMOID(48.0f)
+    };
+
+    for (int i = 0; i < OUTPUT_SIZE; i++) {
+        printf("Result: %f\n", res1[i]);
+        printf("Expect: %f\n", expected1[i]);
+        if (fabs(res1[i] - expected1[i]) > 0.000001) {
             printf("FAILED\n");
             exit(EXIT_FAILURE);
           }
