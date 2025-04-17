@@ -2,6 +2,7 @@
 #include "util.h"
 #include <stdio.h>
 #include <stdint.h>
+#include <math.h>
 #include <cuda.h>
 
 void test_create_conv_layer() {
@@ -111,6 +112,43 @@ void test_layer_forward() {
     ConvolutionalLayer* layer = createConvolutionalLayer(1, 1, 1, 2, 2, input);
     float filterData[] = {1, 0, 0, 1};
     setDeviceMatrixData((layer->filters)[0][0], filterData, FILTER_SIZE);
+    
+    layerForward(layer, 0);
+    
+    float res[OUTPUT_SIZE];
+    getDeviceMatrixData(res, (layer->outputs)[0][0], OUTPUT_SIZE);
+
+    float expected[OUTPUT_SIZE] = {
+        SIGMOID(6, SIGMOID(8), SIGMOID(12), SIGMOID(14))
+    };
+    
+    printf("Testing layer forward\n");
+    for (int i = 0; i < OUTPUT_SIZE; i++) {
+        printf("Result: %f\n", res[i]);
+        printf("Expect: %f\n", expected[i]);
+        if (fabs(res[i] - expected[i]) > 0.00005) {
+            printf("FAILED\n");
+            exit(EXIT_FAILURE);
+          }
+    }
+
+    printf("\nPASSED\n\n");
+}
+
+void test_layer_forward_k2() {
+    const int INPUT_SIZE = 9;
+    const int FILTER_SIZE = 4;
+    const int OUTPUT_SIZE = 4;
+
+    ConvolutionalLayer* input = createConvolutionalLayer(1, 0, 1, 3, 3, NULL);
+    float inputData[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    setDeviceMatrixData((input->outputs)[0][0], inputData, INPUT_SIZE);
+
+    ConvolutionalLayer* layer = createConvolutionalLayer(1, 1, 2, 2, 2, input);
+    float filterData[] = {1, 0, 0, 1};
+    setDeviceMatrixData((layer->filters)[0][0], filterData, FILTER_SIZE);
+    filterData = {0, 2, 2, 0};
+    setDeviceMatrixData((layer->filters)[1][0], filterData, FILTER_SIZE);
     
     layerForward(layer, 0);
     
