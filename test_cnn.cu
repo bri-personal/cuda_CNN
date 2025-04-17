@@ -203,14 +203,14 @@ void test_layer_forward_2c() {
     ConvolutionalLayer* input = createConvolutionalLayer(1, 0, 2, 3, 3, NULL);
     float inputData0[] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
     float inputData1[] = {0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1};
-    setDeviceMatrixData((input->outputs)[0][0], inputData, INPUT_SIZE);
-    setDeviceMatrixData((input->outputs)[0][1], inputData, INPUT_SIZE);
+    setDeviceMatrixData((input->outputs)[0][0], inputData0, INPUT_SIZE);
+    setDeviceMatrixData((input->outputs)[0][1], inputData1, INPUT_SIZE);
 
     ConvolutionalLayer* layer = createConvolutionalLayer(1, 2, 1, 2, 2, input);
     float filterData0[] = {1, 0, 0, 1};
-    float filterData0[] = {0, 1, 1, 0};
-    setDeviceMatrixData((layer->filters)[0][0], filterData, FILTER_SIZE);
-    setDeviceMatrixData((layer->filters)[0][1], filterData, FILTER_SIZE);
+    float filterData1[] = {0, 1, 1, 0};
+    setDeviceMatrixData((layer->filters)[0][0], filterData0, FILTER_SIZE);
+    setDeviceMatrixData((layer->filters)[0][1], filterData1, FILTER_SIZE);
     layer->biases[0] = 1;
     
     layerForward(layer, 0);
