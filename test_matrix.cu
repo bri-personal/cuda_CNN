@@ -277,8 +277,7 @@ void test_unfold() {
     initMatrix(&Kernel, 2, 2);
     setDeviceMatrixData(Kernel, kernel, 4);
 
-    deviceConvolve(Img, Img->rows, Img->cols,
-        Kernel, Kernel->rows, Kernel->cols, &Convolved, 1, 0);
+    deviceConvolve(Img, 3, 3, Kernel, 2, 2, &Convolved, 1, 0);
   
     float convolved[4];
     getDeviceMatrixData(convolved, Convolved, 4);
