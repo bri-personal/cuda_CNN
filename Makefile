@@ -32,4 +32,4 @@ mnist.o: mnist.cu
 	nvcc -c mnist.cu -o mnist.o
 
 clean:
-	rm -f test_matrix.o matrix.o test_matrix test_network.o network.o test_network test_cnn.o cnn.o test_cnn mnist.o mnist
+	rm -f test_matrix.o matrix.o test_matrix test_network.o network.o test_network test_cnn.o cnn.o test_cnn mnist.o mnist job.* core.*
