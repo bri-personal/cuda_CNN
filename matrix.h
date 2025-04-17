@@ -41,6 +41,6 @@ void squareLoss(Matrix *x, float *result, int rows, int cols);
 void deviceUnfoldMatrix(Matrix* img, Matrix** imgUnfolded, int kernelRows, int kernelCols, int resRows, int resCols);
 void deviceConvolve(Matrix* img, int imgRows, int imgCols,
   Matrix* kernel, int kernelRows, int kernelCols,
-  Matrix** result, int stride, int padding);
+  Matrix* result, int stride, int padding);
 
 #endif
