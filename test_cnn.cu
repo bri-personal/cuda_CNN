@@ -235,10 +235,68 @@ void test_layer_forward_2c() {
     printf("\nPASSED\n\n");
 }
 
+void test_layer_forward_2k_2c() {
+    const int INPUT_SIZE = 9;
+    const int FILTER_SIZE = 4;
+    const int OUTPUT_SIZE = 4;
+
+    ConvolutionalLayer* input = createConvolutionalLayer(1, 0, 2, 3, 3, NULL);
+    float inputData0[] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
+    float inputData1[] = {0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1};
+    setDeviceMatrixData((input->outputs)[0][0], inputData0, INPUT_SIZE);
+    setDeviceMatrixData((input->outputs)[0][1], inputData1, INPUT_SIZE);
+ 
+    ConvolutionalLayer* layer = createConvolutionalLayer(1, 2, 2, 2, 2, input);
+    float filterData0[] = {1, 0, 0, 1};
+    float filterData1[] = {0, 1, 1, 0};
+    setDeviceMatrixData((layer->filters)[0][0], filterData0, FILTER_SIZE);
+    setDeviceMatrixData((layer->filters)[0][1], filterData1, FILTER_SIZE);
+    layer->biases[0] = 1;
+    layer->biases[1] = 2;
+    
+    layerForward(layer, 0);
+    
+    float res0[OUTPUT_SIZE];
+    getDeviceMatrixData(res0, (layer->outputs)[0][0], OUTPUT_SIZE);
+
+    float expected0[OUTPUT_SIZE] = {
+        SIGMOID(3.0f), SIGMOID(3.0f), SIGMOID(3.0f), SIGMOID(3.0f)
+    };
+    
+    printf("Testing layer forward 2k 2c\n");
+    for (int i = 0; i < OUTPUT_SIZE; i++) {
+        printf("Result: %f\n", res0[i]);
+        printf("Expect: %f\n", expected0[i]);
+        if (fabs(res0[i] - expected0[i]) > 0.000001) {
+            printf("FAILED\n");
+            exit(EXIT_FAILURE);
+          }
+    }
+
+    float res1[OUTPUT_SIZE];
+    getDeviceMatrixData(res1, (layer->outputs)[0][1], OUTPUT_SIZE);
+
+    float expected1[OUTPUT_SIZE] = {
+        SIGMOID(6.0f), SIGMOID(6.0f), SIGMOID(6.0f), SIGMOID(6.0f)
+    };
+
+    for (int i = 0; i < OUTPUT_SIZE; i++) {
+        printf("Result: %f\n", res1[i]);
+        printf("Expect: %f\n", expected1[i]);
+        if (fabs(res1[i] - expected1[i]) > 0.000001) {
+            printf("FAILED\n");
+            exit(EXIT_FAILURE);
+          }
+    }
+
+    printf("\nPASSED\n\n");
+}
+
 int main() {
     test_create_conv_layer();
     test_layer_forward();
     test_layer_forward_2k();
     test_layer_forward_2c();
+    test_layer_forward_2k_2c();
     return 0;
 }
