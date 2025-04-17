@@ -45,12 +45,12 @@ ConvolutionalModel *initConvolutionalModel(int batchSize, float learningRate) {
         layer->filters[k] = (Matrix**) malloc(sizeof(Matrix**) * c_in);
         if (!(layer->filters[k])) {perror("malloc layer filters"); exit(1);}
         for (j = 0; j < c_in; j++) {
-            initMatrix(layer->filters[i] + j, layer->kernelRows, layer->kernelCols);
+            initRandomMatrix(layer->filters[i] + j, layer->kernelRows, layer->kernelCols);
         }
     }
 
-    /* biases is array of k random floats */
-    layer->biases = (float *) calloc(k, sizeof(float)); // TODO: make random instead of 0
+    /* biases is array of k floats */
+    layer->biases = (float *) calloc(k, sizeof(float));
     if (!(layer->biases)) {perror("malloc layer biases"); exit(1);}
 
     /* outputs needs batch_size arrays of k arrays of pointers to Matrix on the device */
