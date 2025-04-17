@@ -115,10 +115,10 @@ void test_layer_forward() {
     layer->biases[0] = 1;
     
     layerForward(layer, 0);
-    /*
+    
     float res[OUTPUT_SIZE];
     getDeviceMatrixData(res, (layer->outputs)[0][0], OUTPUT_SIZE);
-
+/*
     float expected[OUTPUT_SIZE] = {
         SIGMOID(1.6f), SIGMOID(1.8f), SIGMOID(2.2f), SIGMOID(2.4f)
     };
