@@ -223,8 +223,33 @@ void compileModel(ConvolutionalModel *model) {
     }
 }
 
-float backward(ConvolutionalModel* model, float*** targets) {
-    Network* net = model->network;
+void layerUpdate(ConvolutionalLayer* layer, int batchSize) {
+    return;
+}
+
+void backward(ConvolutionalModel* model, float*** targets) {
+    ConvolutionalNetwork* net = model->network;
     int batchSize = model->batchSize;
     ConvolutionalLayer* curr = net->output;
+    int outputSize = curr->outputRows * curr->outputCols;
+    int i, j;
+    for (i = 0; i < batchSize; ++i) {
+        for (j = 0; j < curr->k; ++j) {
+            setDeviceMatrixData(curr[i][j], targets[i][j], outputSize);
+            deviceMatrixSub(curr->outputs[i][j], curr->error[i][j], curr->error[i][j]);
+            deviceMatrixDivideScalarElementwise(curr->error[i][j], curr->error[i][j], outputSize, outputSize);
+        } 
+    }
+
+    for (int i = 0; i < net.numLayers; ++i) {
+        if (!curr->prev) break;
+        layerBackward(curr, model);
+        curr = curr->prev;
+      }
+      curr = net.output;
+      for (int i = 0; i < net.numLayers; ++i) {
+        if (!curr->prev) break;
+        layerUpdate(curr, batchSize);
+        curr = curr->prev;
+      }
 }

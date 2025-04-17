@@ -61,7 +61,7 @@ void addConvLayer(ConvolutionalModel *model, int channels, int rows, int cols);
 void layerForward(ConvolutionalLayer *layer, int sampleNo);
 void forward(ConvolutionalModel *model, float ***input);
 
-float backward(ConvolutionalModel *model, float ***targets);
+void backward(ConvolutionalModel *model, float ***targets);
 void compileModel(ConvolutionalModel *model);
 int modelAccuracy(ConvolutionalModel *model, float **images, uint8_t *labels);
 
