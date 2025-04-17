@@ -22,11 +22,11 @@ ConvolutionalModel *initConvolutionalModel(int batchSize, float learningRate) {
     /* for each channel of this input sample, do forward pass */
 
     // TODO: change size when we have image and kernel dimensions
-    int imgRows = 0;
-    int imgCols = 0;
+    int imgRows = layer->imgRows;
+    int imgCols = layer->imgCols;
     int imgSize = imgRows * imgCols;
-    int kernelRows = 0;
-    int kernelCols = 0;
+    int kernelRows = layer->kernelRows;
+    int kernelCols = layer->kernelCols;
     
     int output_channels = layer->k;
     int input_channels = layer->c_in;

@@ -6,6 +6,7 @@
 typedef struct ConvolutionalLayer {
   int c_in; /* input channels */
   int k; /* output channels */
+  int imgRows, imgCols, kernelRows, kernelCols; /* input size params */
   struct ConvolutionalLayer *prev;
 
   /* for k output channels, have a kernel for each of the c_in input channels*/
