@@ -206,7 +206,7 @@ void initLayerGradients(ConvolutionalLayer *layer, int batchSize) {
         layer->error[i] = (Matrix**) malloc(sizeof(Matrix*) * k);
         if (!(layer->error[i])) {perror("malloc layer e"); exit(1);}
         
-        for (j = 0; j < c_in; j++) {
+        for (j = 0; j < k; j++) {
             initMatrix(layer->gradient[i] + j, r, c);
             initMatrix(layer->delta[i] + j, r, c);
             initMatrix(layer->error[i] + j, r, c);
@@ -235,8 +235,8 @@ void backward(ConvolutionalModel* model, float*** targets) {
     int i, j;
     for (i = 0; i < batchSize; ++i) {
         for (j = 0; j < curr->k; ++j) {
-            setDeviceMatrixData(curr[i][j], targets[i][j], outputSize);
-            deviceMatrixSub(curr->outputs[i][j], curr->error[i][j], curr->error[i][j]);
+            setDeviceMatrixData(curr->error[i][j], targets[i][j], outputSize);
+            deviceMatrixSub(curr->outputs[i][j], curr->error[i][j], curr->error[i][j], outputSize);
             deviceMatrixDivideScalarElementwise(curr->error[i][j], curr->error[i][j], outputSize, outputSize);
         } 
     }
@@ -246,8 +246,8 @@ void backward(ConvolutionalModel* model, float*** targets) {
         layerBackward(curr, model);
         curr = curr->prev;
       }
-      curr = net.output;
-      for (int i = 0; i < net.numLayers; ++i) {
+      curr = net->output;
+      for (int i = 0; i < net->numLayers; ++i) {
         if (!curr->prev) break;
         layerUpdate(curr, batchSize);
         curr = curr->prev;
