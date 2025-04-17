@@ -278,22 +278,30 @@ void deviceUnfoldMatrix(Matrix* img, Matrix** imgUnfolded, int kernelRows, int k
     unfoldMatrix<<<(unfoldedRows * unfoldedCols + 511) / 512, 512>>>(img, *imgUnfolded, kernelRows, resCols);
 }
 
-void deviceConvolve(Matrix* img, Matrix* kernel, Matrix** result, int stride, int padding) {
+void deviceConvolve(Matrix* img, int imgRows, int imgCols,
+      Matrix* kernel, int kernelRows, int kernelCols,
+      Matrix** result, int stride, int padding) {
     /* im 2 col */
-    int resRows = (img->rows - kernel->rows + (padding << 1)) / stride + 1;
-    int resCols = (img->cols - kernel->cols + (padding << 1)) / stride + 1;
+    int resRows = (imgRows - kernelRows + (padding << 1)) / stride + 1;
+    int resCols = (imgCols - kernelCols + (padding << 1)) / stride + 1;
 
     /* unfold image */
     Matrix* imgUnfolded;
-    deviceUnfoldMatrix(img, &imgUnfolded, kernel->rows, kernel->cols, resRows, resCols);
+    deviceUnfoldMatrix(img, &imgUnfolded, kernelRows, kernelCols, resRows, resCols);
 
     /* flatten kernel */
-    kernel->rows = kernel->rows * kernel->cols;
-    kernel->cols = 1;
+    int newKernelRows = kernelRows * kernelCols;
+    int newKernelCols = 1;
+    CERROR( cudaMemcpy(&(kernel->rows), &newKernelRows, sizeof(int), cudaMemcpyHostToDevice) );
+    CERROR( cudaMemcpy(&(kernel->cols), &newKernelCols, sizeof(int), cudaMemcpyHostToDevice) );
 
     /* convolve */
     initMatrix(result, resRows * resCols, 1);
     deviceMatrixMult(imgUnfolded, kernel, *result, resRows * resCols);
-    (*result)->rows = resRows;
-    (*result)->cols = resCols;
+
+    /* fix matrix dimensions */
+    CERROR( cudaMemcpy(&(kernel->rows), &kernelRows, sizeof(int), cudaMemcpyHostToDevice) );
+    CERROR( cudaMemcpy(&(kernel->cols), &kernelRows, sizeof(int), cudaMemcpyHostToDevice) );
+    CERROR( cudaMemcpy(&((*result)->rows), &resRows, sizeof(int), cudaMemcpyHostToDevice) );
+    CERROR( cudaMemcpy(&((*result)->cols), &resCols, sizeof(int), cudaMemcpyHostToDevice) );
 }
