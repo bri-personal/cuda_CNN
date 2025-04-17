@@ -192,7 +192,7 @@ void deviceHadamardProd(Matrix *a, Matrix *b, Matrix *c, int N) {
 __global__ void sigmoid(Matrix *a, Matrix *b) {
   int i = threadIdx.x + blockIdx.x * blockDim.x;
   if (i < size(b))
-    b->data[i] =  1/(1+exp(a->data[i] * -1));
+    b->data[i] =  SIGMOID(a->data[i]);
 }
 void deviceSigmoid(Matrix *a, Matrix *b, int N) {
   sigmoid<<<BLOCKS(N, BLOCKDIM), BLOCKDIM>>>(a, b);

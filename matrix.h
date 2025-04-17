@@ -1,6 +1,8 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
+#define SIGMOID(x) (1/(1+exp(x * -1)))
+
 /** STRUCTS **/
 typedef struct {
   float *data;
