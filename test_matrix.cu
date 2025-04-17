@@ -288,7 +288,7 @@ void test_unfold() {
     for (int i = 0; i < 4; ++i) {
       offset += snprintf(result + offset, sizeof(result) - offset, "%d ", (int)convolved[i]);
     }
-    printf("Testing matrix unfold\n");
+    printf("Testing matrix convolution\n");
     printf("Result: %s\n", result);
     printf("Expect: %s\n", expected);
     if (strncmp(result, expected, strlen(expected)) != 0) {
