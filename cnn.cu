@@ -39,10 +39,10 @@ ConvolutionalModel *initConvolutionalModel(int batchSize, float learningRate) {
     int i, j;
 
     /* filters needs k arrays of c_in arrays of pointers to Matrix on the device*/
-    layer->filters = (Matrix***) malloc(sizeof(Matrix***) * k);
+    layer->filters = (Matrix***) malloc(sizeof(Matrix**) * k);
     if (!(layer->filters)) {perror("malloc layer filters"); exit(1);}
     for (i = 0; i < k; i++) {
-        layer->filters[k] = (Matrix**) malloc(sizeof(Matrix**) * c_in);
+        layer->filters[k] = (Matrix**) malloc(sizeof(Matrix*) * c_in);
         if (!(layer->filters[k])) {perror("malloc layer filters"); exit(1);}
         for (j = 0; j < c_in; j++) {
             initRandomMatrix(layer->filters[i] + j, layer->kernelRows, layer->kernelCols);
@@ -54,10 +54,10 @@ ConvolutionalModel *initConvolutionalModel(int batchSize, float learningRate) {
     if (!(layer->biases)) {perror("malloc layer biases"); exit(1);}
 
     /* outputs needs batch_size arrays of k arrays of pointers to Matrix on the device */
-    layer->outputs = (Matrix***) malloc(sizeof(Matrix***) * batch_size);
+    layer->outputs = (Matrix***) malloc(sizeof(Matrix**) * batch_size);
     if (!(layer->outputs)) {perror("malloc layer outputs"); exit(1);}
     for (i = 0; i < batch_size; ++i) {
-        layer->outputs[i] = (Matrix**) malloc(sizeof(Matrix**) * k);
+        layer->outputs[i] = (Matrix**) malloc(sizeof(Matrix*) * k);
         if (!(layer->outputs[i])) {perror("malloc layer outputs"); exit(1);}
         for (j = 0; j < k; ++j) {
             initMatrix(layer->outputs[i] + j, outputRows, outputCols);
