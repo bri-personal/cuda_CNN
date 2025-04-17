@@ -166,7 +166,7 @@ void test_layer_forward_2k() {
         SIGMOID(1.6f), SIGMOID(1.8f), SIGMOID(2.2f), SIGMOID(2.4f)
     };
     
-    printf("Testing layer forward\n");
+    printf("Testing layer forward 2k\n");
     for (int i = 0; i < OUTPUT_SIZE; i++) {
         printf("Result: %f\n", res0[i]);
         printf("Expect: %f\n", expected0[i]);
@@ -222,7 +222,7 @@ void test_layer_forward_2c() {
         SIGMOID(3.0f), SIGMOID(3.0f), SIGMOID(3.0f), SIGMOID(3.0f)
     };
     
-    printf("Testing layer forward\n");
+    printf("Testing layer forward 2c\n");
     for (int i = 0; i < OUTPUT_SIZE; i++) {
         printf("Result: %f\n", res[i]);
         printf("Expect: %f\n", expected[i]);
