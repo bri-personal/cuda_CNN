@@ -292,6 +292,7 @@ void deviceConvolve(Matrix* img, int imgRows, int imgCols,
     /* flatten kernel */
     int newKernelRows = kernelRows * kernelCols;
     int newKernelCols = 1;
+    // TODO: can we do this better?
     CERROR( cudaMemcpy(&(kernel->rows), &newKernelRows, sizeof(int), cudaMemcpyHostToDevice) );
     CERROR( cudaMemcpy(&(kernel->cols), &newKernelCols, sizeof(int), cudaMemcpyHostToDevice) );
 
@@ -300,6 +301,7 @@ void deviceConvolve(Matrix* img, int imgRows, int imgCols,
     deviceMatrixMult(imgUnfolded, kernel, *result, resRows * resCols);
 
     /* fix matrix dimensions */
+    // TODO: can we do this better?
     CERROR( cudaMemcpy(&(kernel->rows), &kernelRows, sizeof(int), cudaMemcpyHostToDevice) );
     CERROR( cudaMemcpy(&(kernel->cols), &kernelRows, sizeof(int), cudaMemcpyHostToDevice) );
     CERROR( cudaMemcpy(&((*result)->rows), &resRows, sizeof(int), cudaMemcpyHostToDevice) );
