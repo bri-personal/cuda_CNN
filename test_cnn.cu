@@ -122,9 +122,9 @@ void test_layer_forward() {
     char expected[64] = "6.00 8.00 12.00 14.00";
     int offset = 0;
     for (int i = 0; i < OUTPUT_SIZE; ++i) {
-      offset += snprintf(result + offset, sizeof(result) - offset, "%f ", (float)res[i]);
+      offset += snprintf(result + offset, sizeof(result) - offset, "%f ", (float)(res[i]));
     }
-    /*
+    
     printf("Testing layer forward\n");
     printf("Result: %s\n", result);
     printf("Expect: %s\n", expected);
@@ -132,7 +132,6 @@ void test_layer_forward() {
       printf("FAILED\n");
       exit(EXIT_FAILURE);
     }
-*/
 
     printf("\nPASSED\n\n");
 }
