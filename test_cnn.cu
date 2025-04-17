@@ -2,6 +2,7 @@
 #include "util.h"
 #include <stdio.h>
 #include <stdint.h>
+#include <cuda.h>
 
 void test_create_conv_layer() {
     const int INPUT_ROWS = 3;
@@ -20,6 +21,19 @@ void test_create_conv_layer() {
     }
     printf("Output cols:\nExpect: %d\nActual: %d\n", INPUT_COLS, input->outputCols);
     if (INPUT_COLS != input->outputCols) {
+        printf("FAILED\n");
+        exit(EXIT_FAILURE);
+    }
+    Matrix temp;
+    cudaMemcpy(&temp, input->layers[0][0]);
+    printf("Testing create convolutional layer 1 matrix\n");
+    printf("Output rows:\nExpect: %d\nActual: %d\n", INPUT_ROWS, temp->rows);
+    if (INPUT_ROWS != temp->cols) {
+        printf("FAILED\n");
+        exit(EXIT_FAILURE);
+    }
+    printf("Output cols:\nExpect: %d\nActual: %d\n", INPUT_COLS, temp->cols);
+    if (INPUT_COLS != temp->cols) {
         printf("FAILED\n");
         exit(EXIT_FAILURE);
     }
@@ -94,7 +108,7 @@ void test_layer_forward() {
 }
 
 int main() {
-    //test_create_conv_layer();
-    test_layer_forward();
+    test_create_conv_layer();
+    //test_layer_forward();
     return 0;
 }
