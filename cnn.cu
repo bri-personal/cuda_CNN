@@ -42,8 +42,8 @@ ConvolutionalModel *initConvolutionalModel(int batchSize, float learningRate) {
     layer->filters = (Matrix***) malloc(sizeof(Matrix**) * k);
     if (!(layer->filters)) {perror("malloc layer filters"); exit(1);}
     for (i = 0; i < k; i++) {
-        layer->filters[k] = (Matrix**) malloc(sizeof(Matrix*) * c_in);
-        if (!(layer->filters[k])) {perror("malloc layer filters"); exit(1);}
+        layer->filters[i] = (Matrix**) malloc(sizeof(Matrix*) * c_in);
+        if (!(layer->filters[i])) {perror("malloc layer filters"); exit(1);}
         for (j = 0; j < c_in; j++) {
             initRandomMatrix(layer->filters[i] + j, layer->kernelRows, layer->kernelCols);
         }
