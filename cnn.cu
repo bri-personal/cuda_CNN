@@ -2,6 +2,7 @@
 #include "util.h"
 #include <stdio.h>
 #include <stdint.h>
+#include <cuda.h>
 
 ConvolutionalModel *initConvolutionalModel(int batchSize, float learningRate) {
     ConvolutionalModel *model = (ConvolutionalModel *)malloc(sizeof(ConvolutionalModel));
@@ -16,6 +17,54 @@ ConvolutionalModel *initConvolutionalModel(int batchSize, float learningRate) {
   
     checkError("Init CNN");
     return model;
+  }
+
+  ConvolutionalLayer* createConvolutionalLayer(int batch_size, int c_in, int k,
+        int outputRows, int outputCols, ConvolutionalLayer* prev) {
+    ConvolutionalLayer* layer = (ConvolutionalLayer*) calloc(1, sizeof(ConvolutionalLayer));
+    if (!layer) {perror("malloc"); exit(1);}
+    layer->c_in = c_in;
+    layer->k = k;
+    layer->outputRows = outputRows;
+    layer->outputCols = outputCols;
+    layer->prev = prev;
+    if (prev != NULL) {
+        prev->next = layer;
+        layer->imgRows = prev->outputRows;
+        layer->imgCols = prev->outputCols;
+    }
+    layer->kernelRows = layer->imgRows + 1 - outputRows;
+    layer->kernelCols = layer->imgCols + 1 - outputCols;
+
+    int i, j;
+
+    /* filters needs k arrays of c_in arrays of pointers to Matrix on the device*/
+    layer->filters = (Matrix***) malloc(sizeof(Matrix***) * k);
+    if (!(layer->filters)) {perror("malloc layer filters"); exit(1);}
+    for (i = 0; i < k; i++) {
+        layer->filters[k] = (Matrix**) malloc(sizeof(Matrix**) * c_in);
+        if (!(layer->filters[k])) {perror("malloc layer filters"); exit(1);}
+        for (j = 0; j < c_in; j++) {
+            initMatrix(layer->filters[i][j], layer->kernelRows, layer->kernelCols);
+        }
+    }
+
+    /* biases is array of k random floats */
+    layer->biases = (float *) calloc(k, sizeof(float)); // TODO: make random instead of 0
+    if (!(layer->biases)) {perror("malloc layer biases"); exit(1);}
+
+    /* outputs needs batch_size arrays of k arrays of pointers to Matrix on the device */
+    layer->outputs = (Matrix***) malloc(sizeof(Matrix***) * batch_size);
+    if (!(layer->outputs)) {perror("malloc layer outputs"); exit(1);}
+    for (i = 0; i < batch_size; ++i) {
+        layer->outputs[i] = (Matrix**) malloc(sizeof(Matrix**) * k);
+        if (!(layer->outputs[i])) {perror("malloc layer outputs"); exit(1);}
+        for (j = 0; j < k; ++j) {
+            initMatrix(layer->outputs[i][j], outputRows, outputCols);
+        }
+    }
+
+    return layer;
   }
 
   void layerForward(ConvolutionalLayer *layer, int sampleNo) {
@@ -35,24 +84,24 @@ ConvolutionalModel *initConvolutionalModel(int batchSize, float learningRate) {
     Matrix *temp;
     initMatrix(&temp, layer->outputRows, layer->outputCols);
 
-    Matrix *inputImage0, *outputImageK, *filtersK0;
-    inputImage0 = (layer->prev->outputs)[sampleNo];
+    Matrix **inputImages, *outputImageK, **filtersK;
+    inputImages = (layer->prev->outputs)[sampleNo];
 
     for (k = 0; k < output_channels; k++) {
-        outputImageK = (layer->outputs)[sampleNo] + k;
-        filtersK0 = (layer->filters)[k];
+        outputImageK = (layer->outputs)[sampleNo][k];
+        filtersK = (layer->filters)[k];
 
         // TODO: change to convolution
         /* convolve first input channel image with first filter */
-        deviceConvolve(inputImage0, imgRows, imgCols, 
-            filtersK0, kernelRows, kernelCols,
+        deviceConvolve(inputImages[0], imgRows, imgCols, 
+            filtersK[0], kernelRows, kernelCols,
             outputImageK, 1, 0);
         for (c = 1; c < input_channels; c++) {
             /* for each remaining channel, add the convolution of the image 
              * and filter to the running total
              */
-            deviceConvolve(inputImage0 + c, imgRows, imgCols,
-                filtersK0 + c, kernelRows, kernelCols,
+            deviceConvolve(inputImages[c], imgRows, imgCols,
+                filtersK[c], kernelRows, kernelCols,
                 temp, 1, 0);
 
             deviceMatrixAdd(
@@ -88,7 +137,7 @@ ConvolutionalModel *initConvolutionalModel(int batchSize, float learningRate) {
     /* initialize 4D tensor of input images */
     for (i = 0; i < batchSize; ++i) {
         for (j = 0; j < inputChannels; ++j) {
-            setDeviceMatrixData((net.layers->outputs)[i] + j, input[i][j], imageSize);
+            setDeviceMatrixData((net.layers->outputs)[i][j], input[i][j], imageSize);
         }
     }
     
@@ -98,7 +147,7 @@ ConvolutionalModel *initConvolutionalModel(int batchSize, float learningRate) {
 
         /* for each sample in minibatch, go forward */
         for (j = 0; j < batchSize; ++j) {
-            layerForward(curr, i);
+            layerForward(curr, j);
         }
         curr = curr->next;
     }

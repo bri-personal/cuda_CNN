@@ -10,16 +10,16 @@ typedef struct ConvolutionalLayer {
   struct ConvolutionalLayer *prev;
 
   /* for k output channels, have a kernel for each of the c_in input channels*/
-  Matrix** filters;
+  Matrix*** filters;
 
   /* for k output channels, have a constant to add to each element of the conv result */
   float* biases;
 
   /* for each sample of minibatch, have k output images */
-  Matrix** outputs;
+  Matrix*** outputs;
 
   /* for each sample of minibatch, have c_in input image gradients */
-  Matrix** delta;
+  Matrix*** delta;
 
   //Matrix *gradient;
   //Matrix *error;
@@ -53,6 +53,8 @@ typedef struct {
 } ConvolutionalModel;
 
 ConvolutionalModel *initModel(int batchSize, float learningRate);
+ConvolutionalLayer* createConvolutionalLayer(int batch_size, int c_in, int k,
+  int outputRows, int outputCols, ConvolutionalLayer* prev);
 
 void addInputLayer(ConvolutionalModel *model, int size);
 void addDenseLayer(ConvolutionalModel *model, int size);
