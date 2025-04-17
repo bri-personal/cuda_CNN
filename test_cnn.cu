@@ -113,9 +113,11 @@ void test_layer_forward() {
     setDeviceMatrixData((layer->filters)[0][0], filterData, FILTER_SIZE);
     
     layerForward(layer, 0);
-/*    
+    
     float res[OUTPUT_SIZE];
     getDeviceMatrixData(res, (layer->outputs)[0][0], OUTPUT_SIZE);
+
+    /*
     char result[64];
     char expected[64] = "6.00 8.00 12.00 14.00";
     int offset = 0;
