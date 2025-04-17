@@ -339,6 +339,7 @@ int main() {
 
   test_matrixMult();
   test_matrixElementWise();
+  test_matrix_add_scalar_elementwise();
   test_transpose();
   test_acrossRows();
   test_unfold();
