@@ -1,10 +1,11 @@
 #include <iostream>
-#include <cuda.h>
-#include <cuda_runtime.h>
-#include <curand_kernel.h>
 #include <string.h>
 #include "util.h"
 #include "matrix.h"
+#include <cuda.h>
+#include <cuda_runtime.h>
+#include <curand_kernel.h>
+
 #define BLOCKDIM 512
 #define CONSTRAIN(x, min, max) (x < min ? min : (x > max ? max : x))
 
@@ -309,7 +310,6 @@ void deviceConvolve(Matrix* img, int imgRows, int imgCols,
     CERROR( cudaMemcpy(&(kernel->cols), &newKernelCols, sizeof(int), cudaMemcpyHostToDevice) );
 
     /* convolve */
-    initMatrix(result, resRows * resCols, 1);
     deviceMatrixMult(imgUnfolded, kernel, result, resRows * resCols);
     freeMatrix(imgUnfolded);
 
@@ -317,6 +317,4 @@ void deviceConvolve(Matrix* img, int imgRows, int imgCols,
     // TODO: can we do this better?
     CERROR( cudaMemcpy(&(kernel->rows), &kernelRows, sizeof(int), cudaMemcpyHostToDevice) );
     CERROR( cudaMemcpy(&(kernel->cols), &kernelRows, sizeof(int), cudaMemcpyHostToDevice) );
-    CERROR( cudaMemcpy(&(result->rows), &resRows, sizeof(int), cudaMemcpyHostToDevice) );
-    CERROR( cudaMemcpy(&(result->cols), &resCols, sizeof(int), cudaMemcpyHostToDevice) );
 }
