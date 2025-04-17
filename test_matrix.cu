@@ -161,8 +161,8 @@ void test_matrix_add_scalar_elementwise() {
   getDeviceMatrixData(b, B, 6);
 
   int offset = 0;
-  char result[32];
-  char expected[32] = "10 11 12 13 14 15";
+  char result[64];
+  char expected[64] = "10.00 11.00 12.00 13.00 14.00 15.00";
   for (int i = 0; i < 6; ++i) {
     offset += snprintf(result + offset, sizeof(result) - offset, "%.2f ", b[i]);
   }
