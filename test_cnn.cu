@@ -159,7 +159,7 @@ void test_layer_forward_2k() {
     layerForward(layer, 0);
     
     float res0[OUTPUT_SIZE];
-    getDeviceMatrixData(res, (layer->outputs)[0][0], OUTPUT_SIZE);
+    getDeviceMatrixData(res0, (layer->outputs)[0][0], OUTPUT_SIZE);
 
     float expected0[OUTPUT_SIZE] = {
         SIGMOID(16.0f), SIGMOID(18.0f), SIGMOID(22.0f), SIGMOID(24.0f)
@@ -176,7 +176,7 @@ void test_layer_forward_2k() {
     }
 
     float res1[OUTPUT_SIZE];
-    getDeviceMatrixData(res, (layer->outputs)[1][0], OUTPUT_SIZE);
+    getDeviceMatrixData(res1, (layer->outputs)[1][0], OUTPUT_SIZE);
 
     float expected1[OUTPUT_SIZE] = {
         SIGMOID(32.0f), SIGMOID(36.0f), SIGMOID(44.0f), SIGMOID(48.0f)
