@@ -351,7 +351,7 @@ void test_forward() {
     const int OUTPUT_SIZE = 4;
     const int BATCH_SIZE = 1;
 
-    ConvolutionalModel* model = initModel(BATCH_SIZE, 0.01);
+    ConvolutionalModel* model = initConvolutionalModel(BATCH_SIZE, 0.01);
     addInputLayer(model, 1, 3, 3);
     addConvLayer(model, 1, 2, 2);
 
