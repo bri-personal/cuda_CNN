@@ -312,6 +312,7 @@ void test_layer_forward_batch2() {
     layer->biases[0] = 1;
     
     layerForward(layer, 0);
+    layerForward(layer, 1);
     
     float res0[OUTPUT_SIZE];
     getDeviceMatrixData(res, (layer->outputs)[0][0], OUTPUT_SIZE);
