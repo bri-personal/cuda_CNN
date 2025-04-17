@@ -253,8 +253,8 @@ void test_layer_forward_2k_2c() {
     float filterData3[] = {0, 2, 2, 0};
     setDeviceMatrixData((layer->filters)[0][0], filterData0, FILTER_SIZE);
     setDeviceMatrixData((layer->filters)[0][1], filterData1, FILTER_SIZE);
-    setDeviceMatrixData((layer->filters)[1][0], filterData0, FILTER_SIZE);
-    setDeviceMatrixData((layer->filters)[1][1], filterData1, FILTER_SIZE);
+    setDeviceMatrixData((layer->filters)[1][0], filterData2, FILTER_SIZE);
+    setDeviceMatrixData((layer->filters)[1][1], filterData3, FILTER_SIZE);
     layer->biases[0] = 1;
     layer->biases[1] = 2;
     
