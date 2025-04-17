@@ -126,7 +126,7 @@ void test_layer_forward() {
     for (int i = 0; i < OUTPUT_SIZE; i++) {
         printf("Result: %f\n", res[i]);
         printf("Expect: %f\n", expected[i]);
-        if (fabs(res[i] - expected[i]) > 0.00005) {
+        if (fabs(res[i] - expected[i]) > 0.000001) {
             printf("FAILED\n");
             exit(EXIT_FAILURE);
           }
