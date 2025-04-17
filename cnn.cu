@@ -45,7 +45,7 @@ ConvolutionalModel *initConvolutionalModel(int batchSize, float learningRate) {
         layer->filters[k] = (Matrix**) malloc(sizeof(Matrix**) * c_in);
         if (!(layer->filters[k])) {perror("malloc layer filters"); exit(1);}
         for (j = 0; j < c_in; j++) {
-            initMatrix(layer->filters[i][j], layer->kernelRows, layer->kernelCols);
+            initMatrix(layer->filters[i] + j, layer->kernelRows, layer->kernelCols);
         }
     }
 
@@ -60,7 +60,7 @@ ConvolutionalModel *initConvolutionalModel(int batchSize, float learningRate) {
         layer->outputs[i] = (Matrix**) malloc(sizeof(Matrix**) * k);
         if (!(layer->outputs[i])) {perror("malloc layer outputs"); exit(1);}
         for (j = 0; j < k; ++j) {
-            initMatrix(layer->outputs[i][j], outputRows, outputCols);
+            initMatrix(layer->outputs[i] + j, outputRows, outputCols);
         }
     }
 
