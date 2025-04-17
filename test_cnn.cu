@@ -111,9 +111,9 @@ void test_layer_forward() {
     ConvolutionalLayer* layer = createConvolutionalLayer(1, 1, 1, 2, 2, input);
     float filterData[] = {1, 0, 0, 1};
     setDeviceMatrixData((layer->filters)[0][0], filterData, FILTER_SIZE);
-/*    
-    layerForward(layer, 0);
     
+    layerForward(layer, 0);
+/*    
     float res[OUTPUT_SIZE];
     getDeviceMatrixData(res, (layer->outputs)[0][0], OUTPUT_SIZE);
     char result[64];
