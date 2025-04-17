@@ -362,7 +362,7 @@ void test_forward() {
     setDeviceMatrixData((model->network->output->filters)[0][0], filterData, FILTER_SIZE);
     layer->biases[0] = 1;
     
-    layerForward(layer, 0);
+    forward(model);
     
     float res[OUTPUT_SIZE];
     getDeviceMatrixData(res, (model->network->output->outputs)[0][0], OUTPUT_SIZE);
