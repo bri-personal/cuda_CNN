@@ -6,7 +6,7 @@
 typedef struct ConvolutionalLayer {
   int c_in; /* input channels */
   int k; /* output channels */
-  int imgRows, imgCols, kernelRows, kernelCols; /* input size params */
+  int imgRows, imgCols, kernelRows, kernelCols, outputRows, outputCols; /* size params */
   struct ConvolutionalLayer *prev;
 
   /* for k output channels, have a kernel for each of the c_in input channels*/
@@ -53,9 +53,13 @@ typedef struct {
 } ConvolutionalModel;
 
 ConvolutionalModel *initModel(int batchSize, float learningRate);
+
 void addInputLayer(ConvolutionalModel *model, int size);
 void addDenseLayer(ConvolutionalModel *model, int size);
-void forward(ConvolutionalModel *model, float *input);
+
+void layerForward(ConvolutionalLayer *layer, int sampleNo);
+void forward(ConvolutionalModel *model, float ***input);
+
 float backward(ConvolutionalModel *model, float *target);
 void compileModel(ConvolutionalModel *model);
 int modelAccuracy(ConvolutionalModel *model, float **images, uint8_t *labels);

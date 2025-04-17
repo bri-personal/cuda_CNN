@@ -33,6 +33,8 @@ ConvolutionalModel *initConvolutionalModel(int batchSize, float learningRate) {
 
     int c, k;
     Matrix *temp;
+    initMatrix(&temp, layer->outputRows, layer->outputCols);
+
     Matrix *inputImage0, *outputImageK, *filtersK0;
     inputImage0 = (layer->prev->outputs)[sampleNo];
 
@@ -44,14 +46,14 @@ ConvolutionalModel *initConvolutionalModel(int batchSize, float learningRate) {
         /* convolve first input channel image with first filter */
         deviceConvolve(inputImage0, imgRows, imgCols, 
             filtersK0, kernelRows, kernelCols,
-            &outputImageK, 1, 0);
+            outputImageK, 1, 0);
         for (c = 1; c < input_channels; c++) {
             /* for each remaining channel, add the convolution of the image 
              * and filter to the running total
              */
             deviceConvolve(inputImage0 + c, imgRows, imgCols,
                 filtersK0 + c, kernelRows, kernelCols,
-                &temp, 1, 0);
+                temp, 1, 0);
 
             deviceMatrixAdd(
                 outputImageK,
@@ -67,7 +69,8 @@ ConvolutionalModel *initConvolutionalModel(int batchSize, float learningRate) {
         /* apply sigmoid activation to every element */
         deviceSigmoid(outputImageK, outputImageK, imgSize);
     }
-    
+
+    freeMatrix(temp);
   }
   
   /**
