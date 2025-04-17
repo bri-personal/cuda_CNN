@@ -249,8 +249,12 @@ void test_layer_forward_2k_2c() {
     ConvolutionalLayer* layer = createConvolutionalLayer(1, 2, 2, 2, 2, input);
     float filterData0[] = {1, 0, 0, 1};
     float filterData1[] = {0, 1, 1, 0};
+    float filterData2[] = {2, 0, 0, 2};
+    float filterData3[] = {0, 2, 2, 0};
     setDeviceMatrixData((layer->filters)[0][0], filterData0, FILTER_SIZE);
     setDeviceMatrixData((layer->filters)[0][1], filterData1, FILTER_SIZE);
+    setDeviceMatrixData((layer->filters)[1][0], filterData0, FILTER_SIZE);
+    setDeviceMatrixData((layer->filters)[1][1], filterData1, FILTER_SIZE);
     layer->biases[0] = 1;
     layer->biases[1] = 2;
     
