@@ -294,6 +294,6 @@ void deviceConvolve(Matrix* img, Matrix* kernel, Matrix** result, int stride, in
     /* convolve */
     initMatrix(result, resRows * resCols, 1);
     deviceMatrixMult(imgUnfolded, kernel, *result, resRows * resCols);
-    result->rows = resRows;
-    result->cols = resCols;
+    (*result)->rows = resRows;
+    (*result)->cols = resCols;
 }
