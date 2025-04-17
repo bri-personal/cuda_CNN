@@ -71,19 +71,30 @@ void test_create_conv_layer() {
         exit(EXIT_FAILURE);
     }
 
-    CERROR(cudaMemcpy(&temp, input->filters[0][0], sizeof(Matrix), cudaMemcpyDeviceToHost));
-    printf("Testing create convolutional layer 2 filter matrix\n");
-    printf("Output rows:\nExpect: %d\nActual: %d\n", FILTER_ROWS, temp.rows);
+    CERROR(cudaMemcpy(&temp, layer->filters[0][0], sizeof(Matrix), cudaMemcpyDeviceToHost));
+    printf("Testing create convolutional layer 2 matrices\n");
+    printf("Filter rows:\nExpect: %d\nActual: %d\n", FILTER_ROWS, temp.rows);
     if (FILTER_ROWS != temp.rows) {
         printf("FAILED\n");
         exit(EXIT_FAILURE);
     }
-    printf("Output cols:\nExpect: %d\nActual: %d\n", FILTER_COLS, temp.cols);
+    printf("Filter cols:\nExpect: %d\nActual: %d\n", FILTER_COLS, temp.cols);
     if (FILTER_COLS != temp.cols) {
         printf("FAILED\n");
         exit(EXIT_FAILURE);
     }
-    
+
+    CERROR(cudaMemcpy(&temp, layer->outputs[0][0], sizeof(Matrix), cudaMemcpyDeviceToHost));
+    printf("Output rows:\nExpect: %d\nActual: %d\n", OUTPUT_ROWS, temp.rows);
+    if (OUTPUT_ROWS != temp.rows) {
+        printf("FAILED\n");
+        exit(EXIT_FAILURE);
+    }
+    printf("Output cols:\nExpect: %d\nActual: %d\n", OUTPUT_COLS, temp.cols);
+    if (OUTPUT_COLS != temp.cols) {
+        printf("FAILED\n");
+        exit(EXIT_FAILURE);
+    }
 
     printf("\nPASSED\n\n");
 }
