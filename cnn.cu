@@ -22,41 +22,50 @@ ConvolutionalModel *initConvolutionalModel(int batchSize, float learningRate) {
     /* for each channel of this input sample, do forward pass */
 
     // TODO: change size when we have image and kernel dimensions
-    int size = 0;
+    int imgRows = 0;
+    int imgCols = 0;
+    int imgSize = imgRows * imgCols;
+    int kernelRows = 0;
+    int kernelCols = 0;
     
     int output_channels = layer->k;
     int input_channels = layer->c_in;
+
     int c, k;
-    Matrix temp;
-    Matrix *inputImage0, *outputImageK;
+    Matrix *temp;
+    Matrix *inputImage0, *outputImageK, *filtersK0;
     inputImage0 = (layer->prev->outputs)[sampleNo];
 
     for (k = 0; k < output_channels; k++) {
         outputImageK = (layer->outputs)[sampleNo] + k;
+        filtersK0 = (layer->filters)[k];
 
         // TODO: change to convolution
-        /* convolve first channel image with first filter */
-        deviceMatrixMult(inputImage0, (layer->filters)[k],
-            outputImageK, size);
+        /* convolve first input channel image with first filter */
+        deviceConvolve(inputImage0, imgRows, imgCols, 
+            filtersK0, kernelRows, kernelCols,
+            &outputImageK, 1, 0);
         for (c = 1; c < input_channels; c++) {
             /* for each remaining channel, add the convolution of the image 
              * and filter to the running total
              */
-            deviceMatrixMult(inputImage0 + c,
-                    (layer->filters)[k] + c, &temp, size);
+            deviceConvolve(inputImage0 + c, imgRows, imgCols,
+                filtersK0 + c, kernelRows, kernelCols,
+                &temp, 1, 0);
 
             deviceMatrixAdd(
                 outputImageK,
-                &temp,
+                temp,
                 outputImageK,
-                size
+                imgSize
             );
         }
         
-        // TODO: change to add scalar to every element
-        deviceMatrixAddVec(outputImageK, layer->biases, outputImageK, size);
+        /* add bias to every element */
+        deviceMatrixAddScalarElementwise(outputImageK, outputImageK, (layer->biases)[k], imgSize);
 
-        deviceSigmoid(outputImageK, outputImageK, size);
+        /* apply sigmoid activation to every element */
+        deviceSigmoid(outputImageK, outputImageK, imgSize);
     }
     
   }
@@ -75,7 +84,7 @@ ConvolutionalModel *initConvolutionalModel(int batchSize, float learningRate) {
 
     /* initialize 4D tensor of input images */
     for (i = 0; i < batchSize; ++i) {
-        for (j = 0; j < inputChannels; j++) {
+        for (j = 0; j < inputChannels; ++j) {
             setDeviceMatrixData((net.layers->outputs)[i] + j, input[i][j], imageSize);
         }
     }

@@ -12,7 +12,7 @@ typedef struct ConvolutionalLayer {
   Matrix** filters;
 
   /* for k output channels, have a constant to add to each element of the conv result */
-  Matrix* biases;
+  float* biases;
 
   /* for each sample of minibatch, have k output images */
   Matrix** outputs;
