@@ -147,6 +147,38 @@ void test_matrixElementWise() {
   freeMatrix(C);
 }
 
+void test_matrix_add_scalar_elementwise() {
+  Matrix *A, *B;
+  float data[6] = {0,1,2,3,4,5};
+
+  initMatrix(&A, 2, 3);
+  initMatrix(&B, 2, 3);
+
+  setDeviceMatrixData(A, data, 6);
+  deviceMatrixAddScalarElementwise(A, B, 10, 6);
+
+  float b[6];
+  getDeviceMatrixData(b, B, 6);
+
+  int offset = 0;
+  char result[32];
+  char expected[32] = "10 11 12 13 14 15";
+  for (int i = 0; i < 6; ++i) {
+    offset += snprintf(result + offset, sizeof(result) - offset, "%.2f ", b[i]);
+  }
+  printf("Testing matrix add scalar elementwise \n");
+  printf("Result: %s\n", result);
+  printf("Expect: %s\n", expected);
+  if (strncmp(result, expected, strlen(expected)) != 0) {
+    printf("FAILED\n");
+    exit(EXIT_FAILURE);
+  }
+  printf("\nPASSED\n\n");
+
+  freeMatrix(A);
+  freeMatrix(B);  
+}
+
 void test_transpose() {
   Matrix *A, *tA, *C;
   float a[8] = {

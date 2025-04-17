@@ -122,6 +122,17 @@ void deviceMatrixAddVec(Matrix *a, Matrix *b, Matrix *c, int N) {
   checkError("Matrix add vector");
 }
 
+__global__ void matrixAddScalarElementwise(Matrix * src, Matrix *dest, float scalar) {
+  int i = threadIdx.x + blockIdx.x * blockDim.x;
+  if (i < size(dest))
+    dest->data[i] =  src->data[i] + scalar;
+}
+void deviceMatrixAddScalarElementwise(Matrix *src, Matrix *dest, float scalar, int N) {
+  matrixAddScalarElementwise<<<BLOCKS(N, BLOCKDIM), BLOCKDIM>>>(src, dest, scalar);
+  cudaDeviceSynchronize();
+  checkError("Matrix add scalar elementwise");
+}
+
 __global__ void reduceRows(Matrix *x, Matrix *y) {
   int row = threadIdx.x;
   int col = blockIdx.x;
@@ -276,6 +287,7 @@ void deviceUnfoldMatrix(Matrix* img, Matrix** imgUnfolded, int kernelRows, int k
     initMatrix(imgUnfolded, unfoldedRows, unfoldedCols);
     
     unfoldMatrix<<<(unfoldedRows * unfoldedCols + 511) / 512, 512>>>(img, *imgUnfolded, kernelRows, resCols);
+    cudaDeviceSynchronize();
 }
 
 void deviceConvolve(Matrix* img, int imgRows, int imgCols,
