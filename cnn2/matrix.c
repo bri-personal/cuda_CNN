@@ -4,10 +4,10 @@
 
 int main() {
   elem_t iData[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, -1, -2, -3, -4, -5, -6, -7, -8, -9, 11, 12, 13, 14, 15, 16, 17, 18, 19, -11, -12, -13, -14, -15, -16, -17, -18, -19};
-  Tensor4 i = {2, 2, 3, 3, iData};
+  Tensor4D i = {2, 2, 3, 3, iData};
 
   elem_t kData[] = {0, 1, 1, 0, -1, 0, 0, -1, 2, 0, 0, 2, 0, -2, -2, 0};
-  Tensor4 k = {2, 2, 2, 2, kData};
+  Tensor4D k = {2, 2, 2, 2, kData};  
 
   int outputWidth = OUTPUT_DIM(3, 2, 0, 1);
   int outputHeight = outputWidth;
@@ -23,34 +23,55 @@ int main() {
   im2colFlatten4D_CPU(&kFlattened, &k);
 
   printf("I unfolded\n");
-  for(int h = 0; h < iUnfolded.height; ++h) {
-    for(int w = 0; w < iUnfolded.width; ++w) {
-      printf("%f ", iUnfolded.data[h*iUnfolded.width + w]);
-    }
-    printf("\n");
-  }
+  printMatrix(&iUnfolded);
 
   printf("K flattened\n");
-  for(int h = 0; h < kFlattened.height; ++h) {
-    for(int w = 0; w < kFlattened.width; ++w) {
-      printf("%f ", kFlattened.data[h*kFlattened.width + w]);
-    }
-    printf("\n");
-  }
+  printMatrix(&kFlattened);
 
   elem_t oData[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  Matrix o = {8, 2, oData};
-  gemm_CPU(&o, &iUnfolded, &kFlattened);
+  Matrix im2colConvOutput = {8, 2, oData};
+  gemm_CPU(&im2colConvOutput, &iUnfolded, &kFlattened);
 
-  printf("O\n");
-  for(int h = 0; h < o.height; ++h) {
-    for(int w = 0; w < o.width; ++w) {
-      printf("%f ", o.data[h*o.width + w]);
+  printf("Im2Col Conv Output\n");
+  printMatrix(&im2colConvOutput);
+
+  elem_t oData2[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  Tensor4D convOutput = {2, 2, 2, 2, oData2};
+
+  conv_CPU(&convOutput, &i, &k);
+
+  printf("Naive Conv Output\n");
+  printTensor4D(&convOutput);
+
+  return 0;
+}
+
+void printMatrix(Matrix* m) {
+  for(int h = 0; h < m->height; ++h) {
+    for(int w = 0; w < m->width; ++w) {
+      printf("%f ", m->data[h*m->width + w]);
     }
     printf("\n");
   }
+}
 
-  return 0;
+void printTensor4D(Tensor4D* t) {
+  int tWidth = t->width;
+  int areaPerDim3 = t->height * tWidth;
+  int volumePerDim4 = t->depth * areaPerDim3;
+
+  for(int n = 0; n < t->dim4; ++n) {
+    printf("Dim4=%d\n", n);
+    for(int d = 0; d < t->depth; ++d) {
+      printf("- Depth=%d\n", d);
+      for(int h = 0; h < t->height; ++h) {
+        for(int w = 0; w < tWidth; ++w) {
+          printf("%f ", t->data[n*volumePerDim4 + d*areaPerDim3 + h*tWidth + w]);
+        }
+        printf("\n");
+      }
+    }
+  }
 }
 
 void gemm_CPU(Matrix* C, Matrix* A, Matrix* B) {
@@ -70,7 +91,7 @@ void gemm_CPU(Matrix* C, Matrix* A, Matrix* B) {
   }
 }
 
-void im2colUnfold4D_CPU(Matrix* imageUnfolded, Tensor4* image, int kernelWidth,
+void im2colUnfold4D_CPU(Matrix* imageUnfolded, Tensor4D* image, int kernelWidth,
   int kernelArea, int outputWidth, int outputArea) {
   int imageUnfoldedHeight = imageUnfolded->height;
   int imageUnfoldedWidth = imageUnfolded->width;
@@ -101,7 +122,7 @@ void im2colUnfold4D_CPU(Matrix* imageUnfolded, Tensor4* image, int kernelWidth,
   }
 }
 
-void im2colFlatten4D_CPU(Matrix* kernelFlattened, Tensor4* kernel) {
+void im2colFlatten4D_CPU(Matrix* kernelFlattened, Tensor4D* kernel) {
   int outChannels = kernel->dim4;
   int inChannels = kernel->depth;
   int kernelHeight = kernel->height;
@@ -122,6 +143,47 @@ void im2colFlatten4D_CPU(Matrix* kernelFlattened, Tensor4* kernel) {
         (h_mod_kernel_area / kernelWidth)*kernelWidth +
         (h_mod_kernel_area % kernelWidth)
       ];
+    }
+  }
+}
+
+void conv_CPU(Tensor4D* result, Tensor4D* input, Tensor4D* filter) {
+  int batchSize = input->dim4;
+  int inChannels = input->depth;
+  int imageHeight = input->height;
+  int imageWidth = input->width;
+
+  int outChannels = filter->dim4;
+  int kernelHeight = filter->height;
+  int kernelWidth = filter->width;
+
+  int inputAreaPerChannel = imageHeight*imageWidth;
+  int inputAreaPerSample = inChannels*inputAreaPerChannel;
+
+  int filterAreaPerInputChannel = kernelHeight*kernelWidth;
+  int filterAreaPerOutputChannel = filter->depth*filterAreaPerInputChannel;
+
+  int outputHeight = result->height;
+  int outputWidth = result->width;
+  int outputAreaPerChannel = outputHeight*outputWidth;
+  int outputAreaPerSample = outChannels*outputAreaPerChannel;
+
+  for(int n = 0; n < batchSize; ++n) {
+    for(int k = 0; k < outChannels; ++k) {
+      for(int h = 0; h < imageHeight; ++h) {
+        for(int w = 0; w < imageWidth; ++w) {
+          elem_t acc = 0;
+          for(int c = 0; c < inChannels; ++c) {
+            for(int hk = 0; hk < kernelHeight; ++hk) {
+              for(int wk = 0; wk < kernelWidth; ++wk) {
+                  acc += input->data[n*inputAreaPerSample + c*inputAreaPerChannel + (h + hk)*imageWidth + (w + wk)] * 
+                    filter->data[k*filterAreaPerOutputChannel + c*filterAreaPerInputChannel + hk*kernelWidth + wk];
+              }
+            }
+            result->data[n*outputAreaPerSample + k*outputAreaPerChannel + h*outputWidth + w] = acc;
+          }
+        } 
+      }
     }
   }
 }
