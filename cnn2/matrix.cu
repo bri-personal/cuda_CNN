@@ -7,6 +7,9 @@
 #include <cuda_runtime.h>
 #include <curand_kernel.h>
 
+
+#define SIGMOID(x) (1/(1+exp(x * -1)))
+
 /** MEMORY management **/
 void initMatrix(Matrix **mat, int height, int width) {
   Matrix temp;
