@@ -2,7 +2,7 @@
 #include <string.h>
 #include "util.h"
 #include "matrix.h"
-#include "matrix.cuh"
+#include "cuda_matrix.cuh"
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <curand_kernel.h>
