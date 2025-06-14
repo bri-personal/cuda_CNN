@@ -33,6 +33,7 @@ void printMatrix(Matrix* m);
 void printTensor4D(Tensor4D* t, char* dim4Text, char* depthText);
 void printImage4D(Tensor4D* i);
 void printFilter4D(Tensor4D* f);
+int matrixIsEqual(Matrix* m1, Matrix* m2);
 void gemm_CPU(Matrix* C, Matrix* A, Matrix* B);
 
 /* im2col functions */

@@ -56,6 +56,20 @@ void gemm_CPU(Matrix* C, Matrix* A, Matrix* B) {
   }
 }
 
+int matrixIsEqual(Matrix* m1, Matrix* m2) {
+  if(m1->height!=m2->height || m1->width!=m2->width) {
+    return 0;
+  }
+  for(int i = 0; i < m1->height; ++i) {
+    for(int j = 0; j < m1->width; ++j) {
+      if(m1->data[i*m1->width + j] != m2->data[i*m2->width + j]) {
+        return 0;
+      }
+    }
+  }
+  return 1;
+}
+
 void im2colUnfold4D_CPU(Matrix* imageUnfolded, Tensor4D* image, int kernelWidth,
   int kernelArea, int outputWidth, int outputArea) {
   int imageUnfoldedHeight = imageUnfolded->height;

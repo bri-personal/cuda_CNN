@@ -58,6 +58,8 @@ int main() {
   printf("Naive Conv Output\n");
   printImage4D(&convOutput);
 
+  printf("convOutput == itself: %d", matrixIsEqual(&convOutput, &convOutput));
+
   free(iUnfolded.data);
   free(kFlattened.data);
   free(im2colConvOutput.data);
