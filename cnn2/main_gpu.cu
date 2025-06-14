@@ -33,12 +33,12 @@ int main() {
 
   getDeviceMatrixData(hostA.data, deviceA, I*K);
   getDeviceMatrixData(hostB.data, deviceB, K*J);
-  gemm_CPU(hostC, hostA, hostB);
+  gemm_CPU(&hostC, &hostA, &hostB);
 
   deviceMatrixMult(deviceA, deviceB, deviceC, I*J);
   getDeviceMatrixData(hostC2.data, deviceC, I*J);
 
-  if(matrixEquals(hostC2, hostC)) {
+  if(matrixEquals(&hostC2, &hostC)) {
     printf("CPU and GPU GEMM are equal\n");
   } else {
     printf("CPU and GPU GEMM are NOT equal\n");
@@ -48,7 +48,7 @@ int main() {
   freeMatrix(deviceA);
   freeMatrix(deviceB);
   freeMatrix(deviceC);
-  
+
   return 0;
 
 
