@@ -43,7 +43,7 @@ int main() {
   printf("K flattened\n");
   printMatrix(&kFlattened);
 
-  Matrix im2colConvOutput = {imageUnfoldedHeight, imageUnfoldedWidth,
+  Matrix im2colConvOutput = {iUnfolded.height, kFlattened.width,
     calloc(imageUnfoldedHeight*imageUnfoldedWidth, sizeof(elem_t))};
   gemm_CPU(&im2colConvOutput, &iUnfolded, &kFlattened);
 
