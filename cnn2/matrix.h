@@ -1,6 +1,10 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* data type used in all tensors */
 typedef float elem_t;
 
@@ -51,5 +55,9 @@ void im2colFlatten4D_CPU(Matrix* kernelFlattened, Tensor4D* kernel);
 
 /* CPU convolution functions */
 void conv_CPU(Tensor4D* result, Tensor4D* input, Tensor4D* filter);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
