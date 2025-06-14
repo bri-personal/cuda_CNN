@@ -63,6 +63,8 @@ int matrixEquals(Matrix* m1, Matrix* m2, elem_t delta) {
   for(int i = 0; i < m1->height; ++i) {
     for(int j = 0; j < m1->width; ++j) {
       if(abs(m1->data[i*m1->width + j] - m2->data[i*m2->width + j]) > delta) {
+        printf("NOT EQUAL: m1[%d][%d] (%f) != m2[%d][%d] (%f) within %f\n",
+          i, j, m1->data[i*m1->width + j], i, j, m2->data[i*m2->width + j], delta);
         return 0;
       }
     }
