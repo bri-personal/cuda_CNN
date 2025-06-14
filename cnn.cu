@@ -224,7 +224,20 @@ void compileModel(ConvolutionalModel *model) {
 }
 
 void layerBackward(ConvolutionalLayer* layer, ConvolutionalModel* model) {
-    return;
+    int batchSize = model->batchSize;
+    int k = layer->k;
+    int r = layer->outputRows;
+    int c = layer->outputCols;
+    int outputSize = r * c;
+    int i, j;
+
+    for (i = 0; i < batchSize; ++i) {
+        for (j = 0; j < k; ++j) {
+            deviceSigmoidOutputDerivative(layer->outputs[i][j], layer->gradient[i][j], outputSize);
+            deviceHadamardProd(layer->gradient[i][j], layer->error[i][j], layer->gradient[i][j], outputSize);
+        }
+    }
+    
 }
 
 void layerUpdate(ConvolutionalLayer* layer, int batchSize) {
