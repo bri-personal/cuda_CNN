@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "matrix.h"
 
 int main() {
@@ -43,6 +44,9 @@ int main() {
 
   printf("Naive Conv Output\n");
   printImage4D(&convOutput);
+
+  free(iUnfolded.data);
+  free(kFlattened.data);
 
   return 0;
 }
