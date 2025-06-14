@@ -31,8 +31,8 @@ int main() {
   int imageUnfoldedHeight = outputArea*i.dim4;
   int imageUnfoldedWidth = i.depth*kernelArea;
 
-  Matrix iUnfolded = {imageUnfoldedHeight, imageUnfoldedWidth, calloc(imageUnfoldedHeight*imageUnfoldedWidth, sizeof(elem_t))};
-  Matrix kFlattened = {imageUnfoldedWidth, k.dim4, calloc(imageUnfoldedWidth*k.dim4, sizeof(elem_t))};
+  Matrix iUnfolded = {imageUnfoldedHeight, imageUnfoldedWidth, (elem_t*) calloc(imageUnfoldedHeight*imageUnfoldedWidth, sizeof(elem_t))};
+  Matrix kFlattened = {imageUnfoldedWidth, k.dim4, (elem_t*) calloc(imageUnfoldedWidth*k.dim4, sizeof(elem_t))};
 
   im2colUnfold4D_CPU(&iUnfolded, &i, k.width, kernelArea, outputWidth, outputArea);
   im2colFlatten4D_CPU(&kFlattened, &k);
@@ -44,14 +44,14 @@ int main() {
   printMatrix(&kFlattened);
 
   Matrix im2colConvOutput = {iUnfolded.height, kFlattened.width,
-    calloc(imageUnfoldedHeight*imageUnfoldedWidth, sizeof(elem_t))};
+    (elem_t*) calloc(imageUnfoldedHeight*imageUnfoldedWidth, sizeof(elem_t))};
   gemm_CPU(&im2colConvOutput, &iUnfolded, &kFlattened);
 
   printf("Im2Col Conv Output\n");
   printMatrix(&im2colConvOutput);
 
   Tensor4D convOutput = {BATCH_SIZE, OUT_CHANNELS, outputHeight, outputWidth,
-    calloc(BATCH_SIZE*OUT_CHANNELS*outputArea, sizeof(elem_t))};
+    (elem_t*) calloc(BATCH_SIZE*OUT_CHANNELS*outputArea, sizeof(elem_t))};
 
   conv_CPU(&convOutput, &i, &k);
 

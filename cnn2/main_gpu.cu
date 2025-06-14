@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "matrix.h"
-#include "matrix.cuh"
+#include "cuda_matrix.cuh"
 
 #define BATCH_SIZE 2
 #define IN_CHANNELS 2
