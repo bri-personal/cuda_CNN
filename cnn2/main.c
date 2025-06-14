@@ -58,8 +58,8 @@ int main() {
   printf("Naive Conv Output\n");
   printImage4D(&convOutput);
 
-  printf("im2colConvOutput == itself: %d\n", matrixEquals(&im2colConvOutput, &im2colConvOutput));
-  printf("im2colConvOutput == convOutput: %d\n", im2colMatrixEqualsConvTensor4D(&im2colConvOutput, &convOutput));
+  printf("im2colConvOutput == itself: %d\n", matrixEquals(&im2colConvOutput, &im2colConvOutput, 0.000001));
+  printf("im2colConvOutput == convOutput: %d\n", im2colMatrixEqualsConvTensor4D(&im2colConvOutput, &convOutput, 0.000001));
 
   free(iUnfolded.data);
   free(kFlattened.data);
