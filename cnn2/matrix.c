@@ -5,9 +5,11 @@
 int main() {
   elem_t iData[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, -1, -2, -3, -4, -5, -6, -7, -8, -9, 11, 12, 13, 14, 15, 16, 17, 18, 19, -11, -12, -13, -14, -15, -16, -17, -18, -19};
   Tensor4D i = {2, 2, 3, 3, iData};
+  printImage4D(&i);
 
   elem_t kData[] = {0, 1, 1, 0, -1, 0, 0, -1, 2, 0, 0, 2, 0, -2, -2, 0};
-  Tensor4D k = {2, 2, 2, 2, kData};  
+  Tensor4D k = {2, 2, 2, 2, kData};
+  printFilter4D(&k);
 
   int outputWidth = OUTPUT_DIM(3, 2, 0, 1);
   int outputHeight = outputWidth;
@@ -41,7 +43,7 @@ int main() {
   conv_CPU(&convOutput, &i, &k);
 
   printf("Naive Conv Output\n");
-  printTensor4D(&convOutput);
+  printImage4D(&convOutput);
 
   return 0;
 }
@@ -55,7 +57,15 @@ void printMatrix(Matrix* m) {
   }
 }
 
-void printTensor4D(Tensor4D* t) {
+void printImage4D(Tensor4D* i) {
+  printTensor4D(i, "Sample", "Channel");
+}
+
+void printFilter4D(Tensor4D* f) {
+  printTensor4D(f, "Out channel", "In channel");
+}
+
+void printTensor4D(Tensor4D* t, char* dim4Text, char* depthText) {
   int tWidth = t->width;
   int areaPerDim3 = t->height * tWidth;
   int volumePerDim4 = t->depth * areaPerDim3;

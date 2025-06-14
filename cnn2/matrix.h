@@ -30,7 +30,9 @@ typedef struct {
 
 /* general matrix functions */
 void printMatrix(Matrix* m);
-void printTensor4D(Tensor4D* t);
+void printTensor4D(Tensor4D* t, char* dim4Text, char* depthText);
+void printImage4D(Tensor4D* i);
+void printFilter4D(Tensor4D* f);
 void gemm_CPU(Matrix* C, Matrix* A, Matrix* B);
 
 /* im2col functions */
