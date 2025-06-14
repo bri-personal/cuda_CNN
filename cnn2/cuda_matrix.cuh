@@ -11,10 +11,10 @@
 
 /* GPU functions */
 /** MEMORY management **/
-void initMatrix(Matrix **mat, int rows, int cols);
+void initMatrix(Matrix **mat, int height, int width);
 void freeMatrix(Matrix *mat);
-void initRandomMatrix(Matrix **mat, int rows, int cols);
-void initZerosMatrix(Matrix **mat, int rows, int cols);
+void initRandomMatrix(Matrix **mat, int height, int width);
+void initZerosMatrix(Matrix **mat, int height, int width);
 void getDeviceMatrixData(float *dest, Matrix *source, int n);
 void setDeviceMatrixData(Matrix *dest, float *source, int n);
 
@@ -32,13 +32,13 @@ void deviceHadamardProd(Matrix *a, Matrix *b, Matrix *c, int N);
 void deviceSigmoid(Matrix *a, Matrix *b, int N);
 void deviceSigmoidOutputDerivative(Matrix *a, Matrix *b, int N);
 void deviceMatrixAddVec(Matrix *a, Matrix *b, Matrix *c, int N);
-void deviceMatrixReduceRows(Matrix *x, Matrix *y, int rows, int cols);
+void deviceMatrixReduceRows(Matrix *x, Matrix *y, int height, int width);
 
 /** TRANSPOSE **/
 void matrixTranpose(Matrix *a, Matrix **b, int arows, int acols);
 
 /** LOSS **/
-void squareLoss(Matrix *x, float *result, int rows, int cols);
+void squareLoss(Matrix *x, float *result, int height, int width);
 
 /** CONVOLUTION **/
 void deviceUnfoldMatrix(Matrix* img, Matrix** imgUnfolded, int kernelRows, int kernelCols, int resRows, int resCols);
