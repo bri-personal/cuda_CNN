@@ -1,5 +1,9 @@
+#ifndef MATRIX_H
+#define MATRIX_H
+
 /* data type used in all tensors */
 typedef float elem_t;
+
 
 /* structs for data structures */
 typedef struct {
@@ -28,7 +32,8 @@ typedef struct {
   elem_t* data;
 } Tensor4D;
 
-/* general matrix functions */
+
+/* CPU general matrix functions */
 void printMatrix(Matrix* m);
 void printTensor4D(Tensor4D* t, char* dim4Text, char* depthText);
 void printImage4D(Tensor4D* i);
@@ -36,12 +41,58 @@ void printFilter4D(Tensor4D* f);
 int matrixEquals(Matrix* m1, Matrix* m2, elem_t delta);
 void gemm_CPU(Matrix* C, Matrix* A, Matrix* B);
 
-/* im2col functions */
-#define OUTPUT_DIM(imageDim, kernelDim, padding, stride) ((imageDim - kernelDim + (padding << 1)) / stride + 1);
 
+/* CPU im2col functions */
+#define OUTPUT_DIM(imageDim, kernelDim, padding, stride) ((imageDim - kernelDim + (padding << 1)) / stride + 1);
 int im2colMatrixEqualsConvTensor4D(Matrix* im2col, Tensor4D* conv, elem_t delta);
 void im2colUnfold4D_CPU(Matrix* imageUnfolded, Tensor4D* image, int kernelWidth, int kernelArea, int outputWidth, int outputArea);
 void im2colFlatten4D_CPU(Matrix* kernelFlattened, Tensor4D* kernel);
 
-/* convolution functions */
+
+/* CPU convolution functions */
 void conv_CPU(Tensor4D* result, Tensor4D* input, Tensor4D* filter);
+
+
+/* GPU params and macros */
+#define BLOCKDIM 512
+#define CONSTRAIN(x, min, max) (x < min ? min : (x > max ? max : x))
+
+
+/* GPU functions */
+/** MEMORY management **/
+void initMatrix(Matrix **mat, int rows, int cols);
+void freeMatrix(Matrix *mat);
+void initRandomMatrix(Matrix **mat, int rows, int cols);
+void initZerosMatrix(Matrix **mat, int rows, int cols);
+void getDeviceMatrixData(float *dest, Matrix *source, int n);
+void setDeviceMatrixData(Matrix *dest, float *source, int n);
+
+/** HELPER **/
+__device__ int size(Matrix *mat);
+
+/** MATH **/
+void deviceMatrixMult(Matrix *a, Matrix *b, Matrix *ab, int N);
+void deviceMatrixAdd(Matrix *a, Matrix *b, Matrix *c, int N);
+void deviceMatrixSub(Matrix *a, Matrix *b, Matrix *c, int N);
+void deviceMatrixScale(Matrix *a, float scale, Matrix *b, int N);
+void deviceMatrixAddScalarElementwise(Matrix *src, Matrix *dest, float scalar, int N);
+void deviceMatrixDivideScalarElementwise(Matrix *src, Matrix *dest, float scalar, int N);
+void deviceHadamardProd(Matrix *a, Matrix *b, Matrix *c, int N);
+void deviceSigmoid(Matrix *a, Matrix *b, int N);
+void deviceSigmoidOutputDerivative(Matrix *a, Matrix *b, int N);
+void deviceMatrixAddVec(Matrix *a, Matrix *b, Matrix *c, int N);
+void deviceMatrixReduceRows(Matrix *x, Matrix *y, int rows, int cols);
+
+/** TRANSPOSE **/
+void matrixTranpose(Matrix *a, Matrix **b, int arows, int acols);
+
+/** LOSS **/
+void squareLoss(Matrix *x, float *result, int rows, int cols);
+
+/** CONVOLUTION **/
+void deviceUnfoldMatrix(Matrix* img, Matrix** imgUnfolded, int kernelRows, int kernelCols, int resRows, int resCols);
+void deviceConvolve(Matrix* img, int imgRows, int imgCols,
+  Matrix* kernel, int kernelRows, int kernelCols,
+  Matrix* result, int stride, int padding);
+
+#endif
