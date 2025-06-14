@@ -71,9 +71,9 @@ void printTensor4D(Tensor4D* t, char* dim4Text, char* depthText) {
   int volumePerDim4 = t->depth * areaPerDim3;
 
   for(int n = 0; n < t->dim4; ++n) {
-    printf("Dim4=%d\n", n);
+    printf("%s=%d\n", dim4Text, n);
     for(int d = 0; d < t->depth; ++d) {
-      printf("- Depth=%d\n", d);
+      printf("- %s=%d\n", depthText, d);
       for(int h = 0; h < t->height; ++h) {
         for(int w = 0; w < tWidth; ++w) {
           printf("%f ", t->data[n*volumePerDim4 + d*areaPerDim3 + h*tWidth + w]);
