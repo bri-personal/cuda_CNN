@@ -27,6 +27,7 @@ void deviceMatrixAdd(Matrix *a, Matrix *b, Matrix *c, int N);
 void deviceMatrixSub(Matrix *a, Matrix *b, Matrix *c, int N);
 void deviceMatrixScale(Matrix *a, float scale, Matrix *b, int N);
 void deviceMatrixAddScalarElementwise(Matrix *src, Matrix *dest, float scalar, int N);
+void deviceMatrixDivideScalarElementwise(Matrix *src, Matrix *dest, float scalar, int N);
 void deviceHadamardProd(Matrix *a, Matrix *b, Matrix *c, int N);
 void deviceSigmoid(Matrix *a, Matrix *b, int N);
 void deviceSigmoidOutputDerivative(Matrix *a, Matrix *b, int N);

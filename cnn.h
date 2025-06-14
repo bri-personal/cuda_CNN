@@ -21,8 +21,9 @@ typedef struct ConvolutionalLayer {
   /* for each sample of minibatch, have c_in input image gradients */
   Matrix*** delta;
 
-  //Matrix *gradient;
-  //Matrix *error;
+  Matrix *** gradient;
+
+  Matrix *** error;
 
   struct ConvolutionalLayer *next;
 } ConvolutionalLayer;
@@ -60,7 +61,7 @@ void addConvLayer(ConvolutionalModel *model, int channels, int rows, int cols);
 void layerForward(ConvolutionalLayer *layer, int sampleNo);
 void forward(ConvolutionalModel *model, float ***input);
 
-float backward(ConvolutionalModel *model, float *target);
+void backward(ConvolutionalModel *model, float ***targets);
 void compileModel(ConvolutionalModel *model);
 int modelAccuracy(ConvolutionalModel *model, float **images, uint8_t *labels);
 

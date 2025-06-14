@@ -134,6 +134,17 @@ void deviceMatrixAddScalarElementwise(Matrix *src, Matrix *dest, float scalar, i
   checkError("Matrix add scalar elementwise");
 }
 
+__global__ void matrixDivideScalarElementwise(Matrix * src, Matrix *dest, float scalar) {
+  int i = threadIdx.x + blockIdx.x * blockDim.x;
+  if (i < size(dest))
+    dest->data[i] =  src->data[i] / scalar;
+}
+void deviceMatrixDivideScalarElementwise(Matrix *src, Matrix *dest, float scalar, int N) {
+  matrixDivideScalarElementwise<<<BLOCKS(N, BLOCKDIM), BLOCKDIM>>>(src, dest, scalar);
+  cudaDeviceSynchronize();
+  checkError("Matrix divide scalar elementwise");
+}
+
 __global__ void reduceRows(Matrix *x, Matrix *y) {
   int row = threadIdx.x;
   int col = blockIdx.x;

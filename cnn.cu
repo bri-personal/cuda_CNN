@@ -177,3 +177,96 @@ void forward(ConvolutionalModel *model, float ***input) {
         curr = curr->next;
     }
   }
+
+
+void initLayerGradients(ConvolutionalLayer *layer, int batchSize) {
+    int i, j;
+    int k = layer->k;
+    int r = layer->outputRows;
+    int c = layer->outputCols;
+
+    /* backprop fields needs batchsize arrays of k arrays of pointers to Matrix on the device */
+    layer->gradient = (Matrix***) malloc(sizeof(Matrix**) * batchSize);
+    if (!(layer->gradient)) {perror("malloc layer g"); exit(1);}
+
+    layer->delta = (Matrix***) malloc(sizeof(Matrix**) * batchSize);
+    if (!(layer->delta)) {perror("malloc layer d"); exit(1);}
+    if (layer->prev) {
+        layer->error = (Matrix***) malloc(sizeof(Matrix**) * batchSize);
+        if (!(layer->error)) {perror("malloc layer e"); exit(1);}
+    }
+    
+    for (i = 0; i < batchSize; i++) {
+        layer->gradient[i] = (Matrix**) malloc(sizeof(Matrix*) * k);
+        if (!(layer->gradient[i])) {perror("malloc layer g"); exit(1);}
+
+        layer->delta[i] = (Matrix**) malloc(sizeof(Matrix*) * k);
+        if (!(layer->delta[i])) {perror("malloc layer d"); exit(1);}
+
+        layer->error[i] = (Matrix**) malloc(sizeof(Matrix*) * k);
+        if (!(layer->error[i])) {perror("malloc layer e"); exit(1);}
+        
+        for (j = 0; j < k; j++) {
+            initMatrix(layer->gradient[i] + j, r, c);
+            initMatrix(layer->delta[i] + j, r, c);
+            initMatrix(layer->error[i] + j, r, c);
+        }
+    }
+}
+
+void compileModel(ConvolutionalModel *model) {
+    ConvolutionalLayer* curr = model->network->layers->next;
+    for (int i = 0; i < model->network->numLayers; ++i) {
+        if (!curr) break;
+        initLayerGradients(curr, model->batchSize);
+        curr = curr->next;
+    }
+}
+
+void layerBackward(ConvolutionalLayer* layer, ConvolutionalModel* model) {
+    int batchSize = model->batchSize;
+    int k = layer->k;
+    int r = layer->outputRows;
+    int c = layer->outputCols;
+    int outputSize = r * c;
+    int i, j;
+
+    for (i = 0; i < batchSize; ++i) {
+        for (j = 0; j < k; ++j) {
+            deviceSigmoidOutputDerivative(layer->outputs[i][j], layer->gradient[i][j], outputSize);
+            deviceHadamardProd(layer->gradient[i][j], layer->error[i][j], layer->gradient[i][j], outputSize);
+        }
+    }
+    
+}
+
+void layerUpdate(ConvolutionalLayer* layer, int batchSize) {
+    return;
+}
+
+void backward(ConvolutionalModel* model, float*** targets) {
+    ConvolutionalNetwork* net = model->network;
+    int batchSize = model->batchSize;
+    ConvolutionalLayer* curr = net->output;
+    int outputSize = curr->outputRows * curr->outputCols;
+    int i, j;
+    for (i = 0; i < batchSize; ++i) {
+        for (j = 0; j < curr->k; ++j) {
+            setDeviceMatrixData(curr->error[i][j], targets[i][j], outputSize);
+            deviceMatrixSub(curr->outputs[i][j], curr->error[i][j], curr->error[i][j], outputSize);
+            deviceMatrixDivideScalarElementwise(curr->error[i][j], curr->error[i][j], outputSize, outputSize);
+        } 
+    }
+
+    for (int i = 0; i < net->numLayers; ++i) {
+        if (!curr->prev) break;
+        layerBackward(curr, model);
+        curr = curr->prev;
+      }
+      curr = net->output;
+      for (int i = 0; i < net->numLayers; ++i) {
+        if (!curr->prev) break;
+        layerUpdate(curr, batchSize);
+        curr = curr->prev;
+      }
+}
