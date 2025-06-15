@@ -44,7 +44,7 @@ int gemmTest() {
   getDeviceMatrixData(hostC2.data, deviceC, I*J);
 
   if(!matrixEquals(&hostC2, &hostC, 0.000001)) {
-    printf("CPU and GPU GEMM are NOT equal\n");
+    printf("FAILURE: CPU and GPU GEMM are NOT equal\n");
     free(hostA.data);
     free(hostB.data);
     free(hostC.data);
@@ -55,7 +55,7 @@ int gemmTest() {
     return 1;
   }
 
-  printf("CPU and GPU GEMM are equal\n");
+  printf("SUCCESS: CPU and GPU GEMM are equal\n");
   free(hostA.data);
   free(hostB.data);
   free(hostC.data);
@@ -107,7 +107,7 @@ int im2colUnfoldTest() {
   getDeviceMatrixData(hostInputUnfolded2.data, deviceInputUnfolded, unfoldedHeight*unfoldedWidth);
 
   if(!matrixEquals(&hostInputUnfolded2, &hostInputUnfolded, 0.000001)) {
-    printf("CPU and GPU im2col unfold are NOT equal\n");
+    printf("FAILURE: CPU and GPU im2col unfold are NOT equal\n");
     free(hostInput.data);
     free(hostInputUnfolded.data);
     free(hostInputUnfolded2.data);
@@ -116,7 +116,7 @@ int im2colUnfoldTest() {
     return 1;
   }
 
-  printf("CPU and GPU im2col unfold are equal\n");
+  printf("SUCCESS: CPU and GPU im2col unfold are equal\n");
   free(hostInput.data);
   free(hostInputUnfolded.data);
   free(hostInputUnfolded2.data);
