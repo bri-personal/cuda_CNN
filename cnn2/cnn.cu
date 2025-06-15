@@ -1,4 +1,4 @@
-#include "cnn.cuh"
+#include "cuda_cnn.cuh"
 #include "matrix.h"
 #include "cuda_matrix.cuh"
 #include "util.h"

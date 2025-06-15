@@ -1,5 +1,5 @@
-#ifndef CNN_H
-#define CNN_H
+#ifndef CUDA_CNN_H
+#define CUDA_CNN_H
 #include <stdint.h>
 #include <cuda.h>
 #include <curand_kernel.h>

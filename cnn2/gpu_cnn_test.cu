@@ -2,7 +2,7 @@
 #include <math.h>
 #include "matrix.h"
 #include "cuda_matrix.cuh"
-#include "cnn.cuh"
+#include "cuda_cnn.cuh"
 
 
 int initModelTest() {
