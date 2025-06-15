@@ -320,12 +320,12 @@ int convTest() {
   printf("SUCCESS: CPU and GPU conv are equal\n");
   freeTensor4D(deviceInput);
   freeMatrix(deviceResult);
-  //freeTensor4D(deviceKernel); // bad?
+  freeTensor4D(deviceKernel); // bad?
 
   free(hostInput.data);
   free(hostKernel.data);
   // free(hostResultTensor4D.data); // double free or corruption (!prev)
-  free(hostResultMatrix.data); // bad?
+  // free(hostResultMatrix.data); // munmap_chunk(): invalid pointer
   
   return 0;
 }
