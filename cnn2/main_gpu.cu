@@ -258,7 +258,7 @@ int convTest() {
 
   Tensor4D hostResultTensor4D = {
     batchSize, outChannels, outHeight, outWidth,
-    (elem_t*) calloc(batchSize*outChannels*outHeight*outWidth,, sizeof(elem_t))
+    (elem_t*) calloc(batchSize*outChannels*outHeight*outWidth, sizeof(elem_t))
   };
   Matrix hostResultMatrix = {unfoldedHeight, flattenedWidth,
     (elem_t*) calloc(unfoldedHeight*flattenedWidth, sizeof(elem_t))};
