@@ -291,12 +291,12 @@ int convTest() {
     exit(1);
   }
   printf("5\n");
-  return 0;
 
   /* set up output feature map on device */
   Matrix* deviceResult;
   initMatrix(&deviceResult, im2colOutHeight, im2colOutWidth);
   printf("6\n");
+  return 0;
 
   /* get input and filter elements on host */
   getDeviceTensor4DData(hostInput.data, deviceInput, batchSize*inChannels*inHeight*inWidth);
