@@ -540,7 +540,7 @@ void deviceConvolve(
     freeMatrix(kernelFlattened);
 }
 
-__global__ reorderIm2ColToConv(Matrix* src, Tensor4D* dest, int N) {
+__global__ void reorderIm2ColToConv(Matrix* src, Tensor4D* dest, int N) {
   int i = blockIdx.x * blockDim.x + threadIdx.x;
 
   int batchSize = dest->dim4;
