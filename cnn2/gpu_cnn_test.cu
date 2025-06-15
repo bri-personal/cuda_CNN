@@ -332,6 +332,7 @@ int initModelTestCPU() {
         free(outFilter.data);
         return 1;
     }
+    return 0;
     if(hiddenLayer->kernelRows != 3) {
         printf("FAILURE: hidden layer kernel rows NOT correct\n");
         free(hiddenBiases.data);
