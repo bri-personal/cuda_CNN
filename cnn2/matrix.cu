@@ -255,13 +255,13 @@ void deviceMatrixAddScalarElementwise(Matrix *src, Matrix *dest, float scalar, i
   checkError("Matrix add scalar elementwise each col");
 }
 
-__global__ void matrixAddScalarColumnwise(Matrix* src, Matrix *dest, Vector* scalars, int rows, int cols) {
+__global__ void matrixAddScalarColumnwise(Matrix* src, Matrix *dest, Vector* scalars, int cols) {
   int i = threadIdx.x + blockIdx.x * blockDim.x;
   if (i < size(dest))
     dest->data[i] =  src->data[i] + scalars->data[i%cols];
 }
 void deviceMatrixAddScalarColumnwise(Matrix* src, Matrix *dest, Vector* scalars, int rows, int cols) {;
-  matrixAddScalarColumnwise<<<BLOCKS(rows*cols, BLOCKDIM), BLOCKDIM>>>(src, dest, scalars, rows, cols);
+  matrixAddScalarColumnwise<<<BLOCKS(rows*cols, BLOCKDIM), BLOCKDIM>>>(src, dest, scalars, cols);
   cudaDeviceSynchronize();
   checkError("Matrix add scalar elementwise each col");
 }

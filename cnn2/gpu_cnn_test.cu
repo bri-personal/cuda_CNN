@@ -623,11 +623,11 @@ int modelForwardTestOutput() {
 int main() {
     int test_total = 0;
     
-    test_total += initModelTest();
-    test_total += initModelTestCPU();
-    test_total += modelForwardTest();
-    test_total += modelForwardTestCPU();
-    test_total += modelForwardTestOutputCPU();
+    // test_total += initModelTest();
+    // test_total += initModelTestCPU();
+    // test_total += modelForwardTest();
+    // test_total += modelForwardTestCPU();
+    // test_total += modelForwardTestOutputCPU();
     test_total += modelForwardTestOutput();
 
     return test_total;

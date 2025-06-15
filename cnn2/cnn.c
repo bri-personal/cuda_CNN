@@ -98,6 +98,8 @@ void layerForwardCPU(ConvolutionalLayer *layer, int batchSize) {
 
     /* apply sigmoid activation to every element */
     tensor4DSigmoid_CPU(layer->outputs, layer->outputs);
+
+    printTensor4D(layer->outputs, "batch no", "channel");
 }
 
 void forwardCPU(ConvolutionalModel *model, Tensor4D* input) {
