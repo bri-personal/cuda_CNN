@@ -108,10 +108,11 @@ int tensor4DEquals(Tensor4D* t1, Tensor4D* t2, elem_t delta) {
   int width = t1->width;
 
   if(dim4 != t2->dim4 || depth != t2->depth || height!=t2->height || width!=t2->width) {
-    printf("NOTE EQUAL: t1 and t2 have different dimensions\n");
+    printf("NOT EQUAL: t1 and t2 have different dimensions\n");
     return 0;
   }
 
+  int ret = 1;
   for(int n = 0; n < dim4; ++n) {
     for(int k = 0; k < depth; ++k) {
       for(int i = 0; i < height; ++i) {
@@ -120,13 +121,13 @@ int tensor4DEquals(Tensor4D* t1, Tensor4D* t2, elem_t delta) {
           if(fabsf(t1->data[idx] - t2->data[idx]) > delta) {
             printf("NOT EQUAL: t1[%d][%d][%d][%d] (%f) != t2[%d][%d][%d][%d] (%f) within %f\n",
               n, k, i, j, t1->data[idx], n, k, i, j, t2->data[idx], delta);
-            return 0;
+            ret = 0; // keep going to see all differences
           }
         }
       }
     }
   }
-  return 1;
+  return ret;
 }
 
 int im2colMatrixEqualsConvTensor4D(Matrix* im2col, Tensor4D* conv, elem_t delta) {
