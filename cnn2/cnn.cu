@@ -85,7 +85,7 @@ void layerForward(ConvolutionalLayer *layer) {
     int im2colOutRows = layer->outputs->dim4 * outRows * outCols;
     int im2colOutArea = im2colOutRows * outChannels;
 
-    Matrix* temp;
+    Matrix* temp = NULL;
     printf("%p\n", temp);
     exit(0);
 
