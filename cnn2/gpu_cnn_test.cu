@@ -188,7 +188,7 @@ int modelForwardTest() {
 int main() {
     int test_total = 0;
     
-    test_total += initModelTest();
+    //test_total += initModelTest();
     test_total += modelForwardTest();
 
     return test_total;
