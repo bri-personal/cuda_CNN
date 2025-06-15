@@ -29,7 +29,7 @@ int gemmTest() {
   
   Matrix *deviceA, *deviceB, *deviceC;
 
-  curandState_t state = createCurandStates(I * J * K); // more than are needed
+  curandState_t* state = createCurandStates(I * J * K); // more than are needed
   initRandomMatrix(&deviceA, I, K, state);
   initRandomMatrix(&deviceB, K, J, state);
   cleanupCurandStates(state);
