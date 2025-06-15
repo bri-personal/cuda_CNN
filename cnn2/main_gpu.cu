@@ -305,11 +305,12 @@ int convTest() {
   /* CPU convolution for comparison */
   conv_CPU(&hostResultTensor4D, &hostInput, &hostKernel);
   printf("8\n");
-  return 0;
 
   /* convolution on device */
   deviceConvolve(deviceInput, deviceKernel, deviceResult, padding, stride);
   printf("9\n");
+  return 0;
+  
   getDeviceMatrixData(hostResultMatrix.data, deviceResult, im2colOutArea);
   printf("10\n");
 
