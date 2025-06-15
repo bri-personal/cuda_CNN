@@ -585,7 +585,7 @@ int modelForwardTestOutput() {
     int outSize = batchSize*outChannels*outRows*outCols;
     elem_t gpuModelOutData[outSize];
     Tensor4D gpuModelOut = {batchSize, outChannels, outRows, outCols,gpuModelOutData};
-    getDeviceTensor4DData(gpuModelOut->data, model->network->output->outputs, outSize);
+    getDeviceTensor4DData(gpuModelOut.data, model->network->output->outputs, outSize);
 
     cleanupCurandStates(state);
 
@@ -604,14 +604,14 @@ int modelForwardTestOutput() {
 
     elem_t biasData[outChannels];
     Vector biases = {outChannels, biasData};
-    getDeviceVectorData(biases->data, model->network->input->next->biases, outChannels);
+    getDeviceVectorData(biases.data, model->network->input->next->biases, outChannels);
 
     addConvLayerCPU(modelCPU, outChannels, outRows, outCols, &filter, &biases);
     
     forwardCPU(modelCPU, &input);
     
     /* compare */
-    if(!tensor4DEquals(gpuModelOut, modelCPU->network->output->outputs, 0.000001)) {
+    if(!tensor4DEquals(&gpuModelOut, modelCPU->network->output->outputs, 0.000001)) {
         printf("FAILURE: GPU model forward and CPU model forward do NOT have equal output\n");
         return 1;
     }
