@@ -3,6 +3,20 @@
 #include "matrix.h"
 #include "cuda_matrix.cuh"
 
+
+#define BATCH_SIZE 2
+#define IN_CHANNELS 2
+#define IMG_HEIGHT 3
+#define IMG_WIDTH 3
+
+#define OUT_CHANNELS 2
+#define FILTER_HEIGHT 2
+#define FILTER_WIDTH 2
+
+#define PADDING 0
+#define STRIDE 1
+
+
 int gemmTest() {
   const int I = 8;
   const int K = 6;
@@ -49,18 +63,6 @@ int im2colFlattenTest() {
 }
 
 int cpuConvTest() {
-  #define BATCH_SIZE 2
-  #define IN_CHANNELS 2
-  #define IMG_HEIGHT 3
-  #define IMG_WIDTH 3
-
-  #define OUT_CHANNELS 2
-  #define FILTER_HEIGHT 2
-  #define FILTER_WIDTH 2
-
-  #define PADDING 0
-  #define STRIDE 1
-
   elem_t iData[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, -1, -2, -3, -4, -5, -6, -7, -8, -9, 11, 12, 13, 14, 15, 16, 17, 18, 19, -11, -12, -13, -14, -15, -16, -17, -18, -19};
   Tensor4D i = {BATCH_SIZE, IN_CHANNELS, IMG_HEIGHT, IMG_WIDTH, iData};
 
