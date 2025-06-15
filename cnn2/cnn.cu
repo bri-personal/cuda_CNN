@@ -93,14 +93,14 @@ void layerForward(ConvolutionalLayer *layer, int batchSize) {
     /* add bias for each out channel to every element in that channel */
     deviceMatrixAddScalarColumnwise(temp, temp, layer->biases, im2colOutRows, outChannels);
 
-    /* apply sigmoid activation to every element */
-    deviceSigmoid(temp, temp, im2colOutArea);
-
     //DEBUG
     elem_t cpuTempData[im2colOutArea];
     Matrix cpuTemp = {im2colOutRows, outChannels, cpuTempData};
     getDeviceMatrixData(cpuTemp.data, temp, im2colOutArea);
     printMatrix(&cpuTemp);
+
+    /* apply sigmoid activation to every element */
+    deviceSigmoid(temp, temp, im2colOutArea);
 
     /* put temp contents into layer's output Tensor4D */
     deviceReorderIm2ColToConv(temp, layer->outputs, im2colOutArea);
