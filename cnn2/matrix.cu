@@ -368,34 +368,6 @@ void squareLoss(Matrix *x, float *result, int height, int width) {
 }
 
 /* Convolution */
-// void deviceConvolve(Matrix* img, int imgRows, int imgCols,
-//       Matrix* kernel, int kernelRows, int kernelCols,
-//       Matrix* result, int stride, int padding) {
-//     /* im 2 col */
-//     int resRows = (imgRows - kernelRows + (padding << 1)) / stride + 1;
-//     int resCols = (imgCols - kernelCols + (padding << 1)) / stride + 1;
-
-//     /* unfold image */
-//     Matrix* imgUnfolded;
-//     deviceUnfoldMatrix(img, &imgUnfolded, kernelRows, kernelCols, resRows, resCols);
-
-//     /* flatten kernel */
-//     int newKernelRows = kernelRows * kernelCols;
-//     int newKernelCols = 1;
-//     // TODO: can we do this better?
-//     CERROR( cudaMemcpy(&(kernel->height), &newKernelRows, sizeof(int), cudaMemcpyHostToDevice) );
-//     CERROR( cudaMemcpy(&(kernel->width), &newKernelCols, sizeof(int), cudaMemcpyHostToDevice) );
-
-//     /* convolve */
-//     deviceMatrixMult(imgUnfolded, kernel, result, resRows * resCols);
-//     freeMatrix(imgUnfolded);
-
-//     /* fix matrix dimensions */
-//     // TODO: can we do this better?
-//     CERROR( cudaMemcpy(&(kernel->height), &kernelRows, sizeof(int), cudaMemcpyHostToDevice) );
-//     CERROR( cudaMemcpy(&(kernel->width), &kernelRows, sizeof(int), cudaMemcpyHostToDevice) );
-// }
-
 __global__ void flattenKernel(Tensor4D* kernel, Matrix* kernelFlattened,
     int flattenedWidth, int flattenedArea
 ) {
@@ -475,4 +447,49 @@ void deviceUnfoldImage(Tensor4D* img, Matrix* imgUnfolded,
         img, imgUnfolded, kernelWidth, kernelArea, outWidth, outArea,
         unfoldedWidth, unfoldedArea);
     cudaDeviceSynchronize();
+}
+
+void deviceConvolve(Tensor4D* img, Tensor4D* kernel, Matrix* result,
+    int padding, int stride
+) {
+    int batchSize = img->dim4;
+    int inChannels = img->depth;
+    int imgHeight = img->height;
+    int imgWidth = img->width;
+
+    int outChannels = kernel->dim4;
+    int kernelHeight = kernel->height;
+    int kernelWidth = kernel->width;
+    int kernelArea = kernelHeight * kernelWidth;
+
+    /* im 2 col */
+    int outHeight = OUTPUT_DIM(imgHeight, kernelHeight, padding, stride);
+    int outWidth = OUTPUT_DIM(imgWidth, kernelWidth, padding, stride);
+    int outArea = outHeight * outWidth;
+
+    /* unfold image */
+    const int unfoldedHeight = batchSize*outarea;
+    const int unfoldedWidth = inChannels*kernelArea;
+    const int unfoldedArea = unfoldedHeight * unfoldedWidth;
+
+    Matrix* imgUnfolded;
+    initMatrix(&imgUnfolded, unfoldedHeight, unfoldedWidth);
+    deviceUnfoldImage(img, imgUnfolded, kernelWidth, kernelArea,
+        outWidth, outArea, unfoldedWidth, unfoldedArea);
+
+    /* flatten kernel */
+    const int flattenedHeight = inChannels*kernelArea;
+    const int flattenedArea = flattenedHeight*outChannels;
+
+    Matrix* kernelFlattened;
+    initMatrix(&kernelFlattened, flattenedHeight, outChannels);
+    deviceFlattenKernel(kernel, kernelFlattened, outChannels, flattenedArea);
+
+    /* GEMM */
+    deviceMatrixMult(imgUnfolded, kernelFlattened, result, outArea);
+
+    /* cleanup */
+    freeMatrix(imgUnfolded);
+    freeMatrix(kernelFlattened);
+
 }
