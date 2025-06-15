@@ -57,7 +57,11 @@ void matrixTranpose(Matrix *a, Matrix **b, int arows, int acols);
 void squareLoss(Matrix *x, float *result, int height, int width);
 
 /** CONVOLUTION **/
-void deviceUnfoldImage(Tensor4D* img, Matrix* imgUnfolded, int kernelHeight, int kernelWidth, int outHeight, int outWidth);
+void deviceUnfoldImage(Tensor4D* img, Matrix* imgUnfolded,
+    int kernelWidth, int kernelArea,
+    int outWidth, int outArea,
+    int unfoldedHeight, int unfoldedWidth
+);
 void deviceUnfoldMatrix(Matrix* img, Matrix** imgUnfolded, int kernelRows, int kernelCols, int resRows, int resCols);
 void deviceConvolve(Matrix* img, int imgRows, int imgCols,
   Matrix* kernel, int kernelRows, int kernelCols,

@@ -99,9 +99,11 @@ int im2colUnfoldTest() {
   initZerosMatrix(&deviceInputUnfolded, unfoldedHeight, unfoldedWidth);
 
   getDeviceTensor4DData(hostInput.data, deviceInput, batchSize*inChannels*inHeight*inWidth);
-  im2colUnfold4D_CPU(&hostInputUnfolded, &hostInput, filterWidth, filterWidth*filterHeight, outWidth, outWidth*outHeight);
+  im2colUnfold4D_CPU(&hostInputUnfolded, &hostInput, filterWidth, filterWidth*filterHeight,
+    outWidth, outWidth*outHeight);
 
-  deviceUnfoldImage(deviceInput, deviceInputUnfolded, filterHeight, filterWidth, outHeight, outWidth);
+  deviceUnfoldImage(deviceInput, deviceInputUnfolded, filterWidth, filterHeight*filterWidth,
+    outWidth, outWidth*outHeight, unfoldedHeight, unfoldedWidth);
 
   getDeviceMatrixData(hostInputUnfolded2.data, deviceInputUnfolded, unfoldedHeight*unfoldedWidth);
 

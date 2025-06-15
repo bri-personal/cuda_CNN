@@ -418,6 +418,45 @@ void deviceConvolve(Matrix* img, int imgRows, int imgCols,
     CERROR( cudaMemcpy(&(kernel->width), &kernelRows, sizeof(int), cudaMemcpyHostToDevice) );
 }
 
-void deviceUnfoldImage(Tensor4D* img, Matrix* imgUnfolded, int kernelHeight, int kernelWidth, int outHeight, int outWidth) {
-    return;
+__global__ void unfoldImage(Tensor4D* img, Matrix* imgUnfolded,
+        int kernelWidth, int kernelArea, int outputWidth, int outputArea,
+        int unfoldedHeight, int unfoldedWidth
+) {
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    int unfoldedArea = unfoldedHeight * unfoldedWidth;
+
+    int imageHeight = img->height;
+    int imageWidth = img->width;
+    int imageChannels = img->depth;
+    int imageAreaPerChannel = imageHeight*imageWidth;
+    int imageAreaPerSample = imageAreaPerChannel*imageChannels;
+
+    while (i < unfoldedArea) {
+        int h = i / unfoldedWidth;
+        int w = i % unfoldedWidth;
+
+        int h_mod_output_area = h % outputArea;
+        int h_div_output_area = h / outputArea;
+        int hImageUnfoldedRows = h * unfoldedWidth;
+        int w_mod_kernel_area = w % kernelArea;
+
+        imgUnfolded->data[hImageUnfoldedRows + w] = img->data[
+            h_div_output_area*imageAreaPerSample +
+            (w / kernelArea)*imageAreaPerChannel +
+            (h_mod_output_area / outputWidth + w_mod_kernel_area / kernelWidth)*imageWidth +
+            (h_mod_output_area % outputWidth + w_mod_kernel_area % kernelWidth)
+        ];
+
+        i += gridDim.x;
+    }
+}
+void deviceUnfoldImage(Tensor4D* img, Matrix* imgUnfolded,
+    int kernelWidth, int kernelArea,
+    int outWidth, int outArea,
+    int unfoldedHeight, int unfoldedWidth
+) {
+    unfoldImage<<<BLOCKS(unfoldedHeight * unfoldedWidth, BLOCKDIM), BLOCKDIM>>>(
+        img, imgUnfolded, kernelWidth, kernelArea, outWidth, outArea,
+        unfoldedHeight, unfoldedWidth);
+    cudaDeviceSynchronize();
 }
