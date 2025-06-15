@@ -84,13 +84,9 @@ void layerForward(ConvolutionalLayer *layer) {
 
     int im2colOutRows = layer->outputs->dim4 * outRows * outCols;
     int im2colOutArea = im2colOutRows * outChannels;
-    exit(0);
 
     Matrix* temp;
-    exit(0);
-
     initMatrix(&temp, im2colOutRows, outChannels);
-    exit(0);
 
     deviceConvolve(
         layer->prev->outputs,

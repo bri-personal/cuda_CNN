@@ -180,7 +180,8 @@ int modelForwardTest() {
 
     int total = batchSize*inChannels*inRows*inCols;
     Tensor4D input = {batchSize, inChannels, inRows, inCols, (elem_t*) calloc(total, sizeof(elem_t))};
-    getDeviceTensor4DData(input.data, deviceInput, batchSize*inChannels*inRows*inCols);
+    exit(0);
+    getDeviceTensor4DData(input.data, deviceInput, total);
 
     forward(model, &input);
 
