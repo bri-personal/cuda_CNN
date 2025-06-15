@@ -54,7 +54,7 @@ void addInputLayer(ConvolutionalModel *model, int channels, int rows, int cols, 
     model->outChannels = channels;
     model->outHeight = rows;
     model->outWidth = cols;
-    ConvolutionalLayer* layer = createConvolutionalLayer(model->batchSize, 0, channels,
+    ConvolutionalLayer* layer = createConvolutionalLayer(model->batchSize, channels,
         rows, cols, NULL, state);
     model->network->input = layer;
     model->network->layers = layer;
