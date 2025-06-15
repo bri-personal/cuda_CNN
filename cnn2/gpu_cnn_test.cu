@@ -151,10 +151,40 @@ int initModelTest() {
     return 0;
 }
 
+int modelForwardTest() {
+    int batchSize = 10;
+    float learningRate = 0.025;
+
+    int inChannels = 3;
+    int inRows = 7;
+    int inCols = 9;
+
+    int hiddenChannels = 5;
+    int hiddenRows = 5;
+    int hiddenCols = 7;
+
+    int outChannels = 2;
+    int outRows = 3;
+    int outCols = 5;
+
+    curandState_t* state = createCurandStates(batchSize*hiddenChannels*inRows*inCols); // more than needed
+
+    ConvolutionalModel* model;
+    initConvolutionalModel(&model, batchSize, learningRate);
+    addInputLayer(model, inChannels, inRows, inCols, state);
+    addConvLayer(model, hiddenChannels, hiddenRows, hiddenCols, state);
+    addConvLayer(model, outChannels, outRows, outCols, state);
+
+    cleanupCurandStates(state);
+
+    return 0;
+}
+
 int main() {
     int test_total = 0;
     
     test_total += initModelTest();
+    test_total += modelForwardTest();
 
     return test_total;
 }
