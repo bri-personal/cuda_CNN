@@ -254,6 +254,7 @@ int convTest() {
     exit(1);
   }
   printf("1\n");
+  return 0;
 
   /* set up filter kernels on host*/
   Tensor4D hostKernel = {outChannels, inChannels, filterHeight, filterWidth,
