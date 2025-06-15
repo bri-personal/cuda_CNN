@@ -223,6 +223,7 @@ int cpuConvTest() {
 }
 
 int convTest() {
+  /* test params */
   const int padding = 0;
   const int stride = 1;
 
@@ -241,37 +242,60 @@ int convTest() {
   const int unfoldedHeight = batchSize*outHeight*outWidth;
   const int unfoldedWidth = inChannels*filterHeight*filterWidth;
 
-  const int flattenedWidth = outChannels;
+  const int im2colOutHeight = unfoldedHeight;
+  const int im2colOutWidth = outChannels;
+  const int im2colOutArea = im2colOutHeight * im2colOutWidth;
 
+  /* set up input image on host */
   Tensor4D hostInput = {batchSize, inChannels, inHeight, inWidth,
     (elem_t*) calloc(batchSize*inChannels*inHeight*inWidth, sizeof(elem_t))};
-  Tensor4D* deviceInput;
+  printf("1\n");
 
+  /* set up filter kernels on host*/
   Tensor4D hostKernel = {outChannels, inChannels, filterHeight, filterWidth,
     (elem_t*) calloc(outChannels*inChannels*filterHeight*filterWidth, sizeof(elem_t))};
-  Tensor4D* deviceKernel;
+  printf("2\n");
 
+  /* set up input image and filter kernels on device */
+  Tensor4D* deviceInput;
+  Tensor4D* deviceKernel;
   curandState_t* state = createCurandStates(unfoldedHeight*unfoldedWidth);
   initRandomTensor4D(&deviceInput, batchSize, inChannels, inHeight, inWidth, state);
   initRandomTensor4D(&deviceKernel, outChannels, inChannels, filterHeight, filterWidth, state);
   cleanupCurandStates(state);
+  printf("3\n");
 
+  /* set up output feature map on host */
   Tensor4D hostResultTensor4D = {
     batchSize, outChannels, outHeight, outWidth,
     (elem_t*) calloc(batchSize*outChannels*outHeight*outWidth, sizeof(elem_t))
   };
-  Matrix hostResultMatrix = {unfoldedHeight, flattenedWidth,
-    (elem_t*) calloc(unfoldedHeight*flattenedWidth, sizeof(elem_t))};
-  Matrix* deviceResult;
-  initMatrix(&deviceResult, unfoldedHeight, flattenedWidth);
+  printf("4\n");
+  Matrix hostResultMatrix = {im2colOutHeight, im2colOutWidth,
+    (elem_t*) calloc(im2colOutArea, sizeof(elem_t))};
+  printf("5\n");
 
+  /* set up output feature map on device */
+  Matrix* deviceResult;
+  initMatrix(&deviceResult, im2colOutHeight, im2colOutWidth);
+  printf("6\n");
+
+  /* get input and filter elements on host */
   getDeviceTensor4DData(hostInput.data, deviceInput, batchSize*inChannels*inHeight*inWidth);
   getDeviceTensor4DData(hostKernel.data, deviceKernel, outChannels*inChannels*filterHeight*filterWidth);
+  printf("7\n");
+
+  /* CPU convolution for comparison */
   conv_CPU(&hostResultTensor4D, &hostInput, &hostKernel);
+  printf("8\n");
 
+  /* convolution on device */
   deviceConvolve(deviceInput, deviceKernel, deviceResult, padding, stride);
-  getDeviceMatrixData(hostResultMatrix.data, deviceResult, unfoldedHeight*flattenedWidth);
+  printf("9\n");
+  getDeviceMatrixData(hostResultMatrix.data, deviceResult, im2colOutArea);
+  printf("10\n");
 
+  /* equality check */
   if(!im2colMatrixEqualsConvTensor4D(&hostResultMatrix, &hostResultTensor4D, 0.000001)) {
     printf("FAILURE: CPU and GPU conv are NOT equal\n");
     free(hostInput.data);
