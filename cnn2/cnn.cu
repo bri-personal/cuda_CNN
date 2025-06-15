@@ -79,12 +79,12 @@ void layerForward(ConvolutionalLayer *layer, int batchSize) {
     elem_t cpueTemp4DData[im2colOutArea] = {5, 5, 5, 5};
     Tensor4D cpuTemp4D = {batchSize, layer->inChannels, layer->imgRows, layer->imgCols, cpueTemp4DData};
     getDeviceTensor4DData(cpueTemp4DData.data, layer->prev->outputs, batchSize*layer->inChannels*layer->imgRows*layer->imgCols);
-    print("input\n");
+    printf("input\n");
     printTensor4D(&cpuTemp4D, "batch no", "channel");
 
     cpuTemp4D = {outChannels, layer->inChannels, layer->kernelRows, layer->kernelCols, cpueTemp4DData};
     getDeviceTensor4DData(cpueTemp4DData.data, layer->filters, outChannels*layer->inChannels*layer->kernelRows*layer->kernelCols);
-    print("filter\n");
+    printf("filter\n");
     printTensor4D(&cpuTemp4D, "out channel", "in channel");
 
 
@@ -107,7 +107,7 @@ void layerForward(ConvolutionalLayer *layer, int batchSize) {
     elem_t cpuTempData[im2colOutArea] = {5, 5, 5, 5};
     Matrix cpuTemp = {im2colOutRows, outChannels, cpuTempData};
     getDeviceMatrixData(cpuTemp.data, temp, im2colOutArea);
-    print("output\n");
+    printf("output\n");
     printMatrix(&cpuTemp);
 
     /* add bias for each out channel to every element in that channel */

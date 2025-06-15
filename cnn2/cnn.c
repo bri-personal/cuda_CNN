@@ -91,16 +91,16 @@ void layerForwardCPU(ConvolutionalLayer *layer, int batchSize) {
     /* for each channel of this input sample, do forward pass */
 
     // DEBUG
-    print("c input\n");
+    printf("c input\n");
     printTensor4D(layer->prev->outputs, "batch no", "channel");
-    print("c filter\n");
+    printf("c filter\n");
     printTensor4D(layer->filters, "out channel", "in channel");
     
     // TODO: padding and stride are hardcoded to 0 and 1 right now
     conv_CPU(layer->outputs, layer->prev->outputs, layer->filters, 0, 1);
 
     // DEBUG
-    print("c output\n");
+    printf("c output\n");
     printTensor4D(layer->outputs, "batch no", "channel");
 
     /* add bias for each out channel to every element in that channel */
