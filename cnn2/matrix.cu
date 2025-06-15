@@ -10,6 +10,33 @@
 
 #define SIGMOID(x) (1/(1+exp(x * -1)))
 
+/* Randomness stuff */
+/* CLAUDE */
+__global__ void setup_kernel(curandState_t *state, int n) {
+    int i = threadIdx.x + blockIdx.x * blockDim.x;
+    if (i < n) {
+        curand_init(1234, i, 0, state + i);
+    }
+}
+
+/* CLAUDE */
+curandState_t* createCurandStates(int num_elements) {
+    curandState_t *state;
+    CERROR(cudaMalloc(&state, num_elements * sizeof(curandState_t)));
+    
+    setup_kernel<<<BLOCKS(num_elements, BLOCKDIM), BLOCKDIM>>>(state, num_elements);
+    checkError("setup_kernel failed");
+    CERROR(cudaDeviceSynchronize());
+    
+    return state;
+}
+
+/* CLAUDE */
+void cleanupCurandStates(curandState_t* state) {
+    CERROR(cudaFree(state));
+}
+
+
 /** MEMORY management **/
 void initMatrix(Matrix **mat, int height, int width) {
   Matrix temp;
@@ -27,18 +54,17 @@ void freeMatrix(Matrix *mat) {
   CERROR( cudaFree(mat) );
 }
 
-__global__ void initRandomData(Matrix *mat, float range) {
+__global__ void initRandomData(Matrix *mat, float range, curandState_t* state) {
   int i = threadIdx.x + blockIdx.x * blockDim.x;
   if (i < mat->height * mat->width) {
-    curandState_t state;
-    curand_init(1234, i, 0, &state);
-    mat->data[i] = (float)(range + -((range * 2) * curand_uniform(&state)));
+    mat->data[i] = (curand_uniform(state + i) * 2.0f - 1.0f) * range;
   }
 }
 
-void initRandomMatrix(Matrix **mat, int height, int width) {
+void initRandomMatrix(Matrix **mat, int height, int width, curandState_t* state) {
   initMatrix(mat, height, width);
-  initRandomData<<<(height*width + 511) / 512, 512>>>(*mat, 1.0f);
+  initRandomData<<<BLOCKS(num_elements, BLOCKDIM), BLOCKDIM>>>(*mat, 1.0f, state);
+  checkError("initRandomData kernel failed");
 }
 
 __global__ void initZerosData(Matrix *mat) {
@@ -49,7 +75,8 @@ __global__ void initZerosData(Matrix *mat) {
 
 void initZerosMatrix(Matrix **mat, int height, int width) {
   initMatrix(mat, height, width);
-  initZerosData<<<(height*width + 511) / 512, 512>>>(*mat);
+  initZerosData<<<BLOCKS(height*width, BLOCKDIM), BLOCKDIM>>>(*mat);
+  checkError("initZerosData kernel failed");
 }
 
 void getDeviceMatrixData(float *dest, Matrix *source, int n) {
@@ -64,6 +91,68 @@ void setDeviceMatrixData(Matrix *dest, float *source, int n) {
   CERROR( cudaMemcpy(temp.data, source, n * sizeof(float), cudaMemcpyHostToDevice) );
 }
 
+/* for Tensor4D */
+void initTensor4D(Tensor4D **tensor, int dim4, int depth, int height, int width) {
+    Tensor4D temp;
+    temp.dim4 = dim4;
+    temp.depth = depth;
+    temp.height = height;
+    temp.width = width;
+    
+    int total_elements = dim4 * depth * height * width;
+    CERROR(cudaMalloc(&(temp.data), total_elements * sizeof(elem_t)));
+    CERROR(cudaMalloc(tensor, sizeof(Tensor4D)));
+    CERROR(cudaMemcpy(*tensor, &temp, sizeof(Tensor4D), cudaMemcpyHostToDevice));
+}
+
+void freeTensor4D(Tensor4D *tensor) {
+    Tensor4D temp;
+    CERROR(cudaMemcpy(&temp, tensor, sizeof(Tensor4D), cudaMemcpyDeviceToHost));
+    CERROR(cudaFree(temp.data));
+    CERROR(cudaFree(tensor));
+}
+
+__global__ void initRandomDataTensor4D(Tensor4D *tensor, float range, curandState_t* state) {
+    int i = threadIdx.x + blockIdx.x * blockDim.x;
+    int total_elements = tensor->dim4 * tensor->depth * tensor->height * tensor->width;
+    if (i < total_elements) {
+        tensor->data[i] = (curand_uniform(state + i) * 2.0f - 1.0f) * range;
+    }
+}
+
+void initRandomTensor4D(Tensor4D **tensor, int dim4, int depth, int height, int width, curandState_t* state) {
+    initTensor4D(tensor, dim4, depth, height, width);
+    int total_elements = dim4 * depth * height * width;
+    initRandomDataTensor4D<<<BLOCKS(total_elements, BLOCKDIM), BLOCKDIM>>>(*tensor, 1.0f, state);
+    checkError("initRandomDataTensor4D kernel failed");
+}
+
+__global__ void initZerosDataTensor4D(Tensor4D *tensor) {
+    int i = threadIdx.x + blockIdx.x * blockDim.x;
+    int total_elements = tensor->dim4 * tensor->depth * tensor->height * tensor->width;
+    if (i < total_elements) {
+        tensor->data[i] = 0;
+    }
+}
+
+void initZerosTensor4D(Tensor4D **tensor, int dim4, int depth, int height, int width) {
+    initTensor4D(tensor, dim4, depth, height, width);
+    int total_elements = dim4 * depth * height * width;
+    initZerosDataTensor4D<<<BLOCKS(total_elements, BLOCKDIM), BLOCKDIM>>>(*tensor);
+    checkError("initZerosDataTensor4D kernel failed");
+}
+
+void getDeviceTensor4DData(elem_t *dest, Tensor4D *source, int n) {
+    Tensor4D temp;
+    CERROR(cudaMemcpy(&temp, source, sizeof(Tensor4D), cudaMemcpyDeviceToHost));
+    CERROR(cudaMemcpy(dest, temp.data, n * sizeof(elem_t), cudaMemcpyDeviceToHost));
+}
+
+void setDeviceTensor4DData(Tensor4D *dest, elem_t *source, int n) {
+    Tensor4D temp;
+    CERROR(cudaMemcpy(&temp, dest, sizeof(Tensor4D), cudaMemcpyDeviceToHost));
+    CERROR(cudaMemcpy(temp.data, source, n * sizeof(elem_t), cudaMemcpyHostToDevice));
+}
 
 
 /** HELPER **/
@@ -235,7 +324,7 @@ __global__ void transpose(Matrix *a, Matrix *b) {
 }
 void matrixTranpose(Matrix *a, Matrix **b, int arows, int acols) {
   initMatrix(b, acols, arows); // Create matrix with switched height/width
-  transpose<<<(arows*acols + 511) / 512, 512>>>(a, *b);
+  transpose<<<BLOCKS(arows*acols, BLOCKDIM), BLOCKDIM>>>(a, *b);
   cudaDeviceSynchronize();
   checkError("Transpose");
 }
@@ -297,7 +386,7 @@ void deviceUnfoldMatrix(Matrix* img, Matrix** imgUnfolded, int kernelRows, int k
     int unfoldedCols = kernelRows * kernelCols;
     initMatrix(imgUnfolded, unfoldedRows, unfoldedCols);
     
-    unfoldMatrix<<<(unfoldedRows * unfoldedCols + 511) / 512, 512>>>(img, *imgUnfolded, kernelRows, resCols);
+    unfoldMatrix<<<BLOCKS(unfoldedRows * unfoldedCols, BLOCKDIM), BLOCKDIM>>>(img, *imgUnfolded, kernelRows, resCols);
     cudaDeviceSynchronize();
 }
 

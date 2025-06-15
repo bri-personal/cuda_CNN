@@ -28,8 +28,12 @@ int gemmTest() {
   Matrix hostC2 = {I, J, (elem_t*) calloc(I*J, sizeof(elem_t))};
   
   Matrix *deviceA, *deviceB, *deviceC;
-  initRandomMatrix(&deviceA, I, K);
-  initRandomMatrix(&deviceB, K, J);
+
+  curandState_t state = createCurandStates(I * J * K); // more than are needed
+  initRandomMatrix(&deviceA, I, K, state);
+  initRandomMatrix(&deviceB, K, J, state);
+  cleanupCurandStates(state);
+
   initZerosMatrix(&deviceC, I, J);
 
   getDeviceMatrixData(hostA.data, deviceA, I*K);

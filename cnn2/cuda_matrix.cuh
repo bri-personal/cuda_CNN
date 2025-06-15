@@ -2,6 +2,7 @@
 #define MATRIX_CUDA_H
 
 #include <cuda.h>
+#include <curand_kernel.h>
 #include "matrix.h"
 
 /* GPU params and macros */
@@ -10,13 +11,28 @@
 
 
 /* GPU functions */
+/* random stuff */
+curandState_t* createCurandStates(int num_elements);
+void cleanupCurandStates(curandState_t* state)
+
 /** MEMORY management **/
+/* for Matrix */
 void initMatrix(Matrix **mat, int height, int width);
 void freeMatrix(Matrix *mat);
-void initRandomMatrix(Matrix **mat, int height, int width);
+void initRandomMatrix(Matrix **mat, int height, int width, curandState_t* state);
 void initZerosMatrix(Matrix **mat, int height, int width);
 void getDeviceMatrixData(float *dest, Matrix *source, int n);
 void setDeviceMatrixData(Matrix *dest, float *source, int n);
+
+/* for Tensor4D */
+void initTensor4D(Tensor4D **tensor, int dim4, int depth, int height, int width);
+void freeTensor4D(Tensor4D *tensor);
+__global__ void initRandomDataTensor4D(Tensor4D *tensor, float range, curandState_t* state);
+void initRandomTensor4D(Tensor4D **tensor, int dim4, int depth, int height, int width, curandState_t* state);
+__global__ void initZerosDataTensor4D(Tensor4D *tensor);
+void initZerosTensor4D(Tensor4D **tensor, int dim4, int depth, int height, int width);
+void getDeviceTensor4DData(elem_t *dest, Tensor4D *source, int n);
+void setDeviceTensor4DData(Tensor4D *dest, elem_t *source, int n);
 
 /** HELPER **/
 __device__ int size(Matrix *mat);
