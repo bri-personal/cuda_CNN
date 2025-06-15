@@ -57,8 +57,8 @@ void gemm_CPU(Matrix* C, Matrix* A, Matrix* B) {
   }
 }
 
-void addScalarToEachColumnOfTensor4D_CPU(Tensor4D* dest, Tensor4D* src, Vector* scalars) {
-  /* width of scalar must equal width of src and dest */
+void addScalarToEachMatrixOfTensor4D_CPU(Tensor4D* dest, Tensor4D* src, Vector* scalars) {
+  /* width of scalar must equal DEPTH of src and dest */
   int dim4 = src->dim4;
   int depth = src->depth;
   int height = src->height;
@@ -69,7 +69,7 @@ void addScalarToEachColumnOfTensor4D_CPU(Tensor4D* dest, Tensor4D* src, Vector* 
       for(int i = 0; i < height; ++i) {
         for(int j = 0; j < width; ++j) {
           int idx = n*depth*height*width + k*height*width + i*width + j;
-          dest->data[idx] = src->data[idx] + scalars->data[j];
+          dest->data[idx] = src->data[idx] + scalars->data[k];
         }
       }
     }
@@ -93,6 +93,34 @@ int matrixEquals(Matrix* m1, Matrix* m2, elem_t delta) {
         printf("NOT EQUAL: m1[%d][%d] (%f) != m2[%d][%d] (%f) within %f\n",
           i, j, m1->data[i*m1->width + j], i, j, m2->data[i*m2->width + j], delta);
         return 0;
+      }
+    }
+  }
+  return 1;
+}
+
+int tensor4DEquals(Tensor4D* t1, Tensor4D* t2, elem_t delta) {
+  int dim4 = t1->dim4;
+  int depth = t1->depth;
+  int height = t1->height;
+  int width = t1->width;
+
+  if(dim4 != t2->dim4 || depth != t2->depth || height!=t2->height || width!=t2->width) {
+    printf("NOTE EQUAL: t1 and t2 have different dimensions\n");
+    return 0;
+  }
+
+  for(int n = 0; n < dim4; ++n) {
+    for(int k = 0; k < depth; ++k) {
+      for(int i = 0; i < height; ++i) {
+        for(int j = 0; j < width; ++j) {
+          int idx = n*depth*height*width + k*height*width + i*width + j;
+          if(fabsf(t1->data[idx] - t2->data[idx]) > delta) {
+            printf("NOT EQUAL: t1[%d][%d][%d][%d] (%f) != t2[%d][%d][%d][%d] (%f) within %f\n",
+              n, k, i, j, t1->data[idx], n, k, i, j, t2->data[idx], delta);
+            return 0;
+          }
+        }
       }
     }
   }

@@ -509,6 +509,48 @@ int modelForwardTestCPU() {
     return 0;
 }
 
+int modeForwardTestOutputCPU() {
+    const int batchSize = 1;
+    const int learningRate = 0.01;
+
+    const int inRows = 3;
+    const int inCols = 3;
+    const int inChannels = 1;
+
+    const int outRows = 2;
+    const int outCols = 2;
+    const int outChannels = 1;
+    int outFilterRows = inRows + 1 - outRows;
+    int outFilterCols = inCols + 1 - outCols;
+    
+    ConvolutionalModel* model = initConvolutionalModel(batchSize, learningRate);
+    addInputLayer(model, inChannels, inRows, inCols);
+
+    elem_t filterData[] = {1, 0, 0, 1};
+    Tensor4D filter = {outChannels, inChannels, outFilterRows, outFilterCols, filterData};
+
+    elem_t biasData[] = {1};
+    Vector biases = {outChannels, biasData};
+    addConvLayer(model, outChannels, outRows, outCols, &filter, &biases);
+    
+    elem_t inputData[] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
+    Tensor4D input = {batchSize, inChannels, inRows, inCols, inputData};
+    forward(model, &input);
+
+    elem_t expectedData[] = {
+        SIGMOID(1.6f), SIGMOID(1.8f), SIGMOID(2.2f), SIGMOID(2.4f)
+    };
+    Tensor4D expectedOut = {batchSize, outChannels, outRows, outCols, expectedData};
+    
+    if(!tensor4DEquals(expectedOut, model->network->output->outputs, 0.000001)) {
+        printf("FAILURE: CPU model forward does NOT have correct output\n");
+        return 1;
+    }
+
+    printf("SUCCESS: CPU model forward has correct output\n");
+    return 0;
+}
+
 int main() {
     int test_total = 0;
     
@@ -516,6 +558,7 @@ int main() {
     test_total += initModelTestCPU();
     test_total += modelForwardTest();
     test_total += modelForwardTestCPU();
+    test_total += modeForwardTestOutputCPU();
 
     return test_total;
 }
