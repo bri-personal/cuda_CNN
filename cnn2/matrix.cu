@@ -489,6 +489,6 @@ void deviceConvolve(
 
     /* cleanup */
     freeMatrix(imgUnfolded);
-    exit(0);
     freeMatrix(kernelFlattened);
+    exit(0);
 }
