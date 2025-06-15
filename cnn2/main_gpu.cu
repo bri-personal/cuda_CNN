@@ -16,7 +16,7 @@
 #define STRIDE 1
 
 
-int main() {
+int gemm_test() {
   const int I = 8;
   const int K = 6;
   const int J = 9;
@@ -39,17 +39,27 @@ int main() {
   getDeviceMatrixData(hostC2.data, deviceC, I*J);
 
   if(matrixEquals(&hostC2, &hostC, 0.000001)) {
-    printf("CPU and GPU GEMM are equal\n");
-  } else {
     printf("CPU and GPU GEMM are NOT equal\n");
+    freeMatrix(deviceA);
+    freeMatrix(deviceB);
+    freeMatrix(deviceC);
     return 1;
   }
 
+  printf("CPU and GPU GEMM are equal\n");
   freeMatrix(deviceA);
   freeMatrix(deviceB);
   freeMatrix(deviceC);
-
   return 0;
+}
+
+
+int main() {
+  int test_total = 0;
+
+  test_total += gemm_test();
+  
+  return test_total;
 
 
 
