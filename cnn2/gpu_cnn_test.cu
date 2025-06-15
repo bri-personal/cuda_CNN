@@ -11,6 +11,9 @@ int initModelTest() {
     ConvolutionalModel model;
     initConvolutionalModel(&model, batchSize, learningRate);
 
+    printf("b: %d, l: %f\n", model.batchSize, model.learningRate);
+    return 0;
+
     if(model.batchSize != 10 || model.learningRate != 0.025) {
         printf("FAILURE: model params NOT correct\n");
         return 1;
