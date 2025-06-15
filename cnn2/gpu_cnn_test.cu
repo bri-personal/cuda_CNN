@@ -9,7 +9,7 @@ int initModelTest() {
     float learningRate = 0.025;
 
     ConvolutionalModel* model;
-    initConvolutionalModel(model, batchSize, learningRate);
+    initConvolutionalModel(&model, batchSize, learningRate);
 
     if(model->batchSize != 10 || model->learningRate != 0.025) {
         printf("FAILURE: model params NOT correct\n");

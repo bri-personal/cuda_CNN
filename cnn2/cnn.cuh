@@ -54,7 +54,7 @@ typedef struct {
   float learningRate;
 } ConvolutionalModel;
 
-ConvolutionalModel* initConvolutionalModel(ConvolutionalModel* model, int batchSize, float learningRate);
+void initConvolutionalModel(ConvolutionalModel* model, int batchSize, float learningRate);
 
 ConvolutionalLayer* createConvolutionalLayer(int batch_size, int outChannels,
         int outputRows, int outputCols, ConvolutionalLayer* prev, curandState_t* state);

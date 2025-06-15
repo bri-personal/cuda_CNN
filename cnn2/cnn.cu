@@ -7,8 +7,8 @@
 #include <cuda.h>
 #include <curand_kernel.h>
 
-ConvolutionalModel *initConvolutionalModel(ConvolutionalModel* model, int batchSize, float learningRate) {  
-    model = (ConvolutionalModel*) calloc(1, sizeof(ConvolutionalModel));
+void initConvolutionalModel(ConvolutionalModel** model, int batchSize, float learningRate) {  
+    *model = (ConvolutionalModel*) calloc(1, sizeof(ConvolutionalModel));
     if (!model) { perror("calloc model"); exit(1); }
 
     ConvolutionalNetwork *cnn = (ConvolutionalNetwork*) malloc(sizeof(ConvolutionalNetwork));
@@ -20,7 +20,6 @@ ConvolutionalModel *initConvolutionalModel(ConvolutionalModel* model, int batchS
     model->batchSize = batchSize;
   
     checkError("Init CNN");
-    return model;
   }
 
 ConvolutionalLayer* createConvolutionalLayer(int batch_size, int outChannels,
