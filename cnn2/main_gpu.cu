@@ -107,18 +107,18 @@ int im2colUnfoldTest() {
 
   if(!matrixEquals(&hostInputUnfolded2, &hostInputUnfolded, 0.000001)) {
     printf("CPU and GPU im2col unfold are NOT equal\n");
-    free(hostInput->data);
-    free(hostInputUnfolded->data);
-    free(hostInputUnfolded2->data);
+    free(hostInput.data);
+    free(hostInputUnfolded.data);
+    free(hostInputUnfolded2.data);
     freeTensor4D(deviceInput);
     freeMatrix(deviceInputUnfolded);
     return 1;
   }
 
   printf("CPU and GPU im2col unfold are equal\n");
-  free(hostInput->data);
-  free(hostInputUnfolded->data);
-  free(hostInputUnfolded2->data);
+  free(hostInput.data);
+  free(hostInputUnfolded.data);
+  free(hostInputUnfolded2.data);
   freeTensor4D(deviceInput);
   freeMatrix(deviceInputUnfolded);
   return 0;
