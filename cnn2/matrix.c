@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "matrix.h"
 
 
@@ -62,7 +63,7 @@ int matrixEquals(Matrix* m1, Matrix* m2, elem_t delta) {
   }
   for(int i = 0; i < m1->height; ++i) {
     for(int j = 0; j < m1->width; ++j) {
-      if(abs(m1->data[i*m1->width + j] - m2->data[i*m2->width + j]) > delta) {
+      if(fabsf(m1->data[i*m1->width + j] - m2->data[i*m2->width + j]) > delta) {
         printf("NOT EQUAL: m1[%d][%d] (%f) != m2[%d][%d] (%f) within %f\n",
           i, j, m1->data[i*m1->width + j], i, j, m2->data[i*m2->width + j], delta);
         return 0;
@@ -85,7 +86,7 @@ int im2colMatrixEqualsConvTensor4D(Matrix* im2col, Tensor4D* conv, elem_t delta)
     for(int k = 0; k < conv->depth; ++k) {
       for(int h = 0; h < conv->height; ++h) {
         for(int w = 0; w < conv->width; ++w) {
-          if (abs(im2col->data[(n*convArea + h*conv->width + w)*im2col->width + k] - 
+          if (fabsf(im2col->data[(n*convArea + h*conv->width + w)*im2col->width + k] - 
                 conv->data[n*convAreaPerSample + k*convArea + h*conv->width + w]) > delta) {
             return 0;
           }
@@ -101,7 +102,6 @@ void im2colUnfold4D_CPU(Matrix* imageUnfolded, Tensor4D* image, int kernelWidth,
   int imageUnfoldedHeight = imageUnfolded->height;
   int imageUnfoldedWidth = imageUnfolded->width;
 
-  int imageDim4 = image->dim4;
   int imageDepth = image->depth;
   int imageHeight = image->height;
   int imageWidth = image->width;
@@ -129,7 +129,6 @@ void im2colUnfold4D_CPU(Matrix* imageUnfolded, Tensor4D* image, int kernelWidth,
 
 void im2colFlatten4D_CPU(Matrix* kernelFlattened, Tensor4D* kernel) {
   int outChannels = kernel->dim4;
-  int inChannels = kernel->depth;
   int kernelHeight = kernel->height;
   int kernelWidth = kernel->width;
 
