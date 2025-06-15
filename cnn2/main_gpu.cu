@@ -302,6 +302,7 @@ int convTest() {
   deviceConvolve(deviceInput, deviceKernel, deviceResult, padding, stride,
     inChannels, inHeight, inWidth, outChannels, filterHeight, filterWidth,
     im2colOutHeight, im2colOutWidth);
+  exit(0);
   getDeviceMatrixData(hostResultMatrix.data, deviceResult, im2colOutArea);
 
   /* equality check */
