@@ -99,12 +99,6 @@ void layerForward(ConvolutionalLayer *layer, int batchSize) {
     /* put temp contents into layer's output Tensor4D */
     deviceReorderIm2ColToConv(temp, layer->outputs, im2colOutArea);
 
-    //DEBUG
-    elem_t cpuTempData[im2colOutArea];
-    Matrix cpuTemp = {im2colOutRows, outChannels, cpuTempData};
-    getDeviceMatrixData(cpuTemp.data, temp, im2colOutArea);
-    printMatrix(&cpuTemp);
-
     freeMatrix(temp);
   }
   
