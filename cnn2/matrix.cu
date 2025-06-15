@@ -183,6 +183,12 @@ void initRandomVector(Vector **v, int width, curandState_t* state) {
   checkError("initRandomDataVector kernel failed");
 }
 
+void getDeviceVectorData(float *dest, Vector *source, int n) {
+    Vector temp;
+    CERROR(cudaMemcpy(&temp, source, sizeof(Vector), cudaMemcpyDeviceToHost));
+    CERROR(cudaMemcpy(dest, temp.data, n * sizeof(elem_t), cudaMemcpyDeviceToHost));
+}
+
 
 /** HELPER **/
 __device__ int size(Matrix *mat) {

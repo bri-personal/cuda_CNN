@@ -38,6 +38,7 @@ void setDeviceTensor4DData(Tensor4D *dest, elem_t *source, int n);
 void initVector(Vector **v, int width);
 void freeVector(Vector *v);
 void initRandomVector(Vector **v, int width, curandState_t* state);
+void getDeviceVectorData(float *dest, Vector *source, int n);
 
 /** HELPER **/
 __device__ int size(Matrix *mat);
