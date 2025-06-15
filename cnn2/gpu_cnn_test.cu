@@ -543,7 +543,7 @@ int modeForwardTestOutputCPU() {
     };
     Tensor4D expectedOut = {batchSize, outChannels, outRows, outCols, expectedData};
     
-    if(!tensor4DEquals(expectedOut, model->network->output->outputs, 0.000001)) {
+    if(!tensor4DEquals(&expectedOut, model->network->output->outputs, 0.000001)) {
         printf("FAILURE: CPU model forward does NOT have correct output\n");
         return 1;
     }
