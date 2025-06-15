@@ -165,22 +165,26 @@ int initModelTestCPU() {
     int hiddenChannels = 5;
     int hiddenRows = 5;
     int hiddenCols = 7;
+    int hiddenFilterRows = inRows + 1 - hiddenRows;
+    int hiddenFilterCols = inCols + 1 - hiddenCols;
 
     int outChannels = 2;
     int outRows = 3;
     int outCols = 5;
+    int outFilterRows = hiddenRows + 1 - outRows;
+    int outFilterCols = hiddenCols + 1 - outCols;
 
     ConvolutionalModel* model;
     initConvolutionalModel(&model, batchSize, learningRate);
     addInputLayerCPU(model, inChannels, inRows, inCols);
 
-    Tensor4D hiddenFilter = {hiddenChannels, inChannels, hiddenRows, hiddenCols,
-        (elem_t*) malloc(sizeof(elem_t)*hiddenChannels*inChannels*hiddenRows*hiddenCols)};
+    Tensor4D hiddenFilter = {hiddenChannels, inChannels, hiddenFilterRows, hiddenFilterCols,
+        (elem_t*) malloc(sizeof(elem_t)*hiddenChannels*inChannels*hiddenFilterRows*hiddenFilterCols)};
     Vector hiddenBiases = {hiddenChannels, (elem_t*) malloc(sizeof(elem_t)*hiddenChannels)};
     addConvLayerCPU(model, hiddenChannels, hiddenRows, hiddenCols, &hiddenFilter, &hiddenBiases);
 
-    Tensor4D outFilter = {outChannels, hiddenChannels, outRows, outCols,
-        (elem_t*) malloc(sizeof(elem_t)*outChannels*hiddenChannels*outRows*outCols)};
+    Tensor4D outFilter = {outChannels, hiddenChannels, outFilterRows, outFilterCols,
+        (elem_t*) malloc(sizeof(elem_t)*outChannels*hiddenChannels*outFilterRows*outFilterCols)};
     Vector outBiases = {outChannels, (elem_t*) malloc(sizeof(elem_t)*outChannels)};
     addConvLayerCPU(model, outChannels, outRows, outCols, &outFilter, &outBiases);
 
