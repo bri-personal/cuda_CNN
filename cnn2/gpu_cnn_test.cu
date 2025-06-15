@@ -509,7 +509,7 @@ int modelForwardTestCPU() {
     return 0;
 }
 
-int modeForwardTestOutputCPU() {
+int modelForwardTestOutputCPU() {
     const int batchSize = 1;
     const int learningRate = 0.01;
 
@@ -552,6 +552,74 @@ int modeForwardTestOutputCPU() {
     return 0;
 }
 
+int modelForwardTestOutput() {
+    const int batchSize = 1;
+    const int learningRate = 0.01;
+
+    const int inRows = 3;
+    const int inCols = 3;
+    const int inChannels = 1;
+
+    const int outRows = 2;
+    const int outCols = 2;
+    const int outChannels = 1;
+
+    /* input */
+    curandState_t* state = createCurandStates(batchSize*inChannels*inRows*inCols);
+
+    Tensor4D* deviceInput;
+    initRandomTensor4D(&deviceInput, batchSize, inChannels, inRows, inCols, state);
+
+    int inputSize = batchSize*inChannels*inRows*inCols;
+    Tensor4D input = {batchSize, inChannels, inRows, inCols, (elem_t*) calloc(inputSize, sizeof(elem_t))};
+    getDeviceTensor4DData(input.data, deviceInput, inputSize);
+
+    /* GPU */
+    ConvolutionalModel* model;
+    initConvolutionalModel(&model, batchSize, learningRate);
+    addInputLayer(model, inChannels, inRows, inCols, state);
+    addConvLayer(model, outChannels, outRows, outCols, state);
+
+    forward(model, &input);
+
+    int outSize = batchSize*outChannels*outRows*outCols;
+    elem_t gpuModelOutData[outSize];
+    Tensor4D gpuModelOut = {batchSize, outChannels, outRows, outCols,gpuModelOutData};
+    getDeviceTensor4DData(gpuModelOut->data, model->network->output->outputs, outSize);
+
+    cleanupCurandStates(state);
+
+    /* CPU */
+    int outFilterRows = inRows + 1 - outRows;
+    int outFilterCols = inCols + 1 - outCols;
+    int filterSize = outChannels*inChannels*outFilterRows*outFilterCols;
+    
+    ConvolutionalModel* modelCPU;
+    initConvolutionalModel(&modelCPU, batchSize, learningRate);
+    addInputLayerCPU(modelCPU, inChannels, inRows, inCols);
+
+    elem_t filterData[filterSize];
+    Tensor4D filter = {outChannels, inChannels, outFilterRows, outFilterCols, filterData};
+    getDeviceTensor4DData(filter.data, model->network->input->next->filters, filterSize);
+
+    elem_t biasData[outChannels];
+    Vector biases = {outChannels, biasData};
+    getDeviceVectorData(biases->data, model->network->input->next->biases, outChannels);
+
+    addConvLayerCPU(modelCPU, outChannels, outRows, outCols, &filter, &biases);
+    
+    forwardCPU(modelCPU, &input);
+    
+    /* compare */
+    if(!tensor4DEquals(gpuModelOut, modelCPU->network->output->outputs, 0.000001)) {
+        printf("FAILURE: GPU model forward and CPU model forward do NOT have equal output\n");
+        return 1;
+    }
+
+    printf("SUCCESS: GPU model forward and CPU model forward have equal output\n");
+    return 0;
+}
+
 int main() {
     int test_total = 0;
     
@@ -559,7 +627,8 @@ int main() {
     test_total += initModelTestCPU();
     test_total += modelForwardTest();
     test_total += modelForwardTestCPU();
-    test_total += modeForwardTestOutputCPU();
+    test_total += modelForwardTestOutputCPU();
+    test_total += modelForwardTestOutput();
 
     return test_total;
 }
