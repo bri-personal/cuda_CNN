@@ -279,8 +279,6 @@ int convTest() {
     perror("Failed to alloc hostResultTensor4D data");
     exit(1);
   }
-  printf("\n");
-  printf("result tensor %p\n", hostResultTensor4D.data);
   
   Matrix hostResultMatrix = {im2colOutHeight, im2colOutWidth,
     (elem_t*) calloc(im2colOutArea, sizeof(elem_t))};
@@ -288,7 +286,6 @@ int convTest() {
     perror("Failed to alloc hostResultMatrix data");
     exit(1);
   }
-  printf("result matrix %p\n", hostResultMatrix.data);
 
   /* set up output feature map on device */
   Matrix* deviceResult;
@@ -307,25 +304,16 @@ int convTest() {
     im2colOutHeight, im2colOutWidth);
   getDeviceMatrixData(hostResultMatrix.data, deviceResult, im2colOutArea);
 
-  if(hostResultTensor4D.data == NULL) {
-    perror("hostResultTensor4D.data is NULL before eq check");
-    exit(1);
-  }
-  if(hostResultMatrix.data == NULL) {
-    perror("hostResultTensor4D.data is NULL before eq check");
-    exit(1);
-  }
-
   /* equality check */
   if(!im2colMatrixEqualsConvTensor4D(&hostResultMatrix, &hostResultTensor4D, 0.000001)) {
     printf("FAILURE: CPU and GPU conv are NOT equal\n");
-    free(hostInput.data);
     freeTensor4D(deviceInput);
-    free(hostKernel.data);
-    freeTensor4D(deviceKernel);
-    free(hostResultTensor4D.data);
-    free(hostResultMatrix.data);
     freeMatrix(deviceResult);
+    // freeTensor4D(deviceKernel); // corrupted size vs. prev_size
+    free(hostInput.data);
+    free(hostKernel.data);
+    //free(hostResultTensor4D.data); // double free or corruption (!prev)
+    //free(hostResultMatrix.data); // munmap_chunk(): invalid pointer
     return 1;
   }
 
@@ -333,20 +321,9 @@ int convTest() {
   freeTensor4D(deviceInput);
   freeMatrix(deviceResult);
   // freeTensor4D(deviceKernel); // corrupted size vs. prev_size
-
   free(hostInput.data);
   free(hostKernel.data);
-  if(hostResultTensor4D.data == NULL) {
-    perror("hostResultTensor4D.data is NULL after eq check");
-    exit(1);
-  }
-  printf("result tensor %p\n", hostResultTensor4D.data);
   //free(hostResultTensor4D.data); // double free or corruption (!prev)
-  if(hostResultMatrix.data == NULL) {
-    perror("hostResultTensor4D.data is NULL after eq check");
-    exit(1);
-  }
-  printf("result matrix %p\n", hostResultMatrix.data);
   //free(hostResultMatrix.data); // munmap_chunk(): invalid pointer
   
   return 0;
