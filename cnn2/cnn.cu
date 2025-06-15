@@ -15,9 +15,9 @@ void initConvolutionalModel(ConvolutionalModel** model, int batchSize, float lea
     if (!cnn) { perror("malloc network"); exit(1); }
     cnn->numLayers = 0;
   
-    *model->network = cnn;
-    *model->learningRate = learningRate;
-    *model->batchSize = batchSize;
+    (*model)->network = cnn;
+    (*model)->learningRate = learningRate;
+    (*model)->batchSize = batchSize;
   
     checkError("Init CNN");
   }
