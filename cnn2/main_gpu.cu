@@ -301,11 +301,11 @@ int convTest() {
   getDeviceTensor4DData(hostInput.data, deviceInput, batchSize*inChannels*inHeight*inWidth);
   getDeviceTensor4DData(hostKernel.data, deviceKernel, outChannels*inChannels*filterHeight*filterWidth);
   printf("7\n");
-  return 0;
 
   /* CPU convolution for comparison */
   conv_CPU(&hostResultTensor4D, &hostInput, &hostKernel);
   printf("8\n");
+  return 0;
 
   /* convolution on device */
   deviceConvolve(deviceInput, deviceKernel, deviceResult, padding, stride);
