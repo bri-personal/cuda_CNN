@@ -16,7 +16,7 @@
 #define STRIDE 1
 
 
-int gemm_test() {
+int gemmTest() {
   const int I = 8;
   const int K = 6;
   const int J = 9;
@@ -53,12 +53,26 @@ int gemm_test() {
   return 0;
 }
 
+int im2colUnfoldTest() {
+  return 0;
+}
+
+int im2colFlattenTest() {
+  return 0;
+}
+
+int convTest() {
+  return 0;
+}
 
 int main() {
   int test_total = 0;
 
-  test_total += gemm_test();
-  
+  test_total += gemmTest();
+  test_total += im2colUnfoldTest();
+  test_total += im2colFlattenTest();
+  test_total += convTest();
+
   return test_total;
 
 
