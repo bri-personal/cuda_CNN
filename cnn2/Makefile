@@ -7,5 +7,5 @@ gpu_matrix_test:
 clean:
 	rm *_matrix_test
 
-clean_job: clean
-	rm job.*
+job_clean:
+	rm job.* core.*
