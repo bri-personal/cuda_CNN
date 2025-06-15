@@ -91,7 +91,7 @@ void layerForward(ConvolutionalLayer *layer, int batchSize) {
     );
 
     //DEBUG
-    elem_t cpuTempData[im2colOutArea];
+    elem_t cpuTempData[im2colOutArea] = {5, 5, 5, 5};
     Matrix cpuTemp = {im2colOutRows, outChannels, cpuTempData};
     getDeviceMatrixData(cpuTemp.data, temp, im2colOutArea);
     printMatrix(&cpuTemp);
