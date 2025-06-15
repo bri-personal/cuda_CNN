@@ -423,16 +423,15 @@ __global__ void unfoldImage(Tensor4D* img, Matrix* imgUnfolded,
         int h_mod_output_area = h % outputArea;
         int w_mod_kernel_area = w % kernelArea;
 
-        if(h_mod_output_area / outputWidth + w_mod_kernel_area / kernelWidth >=0 && 
-                h_mod_output_area / outputWidth + w_mod_kernel_area / kernelWidth < imageHeight && 
-                h_mod_output_area % outputWidth + w_mod_kernel_area % kernelWidth >= 00 && 
-                h_mod_output_area % outputWidth + w_mod_kernel_area % kernelWidth <= imageWidth
-        ) {
+        int inputRow = h_mod_output_area / outputWidth + w_mod_kernel_area / kernelWidth;
+        int inputCol = h_mod_output_area % outputWidth + w_mod_kernel_area % kernelWidth;
+
+        if(inputRow >=0 && inputRow < imageHeight && inputCol >= 0 && inputCol <= imageWidth) {
             imgUnfolded->data[i] = img->data[
                 (h / outputArea)*imageAreaPerSample +
                 (w / kernelArea)*imageAreaPerChannel +
-                (h_mod_output_area / outputWidth + w_mod_kernel_area / kernelWidth)*imageWidth +
-                (h_mod_output_area % outputWidth + w_mod_kernel_area % kernelWidth)
+                inputRow*imageWidth +
+                inputCol
             ];
         } else {
             imgUnfolded->data[i] = 0;
