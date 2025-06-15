@@ -49,6 +49,7 @@ void deviceMatrixAdd(Matrix *a, Matrix *b, Matrix *c, int N);
 void deviceMatrixSub(Matrix *a, Matrix *b, Matrix *c, int N);
 void deviceMatrixScale(Matrix *a, float scale, Matrix *b, int N);
 void deviceMatrixAddScalarElementwise(Matrix *src, Matrix *dest, float scalar, int N);
+void deviceMatrixAddScalarColumnwise(Matrix* src, Matrix *dest, Vector* scalars, int rows, int cols);
 void deviceMatrixDivideScalarElementwise(Matrix *src, Matrix *dest, float scalar, int N);
 void deviceHadamardProd(Matrix *a, Matrix *b, Matrix *c, int N);
 void deviceSigmoid(Matrix *a, Matrix *b, int N);
@@ -79,5 +80,6 @@ void deviceConvolve(
     int outChannels, int kernelHeight, int kernelWidth,
     int resHeight, int resWidth
 );
+void deviceReorderIm2ColToConv(Matrix* src, Tensor4D* dest, int n);
   
 #endif

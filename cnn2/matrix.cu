@@ -254,7 +254,18 @@ __global__ void matrixAddScalarElementwise(Matrix * src, Matrix *dest, float sca
 void deviceMatrixAddScalarElementwise(Matrix *src, Matrix *dest, float scalar, int N) {
   matrixAddScalarElementwise<<<BLOCKS(N, BLOCKDIM), BLOCKDIM>>>(src, dest, scalar);
   cudaDeviceSynchronize();
-  checkError("Matrix add scalar elementwise");
+  checkError("Matrix add scalar elementwise each col");
+}
+
+__global__ void matrixAddScalarColumnwise(Matrix* src, Matrix *dest, Vector* scalars, int rows, int cols) {
+  int i = threadIdx.x + blockIdx.x * blockDim.x;
+  if (i < size(dest))
+    dest->data[i] =  src->data[i] + scalars->data[i%cols];
+}
+void deviceMatrixAddScalarColumnwise(Matrix* src, Matrix *dest, Vector* scalars, int rows, int cols) {;
+  matrixAddScalarColumnwise<<<BLOCKS(rows*cols, BLOCKDIM), BLOCKDIM>>>(src, dest, scalars, rows, cols);
+  cudaDeviceSynchronize();
+  checkError("Matrix add scalar elementwise each col");
 }
 
 __global__ void matrixDivideScalarElementwise(Matrix * src, Matrix *dest, float scalar) {
@@ -527,4 +538,48 @@ void deviceConvolve(
     /* cleanup */
     freeMatrix(imgUnfolded);
     freeMatrix(kernelFlattened);
+}
+
+__global__ reorderIm2ColToConv(Matrix* src, Tensor4D* dest, int N) {
+  int i = blockIdx.x * blockDim.x + threadIdx.x;
+
+  int batchSize = dest->dim4;
+  int channels = dest->depth;
+  int height = dest->height;
+  int width = dest->width;
+  
+  int destAreaPerChannel = height*width;
+  int destAreaPerSample = channels*destAreaPerChannel;
+
+  int srcWidth = src->width;
+
+  while(i < N) {
+    int n = i / destAreaPerSample;
+    int inSampleIdx = i % destAreaPerSample;
+    int k = inSampleIdx / destAreaPerChannel;
+    int inChannelIdx = inSampleIdx % destAreaPerChannel;
+    int h = inChannelIdx / width;
+    int w = inChannelIdx % width;
+
+    dest[i] = src[(n*destAreaPerChannel + h*width + w)*srcWidth + k];
+
+    i += gridDim.x*blockDim.x;
+  }
+}
+void deviceReorderIm2ColToConv(Matrix* src, Tensor4D* dest, int N) {
+  reorderIm2ColToConv<<<BLOCKS(N, BLOCKDIM), BLOCKDIM>>>(src, dest, N);
+  cudaDeviceSynchronize();
+}
+
+void reorder_conv_to_im2col(elem_t src[BATCH_SIZE][OUT_CHANNELS][OUTPUT_DIM][OUTPUT_DIM], elem_t dest[BATCH_SIZE * OUTPUT_AREA][OUT_CHANNELS]) {
+  /* Rearrange to match 2D format */
+  for(int n = 0; n < BATCH_SIZE; ++n) {
+    for(int k = 0; k < OUT_CHANNELS; ++k) {
+      for(int h = 0; h < OUTPUT_DIM; ++h) {
+        for(int w = 0; w < OUTPUT_DIM; ++w) {
+          dest[n*OUTPUT_AREA + h*OUTPUT_DIM + w][k] = src[n][k][h][w];
+        }
+      }
+    }
+  }
 }

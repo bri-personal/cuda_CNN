@@ -76,91 +76,65 @@ void addConvLayer(ConvolutionalModel *model, int channels, int rows, int cols, c
     model->outWidth = cols;
 }
 
-// void layerForward(ConvolutionalLayer *layer, int sampleNo) {
-//     /* for each channel of this input sample, do forward pass */
+void layerForward(ConvolutionalLayer *layer) {
+    /* for each channel of this input sample, do forward pass */
+    int outChannels = layer->outChannels;
+    int outRows = layer->outputRows;
+    int outCols = layer->outputCols;
 
-//     // TODO: change size when we have image and kernel dimensions
-//     int imgRows = layer->imgRows;
-//     int imgCols = layer->imgCols;
-//     int imgSize = imgRows * imgCols;
-//     int kernelRows = layer->kernelRows;
-//     int kernelCols = layer->kernelCols;
-    
-//     int output_channels = layer->outChannels;
-//     int input_channels = layer->inChannels;
+    int im2colOutRows = model->batchSize*outRows*outCols;
+    int im2colOutArea = im2colOutRows*outChannels;
 
-//     int c, outChannels;
-//     Matrix *temp;
-//     initMatrix(&temp, layer->outputRows, layer->outputCols);
+    Matrix* temp;
+    initMatrix(&temp, im2colOutRows, outChannels);
 
-//     Matrix **inputImages, *outputImageK, **filtersK;
-//     inputImages = (layer->prev->outputs)[sampleNo];
+    deviceConvolve(
+        layer->prev->outputs,
+        layer->filters,
+        temp,
+        0, 1, //TODO: actually use padding and stride
+        layer->inChannels,
+        layer->imgRows,
+        layer->imgCols,
+        outChannels,
+        layer->kernelRows,
+        layer->kernelCols,
+        outRows,
+        outCols
+    );
 
-//     for (outChannels = 0; k < output_channels; k++) {
-//         outputImageK = (layer->outputs)[sampleNo][outChannels];
-//         filtersK = (layer->filters)[outChannels];
+    /* add bias for each out channel to every element in that channel */
+    deviceMatrixAddScalarColumnwise(temp, temp, layer->biases, im2colOutRows, outChannels);
 
-//         // TODO: change to convolution
-//         /* convolve first input channel image with first filter */
-//         deviceConvolve(inputImages[0], imgRows, imgCols, 
-//             filtersK[0], kernelRows, kernelCols,
-//             outputImageK, 1, 0);
-//         for (c = 1; c < input_channels; c++) {
-//             /* for each remaining channel, add the convolution of the image 
-//              * and filter to the running total
-//              */
-//             deviceConvolve(inputImages[c], imgRows, imgCols,
-//                 filtersK[c], kernelRows, kernelCols,
-//                 temp, 1, 0);
+    /* apply sigmoid activation to every element */
+    deviceSigmoid(temp, temp, im2colOutArea);
 
-//             deviceMatrixAdd(
-//                 outputImageK,
-//                 temp,
-//                 outputImageK,
-//                 imgSize
-//             );
-//         }
-        
-//         /* add bias to every element */
-//         deviceMatrixAddScalarElementwise(outputImageK, outputImageK, (layer->biases)[outChannels], imgSize);
+    /* put temp  contents into layer's output Tensor4D */
+    deviceReorderIm2ColToConv(temp, layer->outputs, im2colOutArea);
 
-//         /* apply sigmoid activation to every element */
-//         deviceSigmoid(outputImageK, outputImageK, imgSize);
-//     }
-
-//     freeMatrix(temp);
-//   }
+    freeMatrix(temp);
+  }
   
-// /**
-//  * :param input: list of input samples (size of minibatch).
-//  * Each input sample is an image with inChannels channels, or a list of inChannels lists of floats.
-//  */
-// void forward(ConvolutionalModel *model, float ***input) {
-//     ConvolutionalNetwork net = *(model->network);
-//     int batchSize = model->batchSize;
-//     int inputChannels = model->inChannels;
-//     int imageSize = model->inHeight * model->inWidth;
+/**
+ * :param input: list of input samples (size of minibatch).
+ * Each input sample is an image with inChannels channels, or a list of inChannels lists of floats.
+ */
+void forward(ConvolutionalModel *model, Tensor4D* input) {
+    ConvolutionalNetwork* net = model->network;
+    int batchSize = model->batchSize;
+    int inputChannels = model->inChannels;
+    int imageSize = model->inHeight * model->inWidth;
+    int inputSize = batchSize*inputChannels*imageSize;
 
-//     int i, j;
-
-//     /* initialize 4D tensor of input images */
-//     for (i = 0; i < batchSize; ++i) {
-//         for (j = 0; j < inputChannels; ++j) {
-//             setDeviceMatrixData((net.layers->outputs)[i][j], input[i][j], imageSize);
-//         }
-//     }
+    /* initialize 4D tensor of input images */
+    setDeviceTensor4DData(net->input->outputs, input.data, inputSize);
     
-//     ConvolutionalLayer *curr = net.layers->next; /* first hidden layer */
-//     for (i = 0; i < net.numLayers; ++i) {
-//         if (!curr) break;
-
-//         /* for each sample in minibatch, go forward */
-//         for (j = 0; j < batchSize; ++j) {
-//             layerForward(curr, j);
-//         }
-//         curr = curr->next;
-//     }
-//   }
+    ConvolutionalLayer *curr = net->input->next; /* first hidden layer */
+    while (curr != NULL) {
+        layerForward(curr);
+        curr = curr->next;
+    }
+  }
 
 
 // void initLayerGradients(ConvolutionalLayer *layer, int batchSize) {
