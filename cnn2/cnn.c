@@ -39,8 +39,8 @@ ConvolutionalLayer* createConvolutionalLayerCPU(int batch_size, int outChannels,
     }
 
     // TODO: this is assuming stride = 1 and padding = 0
-    layer->kernelRows = filters->height; //layer->imgRows + 1 - outputRows;
-    layer->kernelCols = filters->width; //layer->imgCols + 1 - outputCols;
+    layer->kernelRows = filters != NULL ? filters->height : 0; //layer->imgRows + 1 - outputRows;
+    layer->kernelCols = filters != NULL ? filters->width : 0; //layer->imgCols + 1 - outputCols;
 
     layer->filters = filters;
     layer->biases = biases;
