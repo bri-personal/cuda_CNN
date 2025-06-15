@@ -409,7 +409,7 @@ __global__ void flattenKernel(Tensor4D* kernel, Matrix* kernelFlattened,
     int kernelAreaPerInputChannel = kernelHeight * kernelWidth;
     int kernelAreaPerOutputChannel = inChannels * kernelAreaPerInputChannel;
 
-    while (i < unfoldedArea) {
+    while (i < flattenedArea) {
         int h = i / flattenedWidth;
         int w = i % flattenedWidth;
 
