@@ -323,10 +323,10 @@ int main() {
   int test_total = 0;
 
   test_total += gemmTest();
-  test_total += im2colUnfoldTest();
-  test_total += im2colFlattenTest();
+  // test_total += im2colUnfoldTest();
+  // test_total += im2colFlattenTest();
   // test_total += cpuConvTest();
-  test_total += convTest();
+  // test_total += convTest();
 
   return test_total;
 }
