@@ -182,7 +182,6 @@ int initModelTestCPU() {
         (elem_t*) malloc(sizeof(elem_t)*hiddenChannels*inChannels*hiddenFilterRows*hiddenFilterCols)};
     Vector hiddenBiases = {hiddenChannels, (elem_t*) malloc(sizeof(elem_t)*hiddenChannels)};
     addConvLayerCPU(model, hiddenChannels, hiddenRows, hiddenCols, &hiddenFilter, &hiddenBiases);
-    return 0;
   
     Tensor4D outFilter = {outChannels, hiddenChannels, outFilterRows, outFilterCols,
         (elem_t*) malloc(sizeof(elem_t)*outChannels*hiddenChannels*outFilterRows*outFilterCols)};

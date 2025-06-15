@@ -80,6 +80,7 @@ void addConvLayerCPU(ConvolutionalModel *model, int channels, int rows, int cols
     ConvolutionalLayer* prev = model->network->output;
     ConvolutionalLayer* layer = createConvolutionalLayerCPU(model->batchSize, channels,
         rows, cols, prev, filters, biases);
+    exit(0);
     model->network->numLayers++;
     model->network->output = layer;
     model->outChannels = channels;
