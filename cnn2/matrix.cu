@@ -63,7 +63,7 @@ __global__ void initRandomData(Matrix *mat, float range, curandState_t* state) {
 
 void initRandomMatrix(Matrix **mat, int height, int width, curandState_t* state) {
   initMatrix(mat, height, width);
-  initRandomData<<<BLOCKS(num_elements, BLOCKDIM), BLOCKDIM>>>(*mat, 1.0f, state);
+  initRandomData<<<BLOCKS(height*width, BLOCKDIM), BLOCKDIM>>>(*mat, 1.0f, state);
   checkError("initRandomData kernel failed");
 }
 
