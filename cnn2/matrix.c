@@ -87,16 +87,18 @@ int matrixEquals(Matrix* m1, Matrix* m2, elem_t delta) {
   if(m1->height!=m2->height || m1->width!=m2->width) {
     return 0;
   }
+
+  int ret = 1;
   for(int i = 0; i < m1->height; ++i) {
     for(int j = 0; j < m1->width; ++j) {
       if(fabsf(m1->data[i*m1->width + j] - m2->data[i*m2->width + j]) > delta) {
         printf("NOT EQUAL: m1[%d][%d] (%f) != m2[%d][%d] (%f) within %f\n",
           i, j, m1->data[i*m1->width + j], i, j, m2->data[i*m2->width + j], delta);
-        return 0;
+        ret = 0; // keep going to see all differences
       }
     }
   }
-  return 1;
+  return ret;
 }
 
 int tensor4DEquals(Tensor4D* t1, Tensor4D* t2, elem_t delta) {
