@@ -182,7 +182,8 @@ int initModelTestCPU() {
         (elem_t*) malloc(sizeof(elem_t)*hiddenChannels*inChannels*hiddenFilterRows*hiddenFilterCols)};
     Vector hiddenBiases = {hiddenChannels, (elem_t*) malloc(sizeof(elem_t)*hiddenChannels)};
     addConvLayerCPU(model, hiddenChannels, hiddenRows, hiddenCols, &hiddenFilter, &hiddenBiases);
-
+    return 0;
+  
     Tensor4D outFilter = {outChannels, hiddenChannels, outFilterRows, outFilterCols,
         (elem_t*) malloc(sizeof(elem_t)*outChannels*hiddenChannels*outFilterRows*outFilterCols)};
     Vector outBiases = {outChannels, (elem_t*) malloc(sizeof(elem_t)*outChannels)};
@@ -332,7 +333,6 @@ int initModelTestCPU() {
         free(outFilter.data);
         return 1;
     }
-    return 0;
     if(hiddenLayer->kernelRows != 3) {
         printf("FAILURE: hidden layer kernel rows NOT correct\n");
         free(hiddenBiases.data);
