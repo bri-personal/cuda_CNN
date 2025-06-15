@@ -279,6 +279,7 @@ int convTest() {
     perror("Failed to alloc hostResultTensor4D data");
     exit(1);
   }
+  printf("result tensor %p\n", hostResultTensor4D.data);
   
   Matrix hostResultMatrix = {im2colOutHeight, im2colOutWidth,
     (elem_t*) calloc(im2colOutArea, sizeof(elem_t))};
@@ -286,6 +287,7 @@ int convTest() {
     perror("Failed to alloc hostResultMatrix data");
     exit(1);
   }
+  printf("result matrix %p\n", hostResultMatrix.data);
 
   /* set up output feature map on device */
   Matrix* deviceResult;
@@ -337,13 +339,13 @@ int convTest() {
     perror("hostResultTensor4D.data is NULL after eq check");
     exit(1);
   }
-  printf("%p\n", hostResultTensor4D.data);
+  printf("result tensor %p\n", hostResultTensor4D.data);
   //free(hostResultTensor4D.data); // double free or corruption (!prev)
   if(hostResultMatrix.data == NULL) {
     perror("hostResultTensor4D.data is NULL after eq check");
     exit(1);
   }
-  printf("%p\n", hostResultMatrix.data);
+  printf("result matrix %p\n", hostResultMatrix.data);
   //free(hostResultMatrix.data); // munmap_chunk(): invalid pointer
   
   return 0;
