@@ -454,8 +454,6 @@ void deviceConvolve(Tensor4D* img, Tensor4D* kernel, Matrix* result,
 ) {
     int batchSize = img->dim4;
     int inChannels = img->depth;
-    int imgHeight = img->height;
-    int imgWidth = img->width;
 
     int outChannels = kernel->dim4;
     int kernelHeight = kernel->height;

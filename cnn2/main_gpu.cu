@@ -224,7 +224,7 @@ int cpuConvTest() {
 
 int convTest() {
   const int padding = 0;
-  const int stride = 0;
+  const int stride = 1;
 
   const int batchSize = 10;
   const int inChannels = 3;
@@ -241,7 +241,6 @@ int convTest() {
   const int unfoldedHeight = batchSize*outHeight*outWidth;
   const int unfoldedWidth = inChannels*filterHeight*filterWidth;
 
-  const int flattenedHeight = inChannels*filterHeight*filterWidth;
   const int flattenedWidth = outChannels;
 
   Tensor4D hostInput = {batchSize, inChannels, inHeight, inWidth,
@@ -257,28 +256,27 @@ int convTest() {
   initRandomTensor4D(&deviceKernel, outChannels, inChannels, filterHeight, filterWidth, state);
   cleanupCurandStates(state);
 
-  Tensor4D hostResultTensor4D = {batchSize, outChannels, outHeight, outWidth,
-    (elem_t*) calloc(batchSize*outChannels*outHeight*outWidth,, sizeof(elem_t))};
-  Matrix hostResultMatrix = {inHeight, filterWidth, (elem_t*) calloc(inHeight*filterWidth, sizeof(elem_t))};
+  Tensor4D hostResultTensor4D = {
+    batchSize, outChannels, outHeight, outWidth,
+    (elem_t*) calloc(batchSize*outChannels*outHeight*outWidth,, sizeof(elem_t))
+  };
+  Matrix hostResultMatrix = {unfoldedHeight, flattenedWidth,
+    (elem_t*) calloc(unfoldedHeight*flattenedWidth, sizeof(elem_t))};
   Matrix* deviceResult;
-  initMatrix(&deviceResult, inHeight, filterWidth);
+  initMatrix(&deviceResult, unfoldedHeight, flattenedWidth);
 
   getDeviceTensor4DData(hostInput.data, deviceInput, batchSize*inChannels*inHeight*inWidth);
   getDeviceTensor4DData(hostKernel.data, deviceKernel, outChannels*inChannels*filterHeight*filterWidth);
-  conv_CPU(hostResultTensor4D, hostInput, hostKernel);
+  conv_CPU(&hostResultTensor4D, &hostInput, &hostKernel);
 
   deviceConvolve(deviceInput, deviceKernel, deviceResult, padding, stride);
-  getDeviceMatrixData(hostResultMatrix.data, deviceResult, inHeight*filterWidth);
+  getDeviceMatrixData(hostResultMatrix.data, deviceResult, unfoldedHeight*flattenedWidth);
 
   if(!im2colMatrixEqualsConvTensor4D(&hostResultMatrix, &hostResultTensor4D, 0.000001)) {
     printf("FAILURE: CPU and GPU conv are NOT equal\n");
     free(hostInput.data);
-    free(hostInputUnfolded.data);
-    free(hostInputUnfolded2.data);
     freeTensor4D(deviceInput);
     free(hostKernel.data);
-    free(hostKernelFlattened.data);
-    free(hostKernelFlattened2.data);
     freeTensor4D(deviceKernel);
     free(hostResultTensor4D.data);
     free(hostResultMatrix.data);
@@ -288,12 +286,8 @@ int convTest() {
 
   printf("SUCCESS: CPU and GPU conv are equal\n");
   free(hostInput.data);
-  free(hostInputUnfolded.data);
-  free(hostInputUnfolded2.data);
   freeTensor4D(deviceInput);
   free(hostKernel.data);
-  free(hostKernelFlattened.data);
-  free(hostKernelFlattened2.data);
   freeTensor4D(deviceKernel);
   free(hostResultTensor4D.data);
   free(hostResultMatrix.data);
