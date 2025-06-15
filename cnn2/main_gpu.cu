@@ -209,7 +209,7 @@ int cpuConvTest() {
 
   Tensor4D convOutput = {BATCH_SIZE, OUT_CHANNELS, outputHeight, outputWidth,
     (elem_t*) calloc(BATCH_SIZE*OUT_CHANNELS*outputArea, sizeof(elem_t))};
-  conv_CPU(&convOutput, &i, &k);
+  conv_CPU(&convOutput, &i, &k, padding, stride);
 
   if(!im2colMatrixEqualsConvTensor4D(&im2colConvOutput, &convOutput, 0.000001)) {
     printf("CPU im2col GEMM and CPU conv are NOT equal\n");
