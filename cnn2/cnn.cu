@@ -99,8 +99,8 @@ void layerForward(ConvolutionalLayer *layer, int batchSize) {
         outChannels,
         layer->kernelRows,
         layer->kernelCols,
-        outRows,
-        outCols
+        im2colOutRows,
+        outChannels
     );
 
     //DEBUG
