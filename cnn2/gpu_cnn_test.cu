@@ -178,9 +178,9 @@ int initModelTestCPU() {
     initConvolutionalModel(&model, batchSize, learningRate);
     addInputLayerCPU(model, inChannels, inRows, inCols);
 
+    exit(0);
     Tensor4D hiddenFilter = {hiddenChannels, inChannels, hiddenFilterRows, hiddenFilterCols,
         (elem_t*) malloc(sizeof(elem_t)*hiddenChannels*inChannels*hiddenFilterRows*hiddenFilterCols)};
-    exit(0);
     Vector hiddenBiases = {hiddenChannels, (elem_t*) malloc(sizeof(elem_t)*hiddenChannels)};
     addConvLayerCPU(model, hiddenChannels, hiddenRows, hiddenCols, &hiddenFilter, &hiddenBiases);
   
