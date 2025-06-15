@@ -47,7 +47,7 @@ int initModelTest() {
         printf("FAILURE: model in height NOT correct\n");
         return 1;
     }
-    if (model->inWidth != inChannels) {
+    if (model->inWidth != inCols) {
         printf("FAILURE: model in width NOT correct\n");
         return 1;
     } 
