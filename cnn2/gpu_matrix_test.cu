@@ -310,11 +310,6 @@ int convTest() {
     im2colOutHeight, im2colOutWidth);
   getDeviceMatrixData(hostResultMatrix.data, deviceResult, im2colOutArea);
 
-  printf("gpu result\n");
-  printMatrix(&hostResultMatrix);
-  printf("cpu result\n");
-  printTensor4D(&hostResultTensor4D, "batch no", "channel");
-
   /* equality check */
   if(!im2colMatrixEqualsConvTensor4D(&hostResultMatrix, &hostResultTensor4D, 0.000001)) {
     printf("FAILURE: CPU and GPU conv are NOT equal\n");

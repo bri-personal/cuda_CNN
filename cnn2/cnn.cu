@@ -75,19 +75,6 @@ void layerForward(ConvolutionalLayer *layer, int batchSize) {
     Matrix* temp;
     initMatrix(&temp, im2colOutRows, outChannels);
 
-    //DEBUG
-    elem_t cpuTemp4DData[im2colOutArea] = {5, 5, 5, 5};
-    Tensor4D cpuTemp4D = {batchSize, layer->inChannels, layer->imgRows, layer->imgCols, cpuTemp4DData};
-    getDeviceTensor4DData(cpuTemp4D.data, layer->prev->outputs, batchSize*layer->inChannels*layer->imgRows*layer->imgCols);
-    printf("input\n");
-    printTensor4D(&cpuTemp4D, "batch no", "channel");
-
-    cpuTemp4D = {outChannels, layer->inChannels, layer->kernelRows, layer->kernelCols, cpuTemp4DData};
-    getDeviceTensor4DData(cpuTemp4D.data, layer->filters, outChannels*layer->inChannels*layer->kernelRows*layer->kernelCols);
-    printf("filter\n");
-    printTensor4D(&cpuTemp4D, "out channel", "in channel");
-
-
     deviceConvolve(
         layer->prev->outputs,
         layer->filters,
@@ -102,13 +89,6 @@ void layerForward(ConvolutionalLayer *layer, int batchSize) {
         im2colOutRows,
         outChannels
     );
-
-    //DEBUG
-    elem_t cpuTempData[im2colOutArea] = {5, 5, 5, 5};
-    Matrix cpuTemp = {im2colOutRows, outChannels, cpuTempData};
-    getDeviceMatrixData(cpuTemp.data, temp, im2colOutArea);
-    printf("output\n");
-    printMatrix(&cpuTemp);
 
     /* add bias for each out channel to every element in that channel */
     deviceMatrixAddScalarColumnwise(temp, temp, layer->biases, im2colOutRows, outChannels);
