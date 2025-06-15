@@ -324,8 +324,8 @@ int convTest() {
 
   free(hostInput.data);
   free(hostKernel.data);
-  free(hostResultTensor4D.data); // bad?
-  // free(hostResultMatrix.data); // bad?
+  // free(hostResultTensor4D.data); // double free or corruption (!prev)
+  free(hostResultMatrix.data); // bad?
   
   return 0;
 }
