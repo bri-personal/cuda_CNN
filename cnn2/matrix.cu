@@ -406,8 +406,9 @@ void deviceFlattenKernel(Tensor4D* kernel, Matrix* kernelFlattened,
 
 __global__ void unfoldImage(Tensor4D* img, Matrix* imgUnfolded,
         int kernelWidth, int kernelArea, int outputWidth, int outputArea,
-        int unfoldedWidth, int unfoldedArea
+        int unfoldedWidth, int unfoldedArea, int padding, int stride
 ) {
+    // TODO: padding and stride not accounted for
     int i = blockIdx.x * blockDim.x + threadIdx.x;
 
     int imageHeight = img->height;
@@ -443,11 +444,12 @@ __global__ void unfoldImage(Tensor4D* img, Matrix* imgUnfolded,
 void deviceUnfoldImage(Tensor4D* img, Matrix* imgUnfolded,
     int kernelWidth, int kernelArea,
     int outWidth, int outArea,
-    int unfoldedWidth, int unfoldedArea
+    int unfoldedWidth, int unfoldedArea,
+    int padding, int stride
 ) {
     unfoldImage<<<BLOCKS(unfoldedArea, BLOCKDIM), BLOCKDIM>>>(
         img, imgUnfolded, kernelWidth, kernelArea, outWidth, outArea,
-        unfoldedWidth, unfoldedArea);
+        unfoldedWidth, unfoldedArea, padding, stride);
     cudaDeviceSynchronize();
 }
 
@@ -475,7 +477,7 @@ void deviceConvolve(
     initMatrix(&imgUnfolded, resHeight, unfoldedWidth);
 
     deviceUnfoldImage(img, imgUnfolded, kernelWidth, kernelArea,
-        outWidth, outArea, unfoldedWidth, unfoldedArea);
+        outWidth, outArea, unfoldedWidth, unfoldedArea, padding, stride);
 
     /* flatten kernel */
     int flattenedArea = unfoldedWidth*outChannels;

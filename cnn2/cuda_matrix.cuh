@@ -60,7 +60,8 @@ void squareLoss(Matrix *x, float *result, int height, int width);
 void deviceUnfoldImage(Tensor4D* img, Matrix* imgUnfolded,
     int kernelWidth, int kernelArea,
     int outWidth, int outArea,
-    int unfoldedWidth, int unfoldedArea
+    int unfoldedWidth, int unfoldedArea,
+    int padding, int stride
 );
 void deviceFlattenKernel(Tensor4D* kernel, Matrix* kernelFlattened,
     int flattenedWidth, int flattenedArea

@@ -67,6 +67,9 @@ int gemmTest() {
 }
 
 int im2colUnfoldTest() {
+  int padding = 0;
+  int stride = 1;
+
   const int batchSize = 10;
   const int inChannels = 3;
   const int inHeight = 5;
@@ -99,10 +102,10 @@ int im2colUnfoldTest() {
 
   getDeviceTensor4DData(hostInput.data, deviceInput, batchSize*inChannels*inHeight*inWidth);
   im2colUnfold4D_CPU(&hostInputUnfolded, &hostInput, filterWidth, filterWidth*filterHeight,
-    outWidth, outWidth*outHeight);
+    outWidth, outWidth*outHeight, padding, stride);
 
   deviceUnfoldImage(deviceInput, deviceInputUnfolded, filterWidth, filterHeight*filterWidth,
-    outWidth, outWidth*outHeight, unfoldedWidth, unfoldedWidth*unfoldedHeight);
+    outWidth, outWidth*outHeight, unfoldedWidth, unfoldedWidth*unfoldedHeight, padding, stride);
 
   getDeviceMatrixData(hostInputUnfolded2.data, deviceInputUnfolded, unfoldedHeight*unfoldedWidth);
 
@@ -184,6 +187,9 @@ int cpuConvTest() {
   elem_t kData[] = {0, 1, 1, 0, -1, 0, 0, -1, 2, 0, 0, 2, 0, -2, -2, 0};
   Tensor4D k = {OUT_CHANNELS, IN_CHANNELS, FILTER_HEIGHT, FILTER_WIDTH, kData};
 
+  int padding = 0;
+  int stride = 1;
+
   int outputWidth = OUTPUT_DIM(IMG_WIDTH, FILTER_WIDTH, PADDING, STRIDE);
   int outputHeight = OUTPUT_DIM(IMG_HEIGHT, FILTER_HEIGHT, PADDING, STRIDE);
   int outputArea = outputWidth*outputHeight;
@@ -194,7 +200,7 @@ int cpuConvTest() {
   Matrix iUnfolded = {imageUnfoldedHeight, imageUnfoldedWidth, (elem_t*) calloc(imageUnfoldedHeight*imageUnfoldedWidth, sizeof(elem_t))};
   Matrix kFlattened = {imageUnfoldedWidth, k.dim4, (elem_t*) calloc(imageUnfoldedWidth*k.dim4, sizeof(elem_t))};
 
-  im2colUnfold4D_CPU(&iUnfolded, &i, k.width, kernelArea, outputWidth, outputArea);
+  im2colUnfold4D_CPU(&iUnfolded, &i, k.width, kernelArea, outputWidth, outputArea, padding, stride);
   im2colFlatten4D_CPU(&kFlattened, &k);
 
   Matrix im2colConvOutput = {iUnfolded.height, kFlattened.width,
@@ -296,7 +302,7 @@ int convTest() {
   getDeviceTensor4DData(hostKernel.data, deviceKernel, outChannels*inChannels*filterHeight*filterWidth);
 
   /* CPU convolution for comparison */
-  conv_CPU(&hostResultTensor4D, &hostInput, &hostKernel);
+  conv_CPU(&hostResultTensor4D, &hostInput, &hostKernel, padding, stride);
 
   /* convolution on device */
   deviceConvolve(deviceInput, deviceKernel, deviceResult, padding, stride,

@@ -98,7 +98,9 @@ int im2colMatrixEqualsConvTensor4D(Matrix* im2col, Tensor4D* conv, elem_t delta)
 }
 
 void im2colUnfold4D_CPU(Matrix* imageUnfolded, Tensor4D* image, int kernelWidth,
-  int kernelArea, int outputWidth, int outputArea) {
+  int kernelArea, int outputWidth, int outputArea, int padding, int stride
+) {
+  //TODO: padding and stride not accounted for
   int imageUnfoldedHeight = imageUnfolded->height;
   int imageUnfoldedWidth = imageUnfolded->width;
 
@@ -151,7 +153,7 @@ void im2colFlatten4D_CPU(Matrix* kernelFlattened, Tensor4D* kernel) {
   }
 }
 
-void conv_CPU(Tensor4D* result, Tensor4D* input, Tensor4D* filter) {
+void conv_CPU(Tensor4D* result, Tensor4D* input, Tensor4D* filter, int padding, int stride) {
   int batchSize = input->dim4;
   int inChannels = input->depth;
   int imageHeight = input->height;
@@ -174,8 +176,8 @@ void conv_CPU(Tensor4D* result, Tensor4D* input, Tensor4D* filter) {
 
   for(int n = 0; n < batchSize; ++n) {
     for(int k = 0; k < outChannels; ++k) {
-      for(int h = 0; h < imageHeight; ++h) {
-        for(int w = 0; w < imageWidth; ++w) {
+      for(int h = 0; h + kernelHeight <= imageHeight; h += stride) {
+        for(int w = 0; w + kernelWidth <= imageWidth; w += stride) {
           elem_t acc = 0;
           for(int c = 0; c < inChannels; ++c) {
             for(int hk = 0; hk < kernelHeight; ++hk) {
