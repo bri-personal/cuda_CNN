@@ -41,8 +41,10 @@ ConvolutionalLayer* createConvolutionalLayer(int batch_size, int outChannels,
     layer->kernelRows = layer->imgRows + 1 - outputRows;
     layer->kernelCols = layer->imgCols + 1 - outputCols;
 
-    initRandomTensor4D(&layer->filters, outChannels, layer->inChannels,
-        layer->kernelRows, layer->kernelCols, state);
+    if(layer->inChannels > 0) {
+        initRandomTensor4D(&layer->filters, outChannels, layer->inChannels,
+            layer->kernelRows, layer->kernelCols, state);
+    }
     initRandomVector(&layer->biases, outChannels, state);
     initTensor4D(&layer->outputs, batch_size, outChannels, outputRows, outputCols);
 
