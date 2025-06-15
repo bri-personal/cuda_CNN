@@ -445,8 +445,6 @@ void deviceUnfoldImage(Tensor4D* img, Matrix* imgUnfolded,
     int outWidth, int outArea,
     int unfoldedWidth, int unfoldedArea
 ) {
-    printf("img: %dx%dx%dx%d\n", img->dim4, img->depth, img->height, img->width);
-    printf("img unfolded: %dx%d\n", imgUnfolded->height, imgUnfolded->width);
     unfoldImage<<<BLOCKS(unfoldedArea, BLOCKDIM), BLOCKDIM>>>(
         img, imgUnfolded, kernelWidth, kernelArea, outWidth, outArea,
         unfoldedWidth, unfoldedArea);
@@ -478,9 +476,6 @@ void deviceConvolve(Tensor4D* img, Tensor4D* kernel, Matrix* result,
 
     Matrix* imgUnfolded;
     initMatrix(&imgUnfolded, resHeight, unfoldedWidth);
-    printf("img: %dx%dx%dx%d\n", img->dim4, img->depth, img->height, img->width);
-    printf("img unfolded: %dx%d\n", imgUnfolded->height, imgUnfolded->width);
-    exit(0);
 
     deviceUnfoldImage(img, imgUnfolded, kernelWidth, kernelArea,
         outWidth, outArea, unfoldedWidth, unfoldedArea);
