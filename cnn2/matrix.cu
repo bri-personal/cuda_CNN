@@ -543,7 +543,6 @@ void deviceConvolve(
 __global__ void reorderIm2ColToConv(Matrix* src, Tensor4D* dest, int N) {
   int i = blockIdx.x * blockDim.x + threadIdx.x;
 
-  int batchSize = dest->dim4;
   int channels = dest->depth;
   int height = dest->height;
   int width = dest->width;
@@ -561,7 +560,7 @@ __global__ void reorderIm2ColToConv(Matrix* src, Tensor4D* dest, int N) {
     int h = inChannelIdx / width;
     int w = inChannelIdx % width;
 
-    dest[i] = src[(n*destAreaPerChannel + h*width + w)*srcWidth + k];
+    dest.data[i] = src.data[(n*destAreaPerChannel + h*width + w)*srcWidth + k];
 
     i += gridDim.x*blockDim.x;
   }
