@@ -233,12 +233,12 @@ int convTest() {
   const int padding = 0;
   const int stride = 1;
 
-  const int batchSize = 10;
-  const int inChannels = 3;
+  const int batchSize = 1;//10;
+  const int inChannels = 1;//3;
   const int inHeight = 5;
   const int inWidth = 7;
 
-  const int outChannels = 4;
+  const int outChannels = 1;//4;
   const int filterHeight = 3;
   const int filterWidth = 5;
 

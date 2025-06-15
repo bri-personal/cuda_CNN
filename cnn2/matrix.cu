@@ -479,7 +479,7 @@ __global__ void unfoldImage(Tensor4D* img, Matrix* imgUnfolded,
                 inputCol
             ];
         } else {
-            imgUnfolded->data[i] = 15;
+            imgUnfolded->data[i] = 0;
         }
 
         i += gridDim.x*blockDim.x;
