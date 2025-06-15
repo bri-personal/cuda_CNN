@@ -4,6 +4,9 @@ cpu_matrix_test:
 gpu_matrix_test:
 	nvcc matrix.cu matrix.c main_gpu.cu -o gpu_matrix_test
 
+batch:
+	sbatch BatchJobscript
+
 clean:
 	rm *_matrix_test
 
