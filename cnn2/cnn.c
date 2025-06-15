@@ -77,7 +77,6 @@ void addInputLayerCPU(ConvolutionalModel *model, int channels, int rows, int col
  * biases should be Vector(channels)
  */
 void addConvLayerCPU(ConvolutionalModel *model, int channels, int rows, int cols, Tensor4D* filters, Vector* biases) {
-    exit(0);
     ConvolutionalLayer* prev = model->network->output;
     ConvolutionalLayer* layer = createConvolutionalLayerCPU(model->batchSize, channels,
         rows, cols, prev, filters, biases);
