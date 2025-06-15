@@ -5,7 +5,7 @@ gpu_matrix_test:
 	nvcc matrix.cu matrix.c gpu_matrix_test.cu -o gpu_matrix_test
 
 gpu_cnn_test:
-	nvcc matrix.cu matrix.c cnn.cu gpu_cnn_test.cu -o gpu_cnn_test
+	nvcc matrix.cu matrix.c cnn.cu cnn.c gpu_cnn_test.cu -o gpu_cnn_test
 
 batch:
 	sbatch BatchJobscript
