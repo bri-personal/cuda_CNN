@@ -47,7 +47,7 @@ void gemm_CPU(Matrix* C, Matrix* A, Matrix* B);
 
 
 /* CPU im2col functions */
-#define OUTPUT_DIM(imageDim, kernelDim, padding, stride) ((imageDim - kernelDim + (padding << 1)) / stride + 1);
+#define OUTPUT_DIM(imageDim, kernelDim, padding, stride) ((imageDim - kernelDim + (padding << 1)) / stride + 1)
 int im2colMatrixEqualsConvTensor4D(Matrix* im2col, Tensor4D* conv, elem_t delta);
 void im2colUnfold4D_CPU(Matrix* imageUnfolded, Tensor4D* image, int kernelWidth, int kernelArea, int outputWidth, int outputArea);
 void im2colFlatten4D_CPU(Matrix* kernelFlattened, Tensor4D* kernel);
