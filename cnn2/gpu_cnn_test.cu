@@ -523,7 +523,8 @@ int modeForwardTestOutputCPU() {
     int outFilterRows = inRows + 1 - outRows;
     int outFilterCols = inCols + 1 - outCols;
     
-    ConvolutionalModel* model = initConvolutionalModel(batchSize, learningRate);
+    ConvolutionalModel* model;
+    initConvolutionalModel(&model, batchSize, learningRate);
     addInputLayer(model, inChannels, inRows, inCols);
 
     elem_t filterData[] = {1, 0, 0, 1};
