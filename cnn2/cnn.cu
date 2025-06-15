@@ -2,6 +2,7 @@
 #include "matrix.h"
 #include "cuda_matrix.cuh"
 #include "util.h"
+#include "cnn.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <cuda.h>

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "matrix.h"
+#include "cnn.h"
 #include "cuda_matrix.cuh"
 #include "cuda_cnn.cuh"
 
