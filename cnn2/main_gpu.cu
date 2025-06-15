@@ -318,7 +318,7 @@ int convTest() {
   }
 
   printf("SUCCESS: CPU and GPU conv are equal\n");
-  // free(hostInput.data);
+  free(hostInput.data);
   // freeTensor4D(deviceInput);
   // free(hostKernel.data);
   // freeTensor4D(deviceKernel);
