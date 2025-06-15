@@ -296,12 +296,12 @@ int convTest() {
   Matrix* deviceResult;
   initMatrix(&deviceResult, im2colOutHeight, im2colOutWidth);
   printf("6\n");
-  return 0;
 
   /* get input and filter elements on host */
   getDeviceTensor4DData(hostInput.data, deviceInput, batchSize*inChannels*inHeight*inWidth);
   getDeviceTensor4DData(hostKernel.data, deviceKernel, outChannels*inChannels*filterHeight*filterWidth);
   printf("7\n");
+  return 0;
 
   /* CPU convolution for comparison */
   conv_CPU(&hostResultTensor4D, &hostInput, &hostKernel);
