@@ -7,7 +7,7 @@
 #include <cuda.h>
 #include <curand_kernel.h>
 
-void initConvolutionalModel(ConvolutionalModel** model, int batchSize, float learningRate) {  
+void initConvolutionalModel(ConvolutionalModel* model, int batchSize, float learningRate) {  
     *model = (ConvolutionalModel*) calloc(1, sizeof(ConvolutionalModel));
     if (!(*model)) { perror("calloc model"); exit(1); }
 

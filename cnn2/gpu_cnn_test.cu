@@ -8,7 +8,7 @@ int initModelTest() {
     int batchSize = 10;
     float learningRate = 0.025;
 
-    ConvolutionalModel* model;
+    ConvolutionalModel model;
     initConvolutionalModel(&model, batchSize, learningRate);
 
     if(model->batchSize != 10 || model->learningRate != 0.025) {
