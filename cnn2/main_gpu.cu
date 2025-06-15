@@ -72,7 +72,6 @@ int im2colUnfoldTest() {
   const int inHeight = 5;
   const int inWidth = 7;
 
-  const int outChannels = 4;
   const int filterHeight = 3;
   const int filterWidth = 5;
 
@@ -127,6 +126,21 @@ int im2colUnfoldTest() {
 }
 
 int im2colFlattenTest() {
+  const int batchSize = 10;
+  const int inChannels = 3;
+  const int inHeight = 5;
+  const int inWidth = 7;
+
+  const int outChannels = 4;
+  const int filterHeight = 3;
+  const int filterWidth = 5;
+
+  const int outHeight = OUTPUT_DIM(inHeight, filterHeight, 0, 1);
+  const int outWidth = OUTPUT_DIM(inWidth, filterWidth, 0, 1);
+
+  const int unfoldedHeight = batchSize*outHeight*outWidth;
+  const int unfoldedWidth = inChannels*filterHeight*filterWidth;
+
   return 0;
 }
 
