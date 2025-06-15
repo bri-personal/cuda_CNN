@@ -482,8 +482,8 @@ void deviceConvolve(
 
     Matrix* kernelFlattened;
     initMatrix(&kernelFlattened, unfoldedWidth, outChannels);
-    exit(0);
     deviceFlattenKernel(kernel, kernelFlattened, outChannels, flattenedArea);
+    exit(0);
 
     /* GEMM */
     deviceMatrixMult(imgUnfolded, kernelFlattened, result, resArea);
