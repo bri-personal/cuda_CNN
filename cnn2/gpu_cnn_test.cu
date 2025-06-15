@@ -178,7 +178,8 @@ int modelForwardTest() {
     Tensor4D* deviceInput;
     initRandomTensor4D(&deviceInput, batchSize, inChannels, inRows, inCols, state);
 
-    Tensor4D input;
+    int total = batchSize*inChannels*inRows*inCols;
+    Tensor4D input = {batchSize, inChannels, inRows, inCols, (elem_t*) calloc(total, sizeof(elem_t))};
     getDeviceTensor4DData(input.data, deviceInput, batchSize*inChannels*inRows*inCols);
 
     forward(model, &input);
