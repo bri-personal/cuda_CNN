@@ -11,7 +11,7 @@ typedef float elem_t;
 
 /* structs for data structures */
 typedef struct {
-  int length;
+  int width;
   elem_t* data;
 } Vector;
 

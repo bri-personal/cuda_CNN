@@ -154,6 +154,35 @@ void setDeviceTensor4DData(Tensor4D *dest, elem_t *source, int n) {
     CERROR(cudaMemcpy(temp.data, source, n * sizeof(elem_t), cudaMemcpyHostToDevice));
 }
 
+/* for vector */
+void initVector(Vector **v, int width) {
+  Vector temp;
+  temp.width = width;
+
+  CERROR( cudaMalloc(&(temp.data), width * sizeof(elem_t)) );
+  CERROR( cudaMalloc(v, sizeof(Vector)) );
+  CERROR( cudaMemcpy(*v, &temp, sizeof(Vector), cudaMemcpyHostToDevice) );
+}
+void freeVector(Vector *v) {
+  Vector temp;
+  CERROR( cudaMemcpy(&temp, v, sizeof(Vector), cudaMemcpyDeviceToHost) );
+  CERROR( cudaFree(temp.data) );
+  CERROR( cudaFree(v) );
+}
+
+__global__ void initRandomDataVector(Vector *v, float range, curandState_t* state) {
+  int i = threadIdx.x + blockIdx.x * blockDim.x;
+  if (i < v->width) {
+    v->data[i] = (curand_uniform(state + i) * 2.0f - 1.0f) * range;
+  }
+}
+
+void initRandomVector(Vector **v, int width, curandState_t* state) {
+  initVector(v, width);
+  initRandomDataVector<<<BLOCKS(width, BLOCKDIM), BLOCKDIM>>>(*v, 1.0f, state);
+  checkError("initRandomDataVector kernel failed");
+}
+
 
 /** HELPER **/
 __device__ int size(Matrix *mat) {

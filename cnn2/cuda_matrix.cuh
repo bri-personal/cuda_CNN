@@ -34,6 +34,11 @@ void initZerosTensor4D(Tensor4D **tensor, int dim4, int depth, int height, int w
 void getDeviceTensor4DData(elem_t *dest, Tensor4D *source, int n);
 void setDeviceTensor4DData(Tensor4D *dest, elem_t *source, int n);
 
+/* for Vector */
+void initVector(Vector **v, int width);
+void freeVector(Vector *v);
+void initRandomVector(Vector **v, int width, curandState_t* state);
+
 /** HELPER **/
 __device__ int size(Matrix *mat);
 
