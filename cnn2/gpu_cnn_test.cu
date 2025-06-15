@@ -525,18 +525,18 @@ int modeForwardTestOutputCPU() {
     
     ConvolutionalModel* model;
     initConvolutionalModel(&model, batchSize, learningRate);
-    addInputLayer(model, inChannels, inRows, inCols);
+    addInputLayerCPU(model, inChannels, inRows, inCols);
 
     elem_t filterData[] = {1, 0, 0, 1};
     Tensor4D filter = {outChannels, inChannels, outFilterRows, outFilterCols, filterData};
 
     elem_t biasData[] = {1};
     Vector biases = {outChannels, biasData};
-    addConvLayer(model, outChannels, outRows, outCols, &filter, &biases);
+    addConvLayerCPU(model, outChannels, outRows, outCols, &filter, &biases);
     
     elem_t inputData[] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
     Tensor4D input = {batchSize, inChannels, inRows, inCols, inputData};
-    forward(model, &input);
+    forwardCPU(model, &input);
 
     elem_t expectedData[] = {
         SIGMOID(1.6f), SIGMOID(1.8f), SIGMOID(2.2f), SIGMOID(2.4f)
