@@ -469,16 +469,17 @@ void deviceConvolve(Tensor4D* img, Tensor4D* kernel, Matrix* result,
     int resArea = resHeight * resWidth;
 
     /* unfold image */
-    const int unfoldedWidth = inChannels*kernelArea;
-    const int unfoldedArea = resHeight * unfoldedWidth;
+    int unfoldedWidth = inChannels*kernelArea;
+    int unfoldedArea = resHeight * unfoldedWidth;
 
     Matrix* imgUnfolded;
     initMatrix(&imgUnfolded, resHeight, unfoldedWidth);
     deviceUnfoldImage(img, imgUnfolded, kernelWidth, kernelArea,
         outWidth, outArea, unfoldedWidth, unfoldedArea);
+    return;
 
     /* flatten kernel */
-    const int flattenedArea = unfoldedWidth*outChannels;
+    int flattenedArea = unfoldedWidth*outChannels;
 
     Matrix* kernelFlattened;
     initMatrix(&kernelFlattened, unfoldedWidth, outChannels);
