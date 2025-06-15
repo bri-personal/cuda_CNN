@@ -103,7 +103,7 @@ int im2colUnfoldTest() {
     outWidth, outWidth*outHeight);
 
   deviceUnfoldImage(deviceInput, deviceInputUnfolded, filterWidth, filterHeight*filterWidth,
-    outWidth, outWidth*outHeight, unfoldedHeight, unfoldedWidth);
+    outWidth, outWidth*outHeight, unfoldedWidth, unfoldedWidth*unfoldedHeight);
 
   getDeviceMatrixData(hostInputUnfolded2.data, deviceInputUnfolded, unfoldedHeight*unfoldedWidth);
 

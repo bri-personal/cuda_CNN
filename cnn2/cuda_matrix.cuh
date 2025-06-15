@@ -60,11 +60,13 @@ void squareLoss(Matrix *x, float *result, int height, int width);
 void deviceUnfoldImage(Tensor4D* img, Matrix* imgUnfolded,
     int kernelWidth, int kernelArea,
     int outWidth, int outArea,
-    int unfoldedHeight, int unfoldedWidth
+    int unfoldedWidth, int unfoldedArea
 );
-void deviceUnfoldMatrix(Matrix* img, Matrix** imgUnfolded, int kernelRows, int kernelCols, int resRows, int resCols);
-void deviceConvolve(Matrix* img, int imgRows, int imgCols,
-  Matrix* kernel, int kernelRows, int kernelCols,
-  Matrix* result, int stride, int padding);
+void deviceFlattenKernel(Tensor4D* kernel, Matrix* kernelFlattened,
+    int flattenedWidth, int flattenedArea
+);
+// void deviceConvolve(Matrix* img, int imgRows, int imgCols,
+//   Matrix* kernel, int kernelRows, int kernelCols,
+//   Matrix* result, int stride, int padding);
   
 #endif

@@ -367,63 +367,79 @@ void squareLoss(Matrix *x, float *result, int height, int width) {
   CERROR( cudaMemcpy(result, y, sizeof(float), cudaMemcpyDeviceToHost) );
 }
 
+/* Convolution */
+// void deviceConvolve(Matrix* img, int imgRows, int imgCols,
+//       Matrix* kernel, int kernelRows, int kernelCols,
+//       Matrix* result, int stride, int padding) {
+//     /* im 2 col */
+//     int resRows = (imgRows - kernelRows + (padding << 1)) / stride + 1;
+//     int resCols = (imgCols - kernelCols + (padding << 1)) / stride + 1;
 
-__global__ void unfoldMatrix(Matrix* m, Matrix* mUnfolded, int kernelCols, int resCols) {
+//     /* unfold image */
+//     Matrix* imgUnfolded;
+//     deviceUnfoldMatrix(img, &imgUnfolded, kernelRows, kernelCols, resRows, resCols);
+
+//     /* flatten kernel */
+//     int newKernelRows = kernelRows * kernelCols;
+//     int newKernelCols = 1;
+//     // TODO: can we do this better?
+//     CERROR( cudaMemcpy(&(kernel->height), &newKernelRows, sizeof(int), cudaMemcpyHostToDevice) );
+//     CERROR( cudaMemcpy(&(kernel->width), &newKernelCols, sizeof(int), cudaMemcpyHostToDevice) );
+
+//     /* convolve */
+//     deviceMatrixMult(imgUnfolded, kernel, result, resRows * resCols);
+//     freeMatrix(imgUnfolded);
+
+//     /* fix matrix dimensions */
+//     // TODO: can we do this better?
+//     CERROR( cudaMemcpy(&(kernel->height), &kernelRows, sizeof(int), cudaMemcpyHostToDevice) );
+//     CERROR( cudaMemcpy(&(kernel->width), &kernelRows, sizeof(int), cudaMemcpyHostToDevice) );
+// }
+
+__global__ void flattenKernel(Tensor4D* kernel, Matrix* kernelFlattened,
+    int flattenedWidth, int flattenedArea
+) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
-    int height = mUnfolded->height, width = mUnfolded->width;
-    int imgCols = m->width;
 
-    while (i < height * width) {
-        int r = i / width;
-        int c = i % width;
-        int j = imgCols * (r / resCols + c / kernelCols) + r % resCols + c % kernelCols;
-        mUnfolded->data[i] = m->data[j];
+    int outChannels = kernel->dim4;
+    int inChannels = kernel->depth;
+    int kernelHeight = kernel->height;
+    int kernelWidth = kernel->width;
+
+    int kernelAreaPerInputChannel = kernelHeight * kernelWidth;
+    int kernelAreaPerOutputChannel = inChannels * kernelAreaPerInputChannel;
+
+    while (i < unfoldedArea) {
+        int h = i / flattenedWidth;
+        int w = i % flattenedWidth;
+
+        int h_div_kernel_area = h / kernelAreaPerInputChannel;
+        int h_mod_kernel_area = h % kernelAreaPerInputChannel;
+        int hKernelFlattenedRows = h * outChannels;
+
+        kernelFlattened->data[hKernelFlattenedRows + w] = kernel->data[
+            w*kernelAreaPerOutputChannel +
+            h_div_kernel_area*kernelAreaPerInputChannel +
+            (h_mod_kernel_area / kernelWidth)*kernelWidth +
+            (h_mod_kernel_area % kernelWidth)
+        ];
+
         i += gridDim.x;
     }
 }
-void deviceUnfoldMatrix(Matrix* img, Matrix** imgUnfolded, int kernelRows, int kernelCols, int resRows, int resCols) {
-    int unfoldedRows = resRows * resCols;
-    int unfoldedCols = kernelRows * kernelCols;
-    initMatrix(imgUnfolded, unfoldedRows, unfoldedCols);
-    
-    unfoldMatrix<<<BLOCKS(unfoldedRows * unfoldedCols, BLOCKDIM), BLOCKDIM>>>(img, *imgUnfolded, kernelRows, resCols);
+void deviceFlattenKernel(Tensor4D* kernel, Matrix* kernelFlattened,
+    int flattenedWidth, int flattenedArea
+) {
+    flattenKernel<<<BLOCKS(flattenedArea, BLOCKDIM), BLOCKDIM>>>(
+        kernel, kernelFlattened, flattenedWidth, flattenedArea);
     cudaDeviceSynchronize();
-}
-
-void deviceConvolve(Matrix* img, int imgRows, int imgCols,
-      Matrix* kernel, int kernelRows, int kernelCols,
-      Matrix* result, int stride, int padding) {
-    /* im 2 col */
-    int resRows = (imgRows - kernelRows + (padding << 1)) / stride + 1;
-    int resCols = (imgCols - kernelCols + (padding << 1)) / stride + 1;
-
-    /* unfold image */
-    Matrix* imgUnfolded;
-    deviceUnfoldMatrix(img, &imgUnfolded, kernelRows, kernelCols, resRows, resCols);
-
-    /* flatten kernel */
-    int newKernelRows = kernelRows * kernelCols;
-    int newKernelCols = 1;
-    // TODO: can we do this better?
-    CERROR( cudaMemcpy(&(kernel->height), &newKernelRows, sizeof(int), cudaMemcpyHostToDevice) );
-    CERROR( cudaMemcpy(&(kernel->width), &newKernelCols, sizeof(int), cudaMemcpyHostToDevice) );
-
-    /* convolve */
-    deviceMatrixMult(imgUnfolded, kernel, result, resRows * resCols);
-    freeMatrix(imgUnfolded);
-
-    /* fix matrix dimensions */
-    // TODO: can we do this better?
-    CERROR( cudaMemcpy(&(kernel->height), &kernelRows, sizeof(int), cudaMemcpyHostToDevice) );
-    CERROR( cudaMemcpy(&(kernel->width), &kernelRows, sizeof(int), cudaMemcpyHostToDevice) );
 }
 
 __global__ void unfoldImage(Tensor4D* img, Matrix* imgUnfolded,
         int kernelWidth, int kernelArea, int outputWidth, int outputArea,
-        int unfoldedHeight, int unfoldedWidth
+        int unfoldedWidth, int unfoldedArea
 ) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
-    int unfoldedArea = unfoldedHeight * unfoldedWidth;
 
     int imageHeight = img->height;
     int imageWidth = img->width;
@@ -453,10 +469,10 @@ __global__ void unfoldImage(Tensor4D* img, Matrix* imgUnfolded,
 void deviceUnfoldImage(Tensor4D* img, Matrix* imgUnfolded,
     int kernelWidth, int kernelArea,
     int outWidth, int outArea,
-    int unfoldedHeight, int unfoldedWidth
+    int unfoldedWidth, int unfoldedArea
 ) {
-    unfoldImage<<<BLOCKS(unfoldedHeight * unfoldedWidth, BLOCKDIM), BLOCKDIM>>>(
+    unfoldImage<<<BLOCKS(unfoldedArea, BLOCKDIM), BLOCKDIM>>>(
         img, imgUnfolded, kernelWidth, kernelArea, outWidth, outArea,
-        unfoldedHeight, unfoldedWidth);
+        unfoldedWidth, unfoldedArea);
     cudaDeviceSynchronize();
 }
