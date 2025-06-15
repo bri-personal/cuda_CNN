@@ -128,9 +128,9 @@ void forward(ConvolutionalModel *model, Tensor4D* input) {
 
     /* initialize 4D tensor of input images */
     setDeviceTensor4DData(net->input->outputs, input->data, inputSize);
-    exit(0);
     
     ConvolutionalLayer *curr = net->input->next; /* first hidden layer */
+    exit(0);
     while (curr != NULL) {
         layerForward(curr);
         curr = curr->next;
