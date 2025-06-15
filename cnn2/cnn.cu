@@ -78,12 +78,12 @@ void layerForward(ConvolutionalLayer *layer, int batchSize) {
     //DEBUG
     elem_t cpueTemp4DData[im2colOutArea] = {5, 5, 5, 5};
     Tensor4D cpuTemp4D = {batchSize, layer->inChannels, layer->imgRows, layer->imgCols, cpueTemp4DData};
-    getDeviceTensor4DData(cpueTemp4DData.data, layer->prev->outputs, batchSize*layer->inChannels*layer->imgRows*layer->imgCols);
+    getDeviceTensor4DData(cpueTemp4D.data, layer->prev->outputs, batchSize*layer->inChannels*layer->imgRows*layer->imgCols);
     printf("input\n");
     printTensor4D(&cpuTemp4D, "batch no", "channel");
 
     cpuTemp4D = {outChannels, layer->inChannels, layer->kernelRows, layer->kernelCols, cpueTemp4DData};
-    getDeviceTensor4DData(cpueTemp4DData.data, layer->filters, outChannels*layer->inChannels*layer->kernelRows*layer->kernelCols);
+    getDeviceTensor4DData(cpueTemp4D.data, layer->filters, outChannels*layer->inChannels*layer->kernelRows*layer->kernelCols);
     printf("filter\n");
     printTensor4D(&cpuTemp4D, "out channel", "in channel");
 
