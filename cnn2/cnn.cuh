@@ -1,6 +1,8 @@
 #ifndef CNN_H
 #define CNN_H
 #include <stdint.h>
+#include <cuda.h>
+#include <curand_kernel.h>
 #include "matrix.h"
 #include "cuda_matrix.cuh"
 

@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <cuda.h>
+#include <curand_kernel.h>
 
 ConvolutionalModel *initConvolutionalModel(ConvolutionalModel* model, int batchSize, float learningRate) {  
     ConvolutionalNetwork *cnn = (ConvolutionalNetwork*) malloc(sizeof(ConvolutionalNetwork));
