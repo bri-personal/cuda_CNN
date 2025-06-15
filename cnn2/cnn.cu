@@ -8,8 +8,8 @@
 #include <curand_kernel.h>
 
 ConvolutionalModel *initConvolutionalModel(ConvolutionalModel* model, int batchSize, float learningRate) {  
-    model = (ConvolutionalModel*) calloc(sizeof(ConvolutionalModel));
-    if (!cnn) { perror("calloc model"); exit(1); }
+    model = (ConvolutionalModel*) calloc(1, sizeof(ConvolutionalModel));
+    if (!model) { perror("calloc model"); exit(1); }
 
     ConvolutionalNetwork *cnn = (ConvolutionalNetwork*) malloc(sizeof(ConvolutionalNetwork));
     if (!cnn) { perror("malloc network"); exit(1); }
