@@ -93,10 +93,10 @@ void layerForwardCPU(ConvolutionalLayer *layer, int batchSize) {
     // TODO: padding and stride are hardcoded to 0 and 1 right now
     conv_CPU(layer->outputs, layer->prev->outputs, layer->filters, 0, 1);
 
+    printTensor4D(layer->outputs, "batch no", "channel");
+
     /* add bias for each out channel to every element in that channel */
     addScalarToEachMatrixOfTensor4D_CPU(layer->outputs, layer->outputs, layer->biases);
-
-    printTensor4D(layer->outputs, "batch no", "channel");
 
     /* apply sigmoid activation to every element */
     tensor4DSigmoid_CPU(layer->outputs, layer->outputs);
