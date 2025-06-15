@@ -64,7 +64,88 @@ int initModelTest() {
         return 1;
     }
 
-    //ConvolutionalNetwork* net = model->network;
+    ConvolutionalNetwork* net = model->network;
+    ConvolutionalLayer* inLayer = net->input;
+    ConvolutionalLayer* hiddenLayer = inLayer->next;
+    ConvolutionalLayer* outLayer = net->output;
+    if(inLayer->outChannels != inChannels) {
+        printf("FAILURE: in layer out channels NOT correct\n");
+        return 1;
+    }
+    if(inLayer->outputRows != inRows) {
+        printf("FAILURE: in layer out rows NOT correct\n");
+        return 1;
+    }
+    if(inLayer->outputCols != inCols) {
+        printf("FAILURE: in layer out channels NOT correct\n");
+        return 1;
+    }
+
+    if(hiddenLayer->inChannels != inChannels) {
+        printf("FAILURE: hidden layer in channels NOT correct\n");
+        return 1;
+    }
+    if(hiddenLayer->imgRows != inRows) {
+        printf("FAILURE: hidden layer in rows NOT correct\n");
+        return 1;
+    }
+    if(hiddenLayer->imgCols != inCols) {
+        printf("FAILURE: hidden layer in cols NOT correct\n");
+        return 1;
+    }
+    if(hiddenLayer->outChannels != hiddenChannels) {
+        printf("FAILURE: hidden layer out channels NOT correct\n");
+        return 1;
+    }
+    if(hiddenLayer->outputRows != hiddenRows) {
+        printf("FAILURE: hidden layer out rows NOT correct\n");
+        return 1;
+    }
+    if(hiddenLayer->outputCols != hiddenCols) {
+        printf("FAILURE: hidden layer out cols NOT correct\n");
+        return 1;
+    }
+    if(hiddenLayer->kernelRows != 3) {
+        printf("FAILURE: hidden layer kernel rows NOT correct\n");
+        return 1;
+    }
+    if(hiddenLayer->kernelCols != 3) {
+        printf("FAILURE: hidden layer kernel cols NOT correct\n");
+        return 1;
+    }
+
+    if(outLayer->inChannels != hiddenChannels) {
+        printf("FAILURE: out layer in channels NOT correct\n");
+        return 1;
+    }
+    if(outLayer->imgRows != hiddenRows) {
+        printf("FAILURE: out layer in rows NOT correct\n");
+        return 1;
+    }
+    if(outLayer->imgCols != hiddenCols) {
+        printf("FAILURE: out layer in cols NOT correct\n");
+        return 1;
+    }
+    if(outLayer->outChannels != outChannels) {
+        printf("FAILURE: out layer out channels NOT correct\n");
+        return 1;
+    }
+    if(outLayer->outputRows != outRows) {
+        printf("FAILURE: out layer out rows NOT correct\n");
+        return 1;
+    }
+    if(outLayer->outputCols != outCols) {
+        printf("FAILURE: out layer out cols NOT correct\n");
+        return 1;
+    }
+    if(outLayer->kernelRows != 3) {
+        printf("FAILURE: out layer kernel rows NOT correct\n");
+        return 1;
+    }
+    if(outLayer->kernelCols != 3) {
+        printf("FAILURE: out layer kernel cols NOT correct\n");
+        return 1;
+    }
 
     printf("SUCCESS: model params correct\n");
     return 0;
