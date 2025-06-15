@@ -13,7 +13,7 @@
 /* GPU functions */
 /* random stuff */
 curandState_t* createCurandStates(int num_elements);
-void cleanupCurandStates(curandState_t* state)
+void cleanupCurandStates(curandState_t* state);
 
 /** MEMORY management **/
 /* for Matrix */
