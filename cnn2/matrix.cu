@@ -388,8 +388,8 @@ __global__ void flattenKernel(Tensor4D* kernel, Matrix* kernelFlattened,
 
         kernelFlattened->data[i] = kernel->data[
             w*kernelAreaPerOutputChannel +
-            h +
-            h_mod_kernel_area +
+            (h / kernelAreaPerInputChannel)*kernelAreaPerInputChannel +
+            (h_mod_kernel_area / kernelWidth)*kernelWidth +
             (h_mod_kernel_area % kernelWidth)
         ];
 
