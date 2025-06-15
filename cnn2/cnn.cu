@@ -87,6 +87,7 @@ void layerForward(ConvolutionalLayer *layer) {
 
     Matrix* temp;
     initMatrix(&temp, im2colOutRows, outChannels);
+    exit(0);
 
     deviceConvolve(
         layer->prev->outputs,
@@ -133,7 +134,6 @@ void forward(ConvolutionalModel *model, Tensor4D* input) {
     while (curr != NULL) {
         layerForward(curr);
         curr = curr->next;
-        exit(0);
     }
   }
 
