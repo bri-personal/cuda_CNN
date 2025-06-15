@@ -473,10 +473,10 @@ void deviceConvolve(
 
     Matrix* imgUnfolded;
     initMatrix(&imgUnfolded, resHeight, unfoldedWidth);
-    exit(0);
 
     deviceUnfoldImage(img, imgUnfolded, kernelWidth, kernelArea,
         outWidth, outArea, unfoldedWidth, unfoldedArea);
+    exit(0);
 
     /* flatten kernel */
     int flattenedArea = unfoldedWidth*outChannels;
