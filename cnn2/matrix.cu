@@ -461,7 +461,7 @@ void deviceConvolve(Tensor4D* img, Tensor4D* kernel, Matrix* result,
     int kernelArea = kernelHeight * kernelWidth;
 
     int outWidth = OUTPUT_DIM(img->width, kernelWidth, padding, stride);
-    int outArea = OUTPUT_DIM(img->height, kernelHeight, padding, stride) * outWidth;
+    int outArea = outWidth*OUTPUT_DIM(img->height, kernelHeight, padding, stride);
 
     /* im 2 col */
     int resHeight = result->height;
