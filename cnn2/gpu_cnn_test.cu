@@ -175,6 +175,11 @@ int modelForwardTest() {
     addConvLayer(model, hiddenChannels, hiddenRows, hiddenCols, state);
     addConvLayer(model, outChannels, outRows, outCols, state);
 
+    Tensor4D* input;
+    initRandomTensor4D(&input, batchSize, inChannels, inRows, inCols, state);
+
+    forward(model, input);
+
     cleanupCurandStates(state);
 
     return 0;
