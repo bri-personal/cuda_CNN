@@ -512,9 +512,9 @@ int modelForwardTestCPU() {
 int main() {
     int test_total = 0;
     
-    //test_total += initModelTest();
+    test_total += initModelTest();
     test_total += initModelTestCPU();
-    //test_total += modelForwardTest();
+    test_total += modelForwardTest();
     test_total += modelForwardTestCPU();
 
     return test_total;
