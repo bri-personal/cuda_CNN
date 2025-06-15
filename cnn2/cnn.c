@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "matrix.h"
 #include "cnn.h"
 
@@ -13,8 +14,6 @@ void initConvolutionalModel(ConvolutionalModel** model, int batchSize, float lea
     (*model)->network = cnn;
     (*model)->learningRate = learningRate;
     (*model)->batchSize = batchSize;
-  
-    checkError("Init CNN");
 }
 
 /**
@@ -79,7 +78,7 @@ void addInputLayerCPU(ConvolutionalModel *model, int channels, int rows, int col
  */
 void addConvLayerCPU(ConvolutionalModel *model, int channels, int rows, int cols, Tensor4D* filters, Vector* biases) {
     ConvolutionalLayer* prev = model->network->output;
-    ConvolutionalLayer* layer = createConvolutionalLayer(model->batchSize, channels,
+    ConvolutionalLayer* layer = createConvolutionalLayerCPU(model->batchSize, channels,
         rows, cols, prev, filters, biases);
     model->network->numLayers++;
     model->network->output = layer;
