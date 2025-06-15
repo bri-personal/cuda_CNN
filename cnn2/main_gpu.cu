@@ -253,7 +253,6 @@ int convTest() {
     perror("Failed to alloc hostInput data");
     exit(1);
   }
-  printf("1\n");
 
   /* set up filter kernels on host*/
   Tensor4D hostKernel = {outChannels, inChannels, filterHeight, filterWidth,
@@ -262,7 +261,6 @@ int convTest() {
     perror("Failed to alloc hostKernel data");
     exit(1);
   }
-  printf("2\n");
 
   /* set up input image and filter kernels on device */
   Tensor4D* deviceInput;
@@ -271,7 +269,6 @@ int convTest() {
   initRandomTensor4D(&deviceInput, batchSize, inChannels, inHeight, inWidth, state);
   initRandomTensor4D(&deviceKernel, outChannels, inChannels, filterHeight, filterWidth, state);
   cleanupCurandStates(state);
-  printf("3\n");
 
   /* set up output feature map on host */
   Tensor4D hostResultTensor4D = {
@@ -282,7 +279,6 @@ int convTest() {
     perror("Failed to alloc hostResultTensor4D data");
     exit(1);
   }
-  printf("4\n");
   
   Matrix hostResultMatrix = {im2colOutHeight, im2colOutWidth,
     (elem_t*) calloc(im2colOutArea, sizeof(elem_t))};
@@ -290,29 +286,21 @@ int convTest() {
     perror("Failed to alloc hostResultMatrix data");
     exit(1);
   }
-  printf("5\n");
 
   /* set up output feature map on device */
   Matrix* deviceResult;
   initMatrix(&deviceResult, im2colOutHeight, im2colOutWidth);
-  printf("6\n");
 
   /* get input and filter elements on host */
   getDeviceTensor4DData(hostInput.data, deviceInput, batchSize*inChannels*inHeight*inWidth);
   getDeviceTensor4DData(hostKernel.data, deviceKernel, outChannels*inChannels*filterHeight*filterWidth);
-  printf("7\n");
 
   /* CPU convolution for comparison */
   conv_CPU(&hostResultTensor4D, &hostInput, &hostKernel);
-  printf("8\n");
 
   /* convolution on device */
   deviceConvolve(deviceInput, deviceKernel, deviceResult, padding, stride);
-  printf("9\n");
-  return 0;
-  
   getDeviceMatrixData(hostResultMatrix.data, deviceResult, im2colOutArea);
-  printf("10\n");
 
   /* equality check */
   if(!im2colMatrixEqualsConvTensor4D(&hostResultMatrix, &hostResultTensor4D, 0.000001)) {

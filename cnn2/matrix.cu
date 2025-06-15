@@ -452,6 +452,7 @@ void deviceUnfoldImage(Tensor4D* img, Matrix* imgUnfolded,
 void deviceConvolve(Tensor4D* img, Tensor4D* kernel, Matrix* result,
     int padding, int stride
 ) {
+    /* get dimensions */
     int batchSize = img->dim4;
     int inChannels = img->depth;
 
@@ -460,31 +461,32 @@ void deviceConvolve(Tensor4D* img, Tensor4D* kernel, Matrix* result,
     int kernelWidth = kernel->width;
     int kernelArea = kernelHeight * kernelWidth;
 
+    int outHeight = OUTPUT_DIM(inHeight, filterHeight, padding, stride);
+    int outWidth = OUTPUT_DIM(inWidth, filterWidth, padding, stride);
+
     /* im 2 col */
-    int outHeight = result->height;
-    int outWidth = result->width;
-    int outArea = outHeight * outWidth;
+    int resHeight = result->height;
+    int resWidth = result->width;
+    int resArea = resHeight * resWidth;
 
     /* unfold image */
-    const int unfoldedHeight = batchSize*outArea;
     const int unfoldedWidth = inChannels*kernelArea;
-    const int unfoldedArea = unfoldedHeight * unfoldedWidth;
+    const int unfoldedArea = resHeight * unfoldedWidth;
 
     Matrix* imgUnfolded;
-    initMatrix(&imgUnfolded, unfoldedHeight, unfoldedWidth);
+    initMatrix(&imgUnfolded, resHeight, unfoldedWidth);
     deviceUnfoldImage(img, imgUnfolded, kernelWidth, kernelArea,
         outWidth, outArea, unfoldedWidth, unfoldedArea);
 
     /* flatten kernel */
-    const int flattenedHeight = inChannels*kernelArea;
-    const int flattenedArea = flattenedHeight*outChannels;
+    const int flattenedArea = unfoldedWidth*outChannels;
 
     Matrix* kernelFlattened;
-    initMatrix(&kernelFlattened, flattenedHeight, outChannels);
+    initMatrix(&kernelFlattened, unfoldedWidth, outChannels);
     deviceFlattenKernel(kernel, kernelFlattened, outChannels, flattenedArea);
 
     /* GEMM */
-    deviceMatrixMult(imgUnfolded, kernelFlattened, result, outArea);
+    deviceMatrixMult(imgUnfolded, kernelFlattened, result, resArea);
 
     /* cleanup */
     freeMatrix(imgUnfolded);
