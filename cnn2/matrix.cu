@@ -417,3 +417,7 @@ void deviceConvolve(Matrix* img, int imgRows, int imgCols,
     CERROR( cudaMemcpy(&(kernel->height), &kernelRows, sizeof(int), cudaMemcpyHostToDevice) );
     CERROR( cudaMemcpy(&(kernel->width), &kernelRows, sizeof(int), cudaMemcpyHostToDevice) );
 }
+
+void deviceUnfoldImage(Tensor4D* img, Matrix* imgUnfolded, int kernelHeight, int kernelWidth, int outHeight, int outWidth) {
+    return;
+}

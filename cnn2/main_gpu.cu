@@ -45,6 +45,10 @@ int gemmTest() {
 
   if(!matrixEquals(&hostC2, &hostC, 0.000001)) {
     printf("CPU and GPU GEMM are NOT equal\n");
+    free(hostA.data);
+    free(hostB.data);
+    free(hostC.data);
+    free(hostC2.data);
     freeMatrix(deviceA);
     freeMatrix(deviceB);
     freeMatrix(deviceC);
@@ -52,6 +56,10 @@ int gemmTest() {
   }
 
   printf("CPU and GPU GEMM are equal\n");
+  free(hostA.data);
+  free(hostB.data);
+  free(hostC.data);
+  free(hostC2.data);
   freeMatrix(deviceA);
   freeMatrix(deviceB);
   freeMatrix(deviceC);
@@ -59,6 +67,60 @@ int gemmTest() {
 }
 
 int im2colUnfoldTest() {
+  const int batchSize = 10;
+  const int inChannels = 3;
+  const int inHeight = 5;
+  const int inWidth = 7;
+
+  const int outChannels = 4;
+  const int filterHeight = 3;
+  const int filterWidth = 5;
+
+  const int outHeight = OUTPUT_DIM(inHeight, filterHeight, 0, 1);
+  const int outWidth = OUTPUT_DIM(inWidth, filterWidth, 0, 1);
+
+  const int unfoldedHeight = batchSize*outHeight*outWidth;
+  const int unfoldedWidth = inChannels*filterHeight*filterWidth;
+
+  Tensor4D hostInput = {batchSize, inChannels, inHeight, inWidth,
+    (elem_t*) calloc(batchSize*inChannels*inHeight*inWidth, sizeof(elem_t))};
+  Matrix hostInputUnfolded = {unfoldedHeight, unfoldedWidth,
+    (elem_t*) calloc(unfoldedHeight*unfoldedWidth, sizeof(elem_t))};
+  Matrix hostInputUnfolded2 = {unfoldedHeight, unfoldedWidth,
+    (elem_t*) calloc(unfoldedHeight*unfoldedWidth, sizeof(elem_t))};
+
+  Tensor4D* deviceInput;
+  Matrix* deviceInputUnfolded;
+
+  curandState_t* state = createCurandStates(unfoldedHeight*unfoldedWidth);
+  initRandomTensor4D(&deviceInput, batchSize, inChannels, inHeight, inWidth, state);
+  cleanupCurandStates(state);
+
+  initZerosMatrix(&deviceInputUnfolded, unfoldedHeight, unfoldedWidth);
+
+  getDeviceTensor4DData(hostInput.data, deviceInput, batchSize*inChannels*inHeight*inWidth);
+  im2colUnfold4D_CPU(&hostInputUnfolded, &hostInput, filterWidth, filterWidth*filterHeight, outWidth, outWidth*outHeight);
+
+  deviceUnfoldImage(deviceInput, deviceInputUnfolded, filterHeight, filterWidth, outHeight, outWidth);
+
+  getDeviceMatrixData(hostInputUnfolded2.data, deviceInputUnfolded, unfoldedHeight*unfoldedWidth);
+
+  if(!matrixEquals(&hostInputUnfolded2, &hostInputUnfolded, 0.000001)) {
+    printf("CPU and GPU im2col unfold are NOT equal\n");
+    free(hostInput->data);
+    free(hostInputUnfolded->data);
+    free(hostInputUnfolded2->data);
+    freeTensor4D(deviceInput);
+    freeMatrix(deviceInputUnfolded);
+    return 1;
+  }
+
+  printf("CPU and GPU im2col unfold are equal\n");
+  free(hostInput->data);
+  free(hostInputUnfolded->data);
+  free(hostInputUnfolded2->data);
+  freeTensor4D(deviceInput);
+  freeMatrix(deviceInputUnfolded);
   return 0;
 }
 
@@ -67,6 +129,7 @@ int im2colFlattenTest() {
 }
 
 int cpuConvTest() {
+  // broken right now
   elem_t iData[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, -1, -2, -3, -4, -5, -6, -7, -8, -9, 11, 12, 13, 14, 15, 16, 17, 18, 19, -11, -12, -13, -14, -15, -16, -17, -18, -19};
   Tensor4D i = {BATCH_SIZE, IN_CHANNELS, IMG_HEIGHT, IMG_WIDTH, iData};
 
