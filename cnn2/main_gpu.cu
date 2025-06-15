@@ -316,7 +316,6 @@ int convTest() {
     freeMatrix(deviceResult);
     return 1;
   }
-  exit(0);
 
   printf("SUCCESS: CPU and GPU conv are equal\n");
   free(hostInput.data);
@@ -326,6 +325,7 @@ int convTest() {
   free(hostResultTensor4D.data);
   free(hostResultMatrix.data);
   freeMatrix(deviceResult);
+  exit(0);
   return 0;
 }
 
