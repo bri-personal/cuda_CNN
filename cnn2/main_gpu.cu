@@ -283,7 +283,7 @@ int convTest() {
     exit(1);
   }
   printf("4\n");
-  return 0;
+  
   Matrix hostResultMatrix = {im2colOutHeight, im2colOutWidth,
     (elem_t*) calloc(im2colOutArea, sizeof(elem_t))};
   if(hostResultMatrix.data == NULL) {
@@ -291,6 +291,7 @@ int convTest() {
     exit(1);
   }
   printf("5\n");
+  return 0;
 
   /* set up output feature map on device */
   Matrix* deviceResult;
