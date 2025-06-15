@@ -254,7 +254,6 @@ int convTest() {
     exit(1);
   }
   printf("1\n");
-  return 0;
 
   /* set up filter kernels on host*/
   Tensor4D hostKernel = {outChannels, inChannels, filterHeight, filterWidth,
@@ -264,6 +263,7 @@ int convTest() {
     exit(1);
   }
   printf("2\n");
+  return 0;
 
   /* set up input image and filter kernels on device */
   Tensor4D* deviceInput;
