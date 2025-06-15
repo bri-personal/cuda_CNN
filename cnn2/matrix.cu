@@ -486,9 +486,9 @@ void deviceConvolve(
 
     /* GEMM */
     deviceMatrixMult(imgUnfolded, kernelFlattened, result, resArea);
-    exit(0);
 
     /* cleanup */
     freeMatrix(imgUnfolded);
+    exit(0);
     freeMatrix(kernelFlattened);
 }
