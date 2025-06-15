@@ -186,6 +186,8 @@ int modelForwardTest() {
 
     cleanupCurandStates(state);
 
+    printf("SUCCESS: model forward didn't crash\n");
+
     return 0;
 }
 
