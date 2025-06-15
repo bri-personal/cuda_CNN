@@ -21,11 +21,15 @@ int initModelTest() {
     int outRows = 3;
     int outCols = 5;
 
+    curandState_t* state = createCurandStates(unfoldedHeight*unfoldedWidth);
+
     ConvolutionalModel* model;
     initConvolutionalModel(&model, batchSize, learningRate);
-    addInputLayer(model, inChannels, inRows, inCols);
-    addConvLayer(model, hiddenChannels, hiddenRows, hiddenCols);
-    addConvLayer(model, outChannels, outRows, outCols);
+    addInputLayer(model, inChannels, inRows, inCols, state);
+    addConvLayer(model, hiddenChannels, hiddenRows, hiddenCols, state);
+    addConvLayer(model, outChannels, outRows, outCols, state);
+
+    cleanupCurandStates(state);
 
     if(model->batchSize != 10 || fabsf(model->learningRate - 0.025) > 0.000001 ||
         model->inChannels != inChannels || model->inHeight != inRows || model->inWidth != inChannels ||
