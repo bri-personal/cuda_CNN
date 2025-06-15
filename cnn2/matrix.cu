@@ -570,16 +570,3 @@ void deviceReorderIm2ColToConv(Matrix* src, Tensor4D* dest, int N) {
   reorderIm2ColToConv<<<BLOCKS(N, BLOCKDIM), BLOCKDIM>>>(src, dest, N);
   cudaDeviceSynchronize();
 }
-
-void reorder_conv_to_im2col(elem_t src[BATCH_SIZE][OUT_CHANNELS][OUTPUT_DIM][OUTPUT_DIM], elem_t dest[BATCH_SIZE * OUTPUT_AREA][OUT_CHANNELS]) {
-  /* Rearrange to match 2D format */
-  for(int n = 0; n < BATCH_SIZE; ++n) {
-    for(int k = 0; k < OUT_CHANNELS; ++k) {
-      for(int h = 0; h < OUTPUT_DIM; ++h) {
-        for(int w = 0; w < OUTPUT_DIM; ++w) {
-          dest[n*OUTPUT_AREA + h*OUTPUT_DIM + w][k] = src[n][k][h][w];
-        }
-      }
-    }
-  }
-}
