@@ -463,8 +463,8 @@ void deviceConvolve(Tensor4D* img, Tensor4D* kernel, Matrix* result,
     int kernelArea = kernelHeight * kernelWidth;
 
     /* im 2 col */
-    int outHeight = OUTPUT_DIM(imgHeight, kernelHeight, padding, stride);
-    int outWidth = OUTPUT_DIM(imgWidth, kernelWidth, padding, stride);
+    int outHeight = result->height;
+    int outWidth = result->width;
     int outArea = outHeight * outWidth;
 
     /* unfold image */
@@ -491,5 +491,4 @@ void deviceConvolve(Tensor4D* img, Tensor4D* kernel, Matrix* result,
     /* cleanup */
     freeMatrix(imgUnfolded);
     freeMatrix(kernelFlattened);
-
 }

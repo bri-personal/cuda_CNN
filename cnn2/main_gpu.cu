@@ -223,6 +223,81 @@ int cpuConvTest() {
 }
 
 int convTest() {
+  const int padding = 0;
+  const int stride = 0;
+
+  const int batchSize = 10;
+  const int inChannels = 3;
+  const int inHeight = 5;
+  const int inWidth = 7;
+
+  const int outChannels = 4;
+  const int filterHeight = 3;
+  const int filterWidth = 5;
+
+  const int outHeight = OUTPUT_DIM(inHeight, filterHeight, padding, stride);
+  const int outWidth = OUTPUT_DIM(inWidth, filterWidth, padding, stride);
+
+  const int unfoldedHeight = batchSize*outHeight*outWidth;
+  const int unfoldedWidth = inChannels*filterHeight*filterWidth;
+
+  const int flattenedHeight = inChannels*filterHeight*filterWidth;
+  const int flattenedWidth = outChannels;
+
+  Tensor4D hostInput = {batchSize, inChannels, inHeight, inWidth,
+    (elem_t*) calloc(batchSize*inChannels*inHeight*inWidth, sizeof(elem_t))};
+  Tensor4D* deviceInput;
+
+  Tensor4D hostKernel = {outChannels, inChannels, filterHeight, filterWidth,
+    (elem_t*) calloc(outChannels*inChannels*filterHeight*filterWidth, sizeof(elem_t))};
+  Tensor4D* deviceKernel;
+
+  curandState_t* state = createCurandStates(unfoldedHeight*unfoldedWidth);
+  initRandomTensor4D(&deviceInput, batchSize, inChannels, inHeight, inWidth, state);
+  initRandomTensor4D(&deviceKernel, outChannels, inChannels, filterHeight, filterWidth, state);
+  cleanupCurandStates(state);
+
+  Tensor4D hostResultTensor4D = {batchSize, outChannels, outHeight, outWidth,
+    (elem_t*) calloc(batchSize*outChannels*outHeight*outWidth,, sizeof(elem_t))};
+  Matrix hostResultMatrix = {inHeight, filterWidth, (elem_t*) calloc(inHeight*filterWidth, sizeof(elem_t))};
+  Matrix* deviceResult;
+  initMatrix(&deviceResult, inHeight, filterWidth);
+
+  getDeviceTensor4DData(hostInput.data, deviceInput, batchSize*inChannels*inHeight*inWidth);
+  getDeviceTensor4DData(hostKernel.data, deviceKernel, outChannels*inChannels*filterHeight*filterWidth);
+  conv_CPU(hostResultTensor4D, hostInput, hostKernel);
+
+  deviceConvolve(deviceInput, deviceKernel, deviceResult, padding, stride);
+  getDeviceMatrixData(hostResultMatrix.data, deviceResult, inHeight*filterWidth);
+
+  if(!im2colMatrixEqualsConvTensor4D(&hostResultMatrix, &hostResultTensor4D, 0.000001)) {
+    printf("FAILURE: CPU and GPU conv are NOT equal\n");
+    free(hostInput.data);
+    free(hostInputUnfolded.data);
+    free(hostInputUnfolded2.data);
+    freeTensor4D(deviceInput);
+    free(hostKernel.data);
+    free(hostKernelFlattened.data);
+    free(hostKernelFlattened2.data);
+    freeTensor4D(deviceKernel);
+    free(hostResultTensor4D.data);
+    free(hostResultMatrix.data);
+    freeMatrix(deviceResult);
+    return 1;
+  }
+
+  printf("SUCCESS: CPU and GPU conv are equal\n");
+  free(hostInput.data);
+  free(hostInputUnfolded.data);
+  free(hostInputUnfolded2.data);
+  freeTensor4D(deviceInput);
+  free(hostKernel.data);
+  free(hostKernelFlattened.data);
+  free(hostKernelFlattened2.data);
+  freeTensor4D(deviceKernel);
+  free(hostResultTensor4D.data);
+  free(hostResultMatrix.data);
+  freeMatrix(deviceResult);
   return 0;
 }
 
