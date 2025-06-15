@@ -2,7 +2,7 @@
 #define CNN_H
 #include <stdint.h>
 #include "matrix.h"
-#include "matrix.cuh"
+#include "cuda_matrix.cuh"
 
 typedef struct ConvolutionalLayer {
   int inChannels; /* input channels */
