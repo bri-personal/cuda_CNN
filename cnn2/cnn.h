@@ -55,6 +55,19 @@ typedef struct {
   float learningRate;
 } ConvolutionalModel;
 
+
+void initConvolutionalModel(ConvolutionalModel** model, int batchSize, float learningRate);
+
+ConvolutionalLayer* createConvolutionalLayerCPU(int batch_size, int outChannels,
+        int outputRows, int outputCols, ConvolutionalLayer* prev, Tensor4D* filters, Vector* biases);
+void addInputLayerCPU(ConvolutionalModel *model, int channels, int rows, int cols);
+void addConvLayerCPU(ConvolutionalModel *model, int channels, int rows, int cols, Tensor4D* filters, Vector* biases);
+
+void layerForwardCPU(ConvolutionalLayer *layer, int batchSize);
+void forwardCPU(ConvolutionalModel *model, Tensor4D* input);
+
+
+
 #ifdef __cplusplus
 }
 #endif

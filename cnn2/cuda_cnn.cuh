@@ -7,7 +7,6 @@
 #include "cuda_matrix.cuh"
 #include "cnn.h"
 
-void initConvolutionalModel(ConvolutionalModel** model, int batchSize, float learningRate);
 
 ConvolutionalLayer* createConvolutionalLayer(int batch_size, int outChannels,
         int outputRows, int outputCols, ConvolutionalLayer* prev, curandState_t* state);

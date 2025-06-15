@@ -57,6 +57,32 @@ void gemm_CPU(Matrix* C, Matrix* A, Matrix* B) {
   }
 }
 
+void addScalarToEachColumnOfTensor4D_CPU(Tensor4D* dest, Tensor4D* src, Vector* scalars) {
+  /* width of scalar must equal width of src and dest */
+  int dim4 = src->dim4;
+  int depth = src->depth;
+  int height = src->height;
+  int width = src->width;
+
+  for(int n = 0; n < dim4; ++n) {
+    for(int k = 0; k < depth; ++k) {
+      for(int i = 0; i < height; ++i) {
+        for(int j = 0; j < width; ++j) {
+          int idx = n*depth*height*width + k*height*width + i*width + j;
+          dest->data[idx] = src->data[idx] + scalars->data[j];
+        }
+      }
+    }
+  }
+}
+
+void tensor4DSigmoid_CPU(Tensor4D* dest, Tensor4D* src) {
+  int size = src->dim4*src->depth*src->height*src->width;
+  for (int i = 0; i < size; ++i) {
+    dest->data[i] = SIGMOID(src->data[i]);
+  }
+}
+
 int matrixEquals(Matrix* m1, Matrix* m2, elem_t delta) {
   if(m1->height!=m2->height || m1->width!=m2->width) {
     return 0;

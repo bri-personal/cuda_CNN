@@ -8,8 +8,6 @@
 #include <curand_kernel.h>
 
 
-#define SIGMOID(x) (1/(1+exp(x * -1)))
-
 /* Randomness stuff */
 /* CLAUDE */
 __global__ void setup_kernel(curandState_t *state, int n) {

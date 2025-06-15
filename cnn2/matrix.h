@@ -38,12 +38,16 @@ typedef struct {
 
 
 /* CPU general matrix functions */
+#define SIGMOID(x) (1/(1+exp(x * -1)))
+
 void printMatrix(Matrix* m);
 void printTensor4D(Tensor4D* t, char* dim4Text, char* depthText);
 void printImage4D(Tensor4D* i);
 void printFilter4D(Tensor4D* f);
 int matrixEquals(Matrix* m1, Matrix* m2, elem_t delta);
 void gemm_CPU(Matrix* C, Matrix* A, Matrix* B);
+void addScalarToEachColumnOfTensor4D_CPU(Tensor4D* dest, Tensor4D* src, Vector* scalars);
+void tensor4DSigmoid_CPU(Tensor4D* dest, Tensor4D* src);
 
 
 /* CPU im2col functions */

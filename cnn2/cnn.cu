@@ -8,20 +8,6 @@
 #include <cuda.h>
 #include <curand_kernel.h>
 
-void initConvolutionalModel(ConvolutionalModel** model, int batchSize, float learningRate) {  
-    *model = (ConvolutionalModel*) calloc(1, sizeof(ConvolutionalModel));
-    if (!(*model)) { perror("calloc model"); exit(1); }
-
-    ConvolutionalNetwork *cnn = (ConvolutionalNetwork*) malloc(sizeof(ConvolutionalNetwork));
-    if (!cnn) { perror("malloc network"); exit(1); }
-    cnn->numLayers = 0;
-  
-    (*model)->network = cnn;
-    (*model)->learningRate = learningRate;
-    (*model)->batchSize = batchSize;
-  
-    checkError("Init CNN");
-  }
 
 ConvolutionalLayer* createConvolutionalLayer(int batch_size, int outChannels,
         int outputRows, int outputCols, ConvolutionalLayer* prev, curandState_t* state) {
@@ -38,7 +24,7 @@ ConvolutionalLayer* createConvolutionalLayer(int batch_size, int outChannels,
         layer->imgCols = prev->outputCols;
     }
 
-    // TODO: this is assuming stride = 0
+    // TODO: this is assuming stride = 1 and padding = 0
     layer->kernelRows = layer->imgRows + 1 - outputRows;
     layer->kernelCols = layer->imgCols + 1 - outputCols;
 
