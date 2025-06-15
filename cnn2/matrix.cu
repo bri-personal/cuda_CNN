@@ -468,7 +468,7 @@ void deviceConvolve(Tensor4D* img, Tensor4D* kernel, Matrix* result,
     int outArea = outHeight * outWidth;
 
     /* unfold image */
-    const int unfoldedHeight = batchSize*outarea;
+    const int unfoldedHeight = batchSize*outArea;
     const int unfoldedWidth = inChannels*kernelArea;
     const int unfoldedArea = unfoldedHeight * unfoldedWidth;
 
