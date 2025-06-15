@@ -31,14 +31,40 @@ int initModelTest() {
 
     cleanupCurandStates(state);
 
-    if(model->batchSize != 10 || fabsf(model->learningRate - 0.025) > 0.000001 ||
-        model->inChannels != inChannels || model->inHeight != inRows || model->inWidth != inChannels ||
-        model->outChannels != outChannels || model->outHeight != outRows || model->outWidth != outCols) {
-        printf("FAILURE: model params NOT correct\n");
+    if(model->batchSize != 10) {
+        printf("FAILURE: model batch size NOT correct\n");
+        return 1;
+    }
+    if (fabsf(model->learningRate - 0.025) > 0.000001) {
+        printf("FAILURE: model learning rate NOT correct\n");
+        return 1;
+    }
+    if (model->inChannels != inChannels) {
+        printf("FAILURE: model in channels NOT correct\n");
+        return 1;
+    }
+    if(model->inHeight != inRows) {
+        printf("FAILURE: model in height NOT correct\n");
+        return 1;
+    }
+    if (model->inWidth != inChannels) {
+        printf("FAILURE: model in width NOT correct\n");
+        return 1;
+    } 
+    if (model->outChannels != outChannels) {
+        printf("FAILURE: model out channels NOT correct\n");
+        return 1;
+    }
+    if(model->outHeight != outRows) {
+        printf("FAILURE: model out height NOT correct\n");
+        return 1;
+    }
+    if(model->outWidth != outCols) {
+        printf("FAILURE: model out width NOT correct\n");
         return 1;
     }
 
-    ConvolutionalNetwork* net = model->network;
+    //ConvolutionalNetwork* net = model->network;
 
     printf("SUCCESS: model params correct\n");
     return 0;
