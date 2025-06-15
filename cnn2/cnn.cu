@@ -76,16 +76,13 @@ void addConvLayer(ConvolutionalModel *model, int channels, int rows, int cols, c
     model->outWidth = cols;
 }
 
-void layerForward(ConvolutionalLayer *layer) {
+void layerForward(ConvolutionalLayer *layer, int batchSize) {
     /* for each channel of this input sample, do forward pass */
     int outChannels = layer->outChannels;
     int outRows = layer->outputRows;
     int outCols = layer->outputCols;
 
-    printf("layer outputs: %p\n", layer->outputs);
-    exit(0);
-
-    int im2colOutRows = layer->outputs->dim4 * outRows * outCols;
+    int im2colOutRows = batchSize * outRows * outCols;
     int im2colOutArea = im2colOutRows * outChannels;
 
     exit(0);
@@ -136,7 +133,7 @@ void forward(ConvolutionalModel *model, Tensor4D* input) {
     
     ConvolutionalLayer *curr = net->input->next; /* first hidden layer */
     while (curr != NULL) {
-        layerForward(curr);
+        layerForward(curr, batchSize);
         curr = curr->next;
     }
   }

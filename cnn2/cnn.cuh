@@ -61,7 +61,7 @@ ConvolutionalLayer* createConvolutionalLayer(int batch_size, int outChannels,
 void addInputLayer(ConvolutionalModel *model, int channels, int rows, int cols, curandState_t* state);
 void addConvLayer(ConvolutionalModel *model, int channels, int rows, int cols, curandState_t* state);
 
-void layerForward(ConvolutionalLayer *layer);
+void layerForward(ConvolutionalLayer *layer, int batchSize);
 void forward(ConvolutionalModel *model, Tensor4D* input);
 
 void backward(ConvolutionalModel *model, Tensor4D* targets);
