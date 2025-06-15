@@ -304,6 +304,15 @@ int convTest() {
     im2colOutHeight, im2colOutWidth);
   getDeviceMatrixData(hostResultMatrix.data, deviceResult, im2colOutArea);
 
+  if(hostResultTensor4D.data == NULL) {
+    perror("hostResultTensor4D.data is NULL before eq check");
+    exit(1);
+  }
+  if(hostResultMatrix.data == NULL) {
+    perror("hostResultTensor4D.data is NULL before eq check");
+    exit(1);
+  }
+
   /* equality check */
   if(!im2colMatrixEqualsConvTensor4D(&hostResultMatrix, &hostResultTensor4D, 0.000001)) {
     printf("FAILURE: CPU and GPU conv are NOT equal\n");
@@ -320,12 +329,20 @@ int convTest() {
   printf("SUCCESS: CPU and GPU conv are equal\n");
   freeTensor4D(deviceInput);
   freeMatrix(deviceResult);
-  freeTensor4D(deviceKernel); // bad?
+  // freeTensor4D(deviceKernel); // corrupted size vs. prev_size
 
   free(hostInput.data);
   free(hostKernel.data);
-  // free(hostResultTensor4D.data); // double free or corruption (!prev)
-  // free(hostResultMatrix.data); // munmap_chunk(): invalid pointer
+  if(hostResultTensor4D.data == NULL) {
+    perror("hostResultTensor4D.data is NULL after eq check");
+    exit(1);
+  }
+  free(hostResultTensor4D.data); // double free or corruption (!prev)
+  if(hostResultMatrix.data == NULL) {
+    perror("hostResultTensor4D.data is NULL after eq check");
+    exit(1);
+  }
+  free(hostResultMatrix.data); // munmap_chunk(): invalid pointer
   
   return 0;
 }
