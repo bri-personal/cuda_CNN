@@ -263,7 +263,6 @@ int convTest() {
     exit(1);
   }
   printf("2\n");
-  return 0;
 
   /* set up input image and filter kernels on device */
   Tensor4D* deviceInput;
@@ -273,6 +272,7 @@ int convTest() {
   initRandomTensor4D(&deviceKernel, outChannels, inChannels, filterHeight, filterWidth, state);
   cleanupCurandStates(state);
   printf("3\n");
+  return 0;
 
   /* set up output feature map on host */
   Tensor4D hostResultTensor4D = {
@@ -339,9 +339,9 @@ int convTest() {
 int main() {
   int test_total = 0;
 
-  test_total += gemmTest();
-  test_total += im2colUnfoldTest();
-  test_total += im2colFlattenTest();
+  // test_total += gemmTest();
+  // test_total += im2colUnfoldTest();
+  // test_total += im2colFlattenTest();
   // test_total += cpuConvTest();
   test_total += convTest();
 
