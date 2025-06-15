@@ -272,7 +272,6 @@ int convTest() {
   initRandomTensor4D(&deviceKernel, outChannels, inChannels, filterHeight, filterWidth, state);
   cleanupCurandStates(state);
   printf("3\n");
-  return 0;
 
   /* set up output feature map on host */
   Tensor4D hostResultTensor4D = {
@@ -284,6 +283,7 @@ int convTest() {
     exit(1);
   }
   printf("4\n");
+  return 0;
   Matrix hostResultMatrix = {im2colOutHeight, im2colOutWidth,
     (elem_t*) calloc(im2colOutArea, sizeof(elem_t))};
   if(hostResultMatrix.data == NULL) {
