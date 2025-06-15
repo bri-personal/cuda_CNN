@@ -82,8 +82,12 @@ void layerForward(ConvolutionalLayer *layer) {
     int outRows = layer->outputRows;
     int outCols = layer->outputCols;
 
+    exit(0);
+
     int im2colOutRows = layer->outputs->dim4 * outRows * outCols;
     int im2colOutArea = im2colOutRows * outChannels;
+
+    
 
     Matrix* temp;
     initMatrix(&temp, im2colOutRows, outChannels);
@@ -130,7 +134,6 @@ void forward(ConvolutionalModel *model, Tensor4D* input) {
     setDeviceTensor4DData(net->input->outputs, input->data, inputSize);
     
     ConvolutionalLayer *curr = net->input->next; /* first hidden layer */
-    exit(0);
     while (curr != NULL) {
         layerForward(curr);
         curr = curr->next;
