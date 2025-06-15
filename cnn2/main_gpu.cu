@@ -34,7 +34,7 @@ int gemmTest() {
   initRandomMatrix(&deviceB, K, J, state);
   cleanupCurandStates(state);
 
-  initZerosMatrix(&deviceC, I, J);
+  initMatrix(&deviceC, I, J);
 
   getDeviceMatrixData(hostA.data, deviceA, I*K);
   getDeviceMatrixData(hostB.data, deviceB, K*J);
@@ -95,7 +95,7 @@ int im2colUnfoldTest() {
   initRandomTensor4D(&deviceInput, batchSize, inChannels, inHeight, inWidth, state);
   cleanupCurandStates(state);
 
-  initZerosMatrix(&deviceInputUnfolded, unfoldedHeight, unfoldedWidth);
+  initMatrix(&deviceInputUnfolded, unfoldedHeight, unfoldedWidth);
 
   getDeviceTensor4DData(hostInput.data, deviceInput, batchSize*inChannels*inHeight*inWidth);
   im2colUnfold4D_CPU(&hostInputUnfolded, &hostInput, filterWidth, filterWidth*filterHeight,
@@ -148,7 +148,7 @@ int im2colFlattenTest() {
   initRandomTensor4D(&deviceKernel, outChannels, inChannels, filterHeight, filterWidth, state);
   cleanupCurandStates(state);
 
-  initZerosMatrix(&deviceKernelFlattened, flattenedHeight, flattenedWidth);
+  initMatrix(&deviceKernelFlattened, flattenedHeight, flattenedWidth);
 
   getDeviceTensor4DData(hostKernel.data, deviceKernel, outChannels*inChannels*filterHeight*filterWidth);
   im2colFlatten4D_CPU(&hostKernelFlattened, &hostKernel);
