@@ -177,12 +177,12 @@ int initModelTestCPU() {
     Tensor4D hiddenFilter = {hiddenChannels, inChannels, hiddenRows, hiddenCols,
         (elem_t*) malloc(sizeof(elem_t)*hiddenChannels*inChannels*hiddenRows*hiddenCols)};
     Vector hiddenBiases = {hiddenChannels, (elem_t*) malloc(sizeof(elem_t)*hiddenChannels)};
-    addConvLayerCPU(model, hiddenChannels, hiddenRows, hiddenCols, hiddenFilter, hiddenBiases);
+    addConvLayerCPU(model, hiddenChannels, hiddenRows, hiddenCols, &hiddenFilter, &hiddenBiases);
 
     Tensor4D outFilter = {outChannels, hiddenChannels, outRows, outCols,
         (elem_t*) malloc(sizeof(elem_t)*outChannels*hiddenChannels*outRows*outCols)};
     Vector outBiases = {outChannels, (elem_t*) malloc(sizeof(elem_t)*outChannels)};
-    addConvLayerCPU(model, outChannels, outRows, outCols, outFilter, outBiases);
+    addConvLayerCPU(model, outChannels, outRows, outCols, &outFilter, &outBiases);
 
     printf("Begin CPU initModelTest\n");
 
