@@ -451,23 +451,20 @@ void deviceUnfoldImage(Tensor4D* img, Matrix* imgUnfolded,
     cudaDeviceSynchronize();
 }
 
-void deviceConvolve(Tensor4D* img, Tensor4D* kernel, Matrix* result,
-    int padding, int stride
+void deviceConvolve(
+    Tensor4D* img, Tensor4D* kernel, Matrix* result,
+    int padding, int stride,
+    int inChannels, int imgHeight, int imgWidth,
+    int outChannels, int kernelHeight, int kernelWidth,
+    int resHeight, int resWidth
 ) {
     /* get dimensions */
-    int inChannels = img->depth;
-
-    int outChannels = kernel->dim4;
-    int kernelHeight = kernel->height;
-    int kernelWidth = kernel->width;
     int kernelArea = kernelHeight * kernelWidth;
 
-    int outWidth = OUTPUT_DIM(img->width, kernelWidth, padding, stride);
-    int outArea = outWidth*OUTPUT_DIM(img->height, kernelHeight, padding, stride);
+    int outWidth = OUTPUT_DIM(imgWidth, kernelWidth, padding, stride);
+    int outArea = outWidth*OUTPUT_DIM(imgHeight, kernelHeight, padding, stride);
 
     /* im 2 col */
-    int resHeight = result->height;
-    int resWidth = result->width;
     int resArea = resHeight * resWidth;
 
     /* unfold image */

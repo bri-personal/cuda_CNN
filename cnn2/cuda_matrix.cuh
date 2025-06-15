@@ -65,8 +65,12 @@ void deviceUnfoldImage(Tensor4D* img, Matrix* imgUnfolded,
 void deviceFlattenKernel(Tensor4D* kernel, Matrix* kernelFlattened,
     int flattenedWidth, int flattenedArea
 );
-void deviceConvolve(Tensor4D* img, Tensor4D* kernel, Matrix* result,
-    int padding, int stride
+void deviceConvolve(
+    Tensor4D* img, Tensor4D* kernel, Matrix* result,
+    int padding, int stride,
+    int inChannels, int imgHeight, int imgWidth,
+    int outChannels, int kernelHeight, int kernelWidth,
+    int resHeight, int resWidth
 );
   
 #endif

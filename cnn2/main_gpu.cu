@@ -299,7 +299,9 @@ int convTest() {
   conv_CPU(&hostResultTensor4D, &hostInput, &hostKernel);
 
   /* convolution on device */
-  deviceConvolve(deviceInput, deviceKernel, deviceResult, padding, stride);
+  deviceConvolve(deviceInput, deviceKernel, deviceResult, padding, stride,
+    inChannels, inHeight, inWidth, outChannels, filterHeight, filterWidth,
+    im2colOutHeight, im2colOutWidth);
   getDeviceMatrixData(hostResultMatrix.data, deviceResult, im2colOutArea);
 
   /* equality check */
@@ -330,10 +332,10 @@ int main() {
   int test_total = 0;
 
   // test_total += gemmTest();
-  test_total += im2colUnfoldTest();
+  // test_total += im2colUnfoldTest();
   // test_total += im2colFlattenTest();
   // test_total += cpuConvTest();
-  // test_total += convTest();
+  test_total += convTest();
 
   return test_total;
 }
