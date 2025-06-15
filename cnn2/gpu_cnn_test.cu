@@ -21,7 +21,7 @@ int initModelTest() {
     int outRows = 3;
     int outCols = 5;
 
-    curandState_t* state = createCurandStates(unfoldedHeight*unfoldedWidth);
+    curandState_t* state = createCurandStates(batchSize*hiddenChannels*inRows*inCols); // more than needed
 
     ConvolutionalModel* model;
     initConvolutionalModel(&model, batchSize, learningRate);
