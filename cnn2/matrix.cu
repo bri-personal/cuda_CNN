@@ -373,7 +373,6 @@ __global__ void flattenKernel(Tensor4D* kernel, Matrix* kernelFlattened,
 ) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
 
-    int outChannels = kernel->dim4;
     int inChannels = kernel->depth;
     int kernelHeight = kernel->height;
     int kernelWidth = kernel->width;
@@ -385,18 +384,16 @@ __global__ void flattenKernel(Tensor4D* kernel, Matrix* kernelFlattened,
         int h = i / flattenedWidth;
         int w = i % flattenedWidth;
 
-        int h_div_kernel_area = h / kernelAreaPerInputChannel;
         int h_mod_kernel_area = h % kernelAreaPerInputChannel;
-        int hKernelFlattenedRows = h * outChannels;
 
-        kernelFlattened->data[hKernelFlattenedRows + w] = kernel->data[
+        kernelFlattened->data[i] = kernel->data[
             w*kernelAreaPerOutputChannel +
-            h_div_kernel_area*kernelAreaPerInputChannel +
-            (h_mod_kernel_area / kernelWidth)*kernelWidth +
+            h +
+            h_mod_kernel_area +
             (h_mod_kernel_area % kernelWidth)
         ];
 
-        i += gridDim.x;
+        i += gridDim.x*blockDim.x;
     }
 }
 void deviceFlattenKernel(Tensor4D* kernel, Matrix* kernelFlattened,
@@ -424,18 +421,24 @@ __global__ void unfoldImage(Tensor4D* img, Matrix* imgUnfolded,
         int w = i % unfoldedWidth;
 
         int h_mod_output_area = h % outputArea;
-        int h_div_output_area = h / outputArea;
-        int hImageUnfoldedRows = h * unfoldedWidth;
         int w_mod_kernel_area = w % kernelArea;
 
-        imgUnfolded->data[hImageUnfoldedRows + w] = img->data[
-            h_div_output_area*imageAreaPerSample +
-            (w / kernelArea)*imageAreaPerChannel +
-            (h_mod_output_area / outputWidth + w_mod_kernel_area / kernelWidth)*imageWidth +
-            (h_mod_output_area % outputWidth + w_mod_kernel_area % kernelWidth)
-        ];
+        if(h_mod_output_area / outputWidth + w_mod_kernel_area / kernelWidth >=0 && 
+                h_mod_output_area / outputWidth + w_mod_kernel_area / kernelWidth < imageHeight && 
+                h_mod_output_area % outputWidth + w_mod_kernel_area % kernelWidth >= 00 && 
+                h_mod_output_area % outputWidth + w_mod_kernel_area % kernelWidth <= imageWidth
+        ) {
+            imgUnfolded->data[i] = img->data[
+                (h / outputArea)*imageAreaPerSample +
+                (w / kernelArea)*imageAreaPerChannel +
+                (h_mod_output_area / outputWidth + w_mod_kernel_area / kernelWidth)*imageWidth +
+                (h_mod_output_area % outputWidth + w_mod_kernel_area % kernelWidth)
+            ];
+        } else {
+            imgUnfolded->data[i] = 0;
+        }
 
-        i += gridDim.x;
+        i += gridDim.x*blockDim.x;
     }
 }
 void deviceUnfoldImage(Tensor4D* img, Matrix* imgUnfolded,
