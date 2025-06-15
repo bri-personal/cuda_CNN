@@ -126,21 +126,53 @@ int im2colUnfoldTest() {
 }
 
 int im2colFlattenTest() {
-  const int batchSize = 10;
   const int inChannels = 3;
-  const int inHeight = 5;
-  const int inWidth = 7;
-
   const int outChannels = 4;
   const int filterHeight = 3;
   const int filterWidth = 5;
 
-  const int outHeight = OUTPUT_DIM(inHeight, filterHeight, 0, 1);
-  const int outWidth = OUTPUT_DIM(inWidth, filterWidth, 0, 1);
+  const int flattenedHeight = inChannels*filterHeight*filterWidth;
+  const int flattenedWidth = outChannels;
 
-  const int unfoldedHeight = batchSize*outHeight*outWidth;
-  const int unfoldedWidth = inChannels*filterHeight*filterWidth;
+  Tensor4D hostKernel = {outChannels, inChannels, filterHeight, filterWidth,
+    (elem_t*) calloc(outChannels*inChannels*filterHeight*filterWidth, sizeof(elem_t))};
+  Matrix hostKernelFlattened = {flattenedHeight, flattenedWidth,
+    (elem_t*) calloc(flattenedHeight*flattenedWidth, sizeof(elem_t))};
+  Matrix hostKernelFlattened2 = {flattenedHeight, flattenedWidth,
+    (elem_t*) calloc(flattenedHeight*flattenedWidth, sizeof(elem_t))};
 
+  Tensor4D* deviceKernel;
+  Matrix* deviceKernelFlattened;
+
+  curandState_t* state = createCurandStates(flattenedHeight*flattenedWidth);
+  initRandomTensor4D(&deviceKernel, outChannels, inChannels, filterHeight, filterWidth, state);
+  cleanupCurandStates(state);
+
+  initZerosMatrix(&deviceKernelFlattened, flattenedHeight, flattenedWidth);
+
+  getDeviceTensor4DData(hostKernel.data, deviceKernel, outChannels*inChannels*filterHeight*filterWidth);
+  im2colFlatten4D_CPU(&hostKernelFlattened, &hostKernel);
+
+  deviceFlattenKernel(deviceKernel, deviceKernelFlattened, flattenedWidth, flattenedWidth*flattenedHeight);
+
+  getDeviceMatrixData(hostKernelFlattened2.data, deviceKernelFlattened, flattenedHeight*flattenedWidth);
+
+  if(!matrixEquals(&hostKernelFlattened2, &hostKernelFlattened, 0.000001)) {
+    printf("FAILURE: CPU and GPU im2col flatten are NOT equal\n");
+    free(hostKernel.data);
+    free(hostKernelFlattened.data);
+    free(hostKernelFlattened2.data);
+    freeTensor4D(deviceKernel);
+    freeMatrix(deviceKernelFlattened);
+    return 1;
+  }
+
+  printf("SUCCESS: CPU and GPU im2col flatten are equal\n");
+  free(hostKernel.data);
+  free(hostKernelFlattened.data);
+  free(hostKernelFlattened2.data);
+  freeTensor4D(deviceKernel);
+  freeMatrix(deviceKernelFlattened);
   return 0;
 }
 
