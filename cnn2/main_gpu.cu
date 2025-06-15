@@ -324,8 +324,8 @@ int convTest() {
   freeTensor4D(deviceKernel);
   free(hostResultTensor4D.data);
   free(hostResultMatrix.data);
-  freeMatrix(deviceResult);
   exit(0);
+  freeMatrix(deviceResult);
   return 0;
 }
 
