@@ -337,12 +337,14 @@ int convTest() {
     perror("hostResultTensor4D.data is NULL after eq check");
     exit(1);
   }
-  free(hostResultTensor4D.data); // double free or corruption (!prev)
+  printf("%p\n", hostResultTensor4D.data);
+  //free(hostResultTensor4D.data); // double free or corruption (!prev)
   if(hostResultMatrix.data == NULL) {
     perror("hostResultTensor4D.data is NULL after eq check");
     exit(1);
   }
-  free(hostResultMatrix.data); // munmap_chunk(): invalid pointer
+  printf("%p\n", hostResultMatrix.data);
+  //free(hostResultMatrix.data); // munmap_chunk(): invalid pointer
   
   return 0;
 }
