@@ -249,11 +249,19 @@ int convTest() {
   /* set up input image on host */
   Tensor4D hostInput = {batchSize, inChannels, inHeight, inWidth,
     (elem_t*) calloc(batchSize*inChannels*inHeight*inWidth, sizeof(elem_t))};
+  if(hostInput.data == NULL) {
+    perror("Failed to alloc hostInput data");
+    exit(1);
+  }
   printf("1\n");
 
   /* set up filter kernels on host*/
   Tensor4D hostKernel = {outChannels, inChannels, filterHeight, filterWidth,
     (elem_t*) calloc(outChannels*inChannels*filterHeight*filterWidth, sizeof(elem_t))};
+  if(hostKernel.data == NULL) {
+    perror("Failed to alloc hostKernel data");
+    exit(1);
+  }
   printf("2\n");
 
   /* set up input image and filter kernels on device */
@@ -270,9 +278,17 @@ int convTest() {
     batchSize, outChannels, outHeight, outWidth,
     (elem_t*) calloc(batchSize*outChannels*outHeight*outWidth, sizeof(elem_t))
   };
+  if(hostResultTensor4D.data == NULL) {
+    perror("Failed to alloc hostResultTensor4D data");
+    exit(1);
+  }
   printf("4\n");
   Matrix hostResultMatrix = {im2colOutHeight, im2colOutWidth,
     (elem_t*) calloc(im2colOutArea, sizeof(elem_t))};
+  if(hostResultMatrix.data == NULL) {
+    perror("Failed to alloc hostResultMatrix data");
+    exit(1);
+  }
   printf("5\n");
 
   /* set up output feature map on device */
@@ -326,7 +342,7 @@ int main() {
   test_total += im2colUnfoldTest();
   test_total += im2colFlattenTest();
   // test_total += cpuConvTest();
-  // test_total += convTest();
+  test_total += convTest();
 
   return test_total;
 }
