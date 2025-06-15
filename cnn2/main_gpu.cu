@@ -279,6 +279,7 @@ int convTest() {
     perror("Failed to alloc hostResultTensor4D data");
     exit(1);
   }
+  printf("\n");
   printf("result tensor %p\n", hostResultTensor4D.data);
   
   Matrix hostResultMatrix = {im2colOutHeight, im2colOutWidth,
