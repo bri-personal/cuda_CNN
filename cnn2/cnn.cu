@@ -124,50 +124,34 @@ void forward(ConvolutionalModel *model, Tensor4D* input) {
   }
 
 
-// void initLayerGradients(ConvolutionalLayer *layer, int batchSize) {
-//     int i, j;
-//     int outChannels = layer->outChannels;
-//     int r = layer->outputRows;
-//     int c = layer->outputCols;
+void initLayerGradients(ConvolutionalLayer *layer, int batchSize) {
+    int i, j;
+    int outChannels = layer->outChannels;
+    int rows = layer->outputRows;
+    int cols = layer->outputCols;
 
-//     /* backprop fields needs batchsize arrays of outChannels arrays of pointers to Matrix on the device */
-//     layer->gradient = (Matrix***) malloc(sizeof(Matrix**) * batchSize);
-//     if (!(layer->gradient)) {perror("malloc layer g"); exit(1);}
+    initTensor4D(layer->gradient, batchSize, outChannels, rows, cols);
 
-//     layer->delta = (Matrix***) malloc(sizeof(Matrix**) * batchSize);
-//     if (!(layer->delta)) {perror("malloc layer d"); exit(1);}
-//     if (layer->prev) {
-//         layer->error = (Matrix***) malloc(sizeof(Matrix**) * batchSize);
-//         if (!(layer->error)) {perror("malloc layer e"); exit(1);}
-//     }
-    
-//     for (i = 0; i < batchSize; i++) {
-//         layer->gradient[i] = (Matrix**) malloc(sizeof(Matrix*) * outChannels);
-//         if (!(layer->gradient[i])) {perror("malloc layer g"); exit(1);}
+    initTensor4D(layer->delta, batchSize, outChannels, rows, cols);
 
-//         layer->delta[i] = (Matrix**) malloc(sizeof(Matrix*) * outChannels);
-//         if (!(layer->delta[i])) {perror("malloc layer d"); exit(1);}
+    if (layer->prev) {
+        initTensor4D(layer->error, batchSize, outChannels, rows, cols);
+    } else {
+        layer->error = NULL;
+    }
+}
 
-//         layer->error[i] = (Matrix**) malloc(sizeof(Matrix*) * outChannels);
-//         if (!(layer->error[i])) {perror("malloc layer e"); exit(1);}
-        
-//         for (j = 0; j < outChannels; j++) {
-//             initMatrix(layer->gradient[i] + j, r, c);
-//             initMatrix(layer->delta[i] + j, r, c);
-//             initMatrix(layer->error[i] + j, r, c);
-//         }
-//     }
-// }
+void compileModel(ConvolutionalModel *model) {
+    int batchSize = model->batchSize;
 
-// void compileModel(ConvolutionalModel *model) {
-//     ConvolutionalLayer* curr = model->network->layers->next;
-//     for (int i = 0; i < model->network->numLayers; ++i) {
-//         if (!curr) break;
-//         initLayerGradients(curr, model->batchSize);
-//         curr = curr->next;
-//     }
-// }
+    ConvolutionalLayer* curr = model->network->layers->next;
+    while (curr != NULL) {
+        initLayerGradients(curr, batchSize);
+        curr = curr->next;
+    }
+}
 
+// TODO: make for Tensor4D
 // void layerBackward(ConvolutionalLayer* layer, ConvolutionalModel* model) {
 //     int batchSize = model->batchSize;
 //     int outChannels = layer->outChannels;
@@ -185,15 +169,18 @@ void forward(ConvolutionalModel *model, Tensor4D* input) {
     
 // }
 
-// void layerUpdate(ConvolutionalLayer* layer, int batchSize) {
-//     return;
-// }
+void layerUpdate(ConvolutionalLayer* layer, int batchSize) {
+    // TODO
+    return;
+}
 
-// void backward(ConvolutionalModel* model, float*** targets) {
+// TODO: make for Tensor4D
+// void backward(ConvolutionalModel* model, Tensor4D* targets) {
 //     ConvolutionalNetwork* net = model->network;
 //     int batchSize = model->batchSize;
 //     ConvolutionalLayer* curr = net->output;
 //     int outputSize = curr->outputRows * curr->outputCols;
+
 //     int i, j;
 //     for (i = 0; i < batchSize; ++i) {
 //         for (j = 0; j < curr->outChannels; ++j) {

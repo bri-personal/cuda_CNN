@@ -66,6 +66,9 @@ void addConvLayerCPU(ConvolutionalModel *model, int channels, int rows, int cols
 void layerForwardCPU(ConvolutionalLayer *layer, int batchSize);
 void forwardCPU(ConvolutionalModel *model, Tensor4D* input);
 
+void compileModelCPU(ConvolutionalModel *model);
+
+
 #ifdef __cplusplus
 }
 #endif

@@ -126,3 +126,58 @@ void forwardCPU(ConvolutionalModel *model, Tensor4D* input) {
         curr = curr->next;
     }
 }
+
+void initLayerGradientsCPU(ConvolutionalLayer *layer, int batchSize) {
+    int i, j;
+    int outChannels = layer->outChannels;
+    int rows = layer->outputRows;
+    int cols = layer->outputCols;
+
+    /* backprop fields needs batchsize arrays of outChannels arrays of pointers to Matrix on the device */
+    layer->gradient = (Tensor4D*) malloc(sizeof(Tensor4D));
+    if (layer->gradient == NULL) {
+        perror("malloc layer gradient");
+        exit(1);
+    }
+    layer->gradient->dim4 = batchSize;
+    layer->gradient->depth = outChannels;
+    layer->gradient->height = rows;
+    layer->gradient->width = cols;
+    layer->gradient->data = (elem_t*) malloc(sizeof(elem_t)*batchSize*outChannels*rows*cols);
+
+    layer->delta = (Tensor4D*) malloc(sizeof(Tensor4D));
+    if (layer->delta == NULL) {
+        perror("malloc layer delta");
+        exit(1);
+    }
+    layer->delta->dim4 = batchSize;
+    layer->delta->depth = outChannels;
+    layer->delta->height = rows;
+    layer->delta->width = cols;
+    layer->delta->data = (elem_t*) malloc(sizeof(elem_t)*batchSize*outChannels*rows*cols);
+
+    if (layer->prev) {
+        layer->error = (Tensor4D*) malloc(sizeof(Tensor4D));
+        if (layer->error == NULL) {
+            perror("malloc layer error");
+            exit(1);
+        }
+        layer->error->dim4 = batchSize;
+        layer->error->depth = outChannels;
+        layer->error->height = rows;
+        layer->error->width = cols;
+        layer->error->data = (elem_t*) malloc(sizeof(elem_t)*batchSize*outChannels*rows*cols);
+    } else {
+        layer->error = NULL;
+    }
+}
+
+void compileModelCPU(ConvolutionalModel *model) {
+    int batchSize = model->batchSize;
+
+    ConvolutionalLayer* curr = model->network->layers->next;
+    while (curr != NULL) {
+        initLayerGradientsCPU(curr, batchSize);
+        curr = curr->next;
+    }
+}
