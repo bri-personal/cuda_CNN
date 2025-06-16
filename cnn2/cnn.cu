@@ -125,17 +125,16 @@ void forward(ConvolutionalModel *model, Tensor4D* input) {
 
 
 void initLayerGradients(ConvolutionalLayer *layer, int batchSize) {
-    int i, j;
     int outChannels = layer->outChannels;
     int rows = layer->outputRows;
     int cols = layer->outputCols;
 
-    initTensor4D(layer->gradient, batchSize, outChannels, rows, cols);
+    initTensor4D(&layer->gradient, batchSize, outChannels, rows, cols);
 
-    initTensor4D(layer->delta, batchSize, outChannels, rows, cols);
+    initTensor4D(&layer->delta, batchSize, outChannels, rows, cols);
 
     if (layer->prev) {
-        initTensor4D(layer->error, batchSize, outChannels, rows, cols);
+        initTensor4D(&layer->error, batchSize, outChannels, rows, cols);
     } else {
         layer->error = NULL;
     }
