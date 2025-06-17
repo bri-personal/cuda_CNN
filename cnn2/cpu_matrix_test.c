@@ -34,7 +34,7 @@ int main() {
   Matrix iUnfolded = {imageUnfoldedHeight, imageUnfoldedWidth, (elem_t*) calloc(imageUnfoldedHeight*imageUnfoldedWidth, sizeof(elem_t))};
   Matrix kFlattened = {imageUnfoldedWidth, k.dim4, (elem_t*) calloc(imageUnfoldedWidth*k.dim4, sizeof(elem_t))};
 
-  im2colUnfold4D_CPU(&iUnfolded, &i, k.width, kernelArea, outputWidth, outputArea);
+  im2colUnfold4D_CPU(&iUnfolded, &i, k.width, kernelArea, outputWidth, outputArea, PADDING, STRIDE);
   im2colFlatten4D_CPU(&kFlattened, &k);
 
   printf("I unfolded\n");
@@ -53,7 +53,7 @@ int main() {
   Tensor4D convOutput = {BATCH_SIZE, OUT_CHANNELS, outputHeight, outputWidth,
     (elem_t*) calloc(BATCH_SIZE*OUT_CHANNELS*outputArea, sizeof(elem_t))};
 
-  conv_CPU(&convOutput, &i, &k);
+  conv_CPU(&convOutput, &i, &k, PADDING, STRIDE);
 
   printf("Naive Conv Output\n");
   printImage4D(&convOutput);
