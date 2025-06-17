@@ -356,6 +356,19 @@ void deviceSigmoidOutputDerivative(Matrix *a, Matrix *b, int N) {
   checkError("Derivative");
 }
 
+__global__ void tensor4DSigmoidOutputDerivative(Tensor4D *a, Tensor4D *b) {
+  int i = threadIdx.x + blockIdx.x * blockDim.x;
+  if (i < size(b)) {
+    float x = a->data[i];
+    b->data[i] = x * (1 - x);
+  }
+}
+void deviceTensor4DSigmoidOutputDerivative(Tensor4D *a, Tensor4D *b, int N) {
+  tensor4DSigmoidOutputDerivative<<<BLOCKS(N, BLOCKDIM), BLOCKDIM>>>(a, b);
+  cudaDeviceSynchronize();
+  checkError("Derivative");
+}
+
 
 /** TRANSPOSE **/
 __global__ void transpose(Matrix *a, Matrix *b) {
