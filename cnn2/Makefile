@@ -1,5 +1,5 @@
 cpu_matrix_test:
-	gcc -o cpu_matrix_test cpu_matrix_test.c matrix.c matrix.h
+	gcc -o cpu_matrix_test cpu_matrix_test.c matrix.c matrix.h -lm
 
 gpu_matrix_test:
 	nvcc matrix.cu matrix.c gpu_matrix_test.cu -o gpu_matrix_test
