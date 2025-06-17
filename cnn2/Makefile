@@ -8,7 +8,7 @@ gpu_cnn_test:
 	nvcc matrix.cu matrix.c cnn.cu cnn.c gpu_cnn_test.cu -o gpu_cnn_test
 
 batch:
-	sbatch BatchJobscript
+	sbatch BatchJobscriptCnn
 
 clean:
 	rm *_matrix_test *_cnn_test
