@@ -48,10 +48,13 @@ __device__ int tensor4DSize(Tensor4D *t);
 void deviceMatrixMult(Matrix *a, Matrix *b, Matrix *ab, int N);
 void deviceMatrixAdd(Matrix *a, Matrix *b, Matrix *c, int N);
 void deviceMatrixSub(Matrix *a, Matrix *b, Matrix *c, int N);
+void deviceTensor4DAdd(Tensor4D *a, Tensor4D *b, Tensor4D *c, int N)
+void deviceTensor4DSub(Tensor4D *a, Tensor4D *b, Tensor4D *c, int N)
 void deviceMatrixScale(Matrix *a, float scale, Matrix *b, int N);
 void deviceMatrixAddScalarElementwise(Matrix *src, Matrix *dest, float scalar, int N);
 void deviceMatrixAddScalarColumnwise(Matrix* src, Matrix *dest, Vector* scalars, int rows, int cols);
 void deviceMatrixDivideScalarElementwise(Matrix *src, Matrix *dest, float scalar, int N);
+void deviceTensor4DDivideScalarElementwise(Tensor4D *src, Tensor4D *dest, elem_t scalar, int N)
 void deviceHadamardProd(Matrix *a, Matrix *b, Matrix *c, int N);
 void deviceTensor4DHadamardProd(Tensor4D *a, Tensor4D *b, Tensor4D *c, int N);
 void deviceSigmoid(Matrix *a, Matrix *b, int N);

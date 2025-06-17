@@ -233,6 +233,26 @@ void deviceMatrixSub(Matrix *a, Matrix *b, Matrix *c, int N) {
   cudaDeviceSynchronize();
   checkError("Matrix sub");
 }
+
+__global__ void tensor4DAdd(Tensor4D *a, Tensor4D *b, Tensor4D *c, int negate, int N) {
+  int i = threadIdx.x + blockIdx.x * blockDim.x;
+  while (i < N) {
+    c->data[i] = a->data[i] + (b->data[i] * negate);
+    i += gridDim.x*blockDim.x;
+  }
+}
+void deviceTensor4DAdd(Tensor4D *a, Tensor4D *b, Tensor4D *c, int N) {
+  tensor4DAdd<<<BLOCKS(N, BLOCKDIM), BLOCKDIM>>>(a, b, c, 1);
+  cudaDeviceSynchronize();
+  checkError("Matrix add");
+}
+void deviceTensor4DSub(Tensor4D *a, TIME_UTC *b, Tensor4D *c, int N) {
+  tensor4DAdd<<<BLOCKS(N, BLOCKDIM), BLOCKDIM>>>(a, b, c, -1);
+  cudaDeviceSynchronize();
+  checkError("Matrix sub");
+}
+
+
 __global__ void matrixAddVec(Matrix *a, Matrix *b, Matrix *c) {
   int i = threadIdx.x + blockIdx.x * blockDim.x;
   if (i < size(c)) {
@@ -277,7 +297,18 @@ __global__ void matrixDivideScalarElementwise(Matrix * src, Matrix *dest, float 
 void deviceMatrixDivideScalarElementwise(Matrix *src, Matrix *dest, float scalar, int N) {
   matrixDivideScalarElementwise<<<BLOCKS(N, BLOCKDIM), BLOCKDIM>>>(src, dest, scalar);
   cudaDeviceSynchronize();
-  checkError("Matrix divide scalar elementwise");
+  checkError("T4D divide scalar elementwise");
+}
+
+__global__ void tensor4DDivideScalarElementwise(Tensor4D * src, Tensor4D *dest, elem_t scalar) {
+  int i = threadIdx.x + blockIdx.x * blockDim.x;
+  if (i < size(dest))
+    dest->data[i] =  src->data[i] / scalar;
+}
+void deviceTensor4DDivideScalarElementwise(Tensor4D *src, Tensor4D *dest, elem_t scalar, int N) {
+  tensor4DDivideScalarElementwise<<<BLOCKS(N, BLOCKDIM), BLOCKDIM>>>(src, dest, scalar);
+  cudaDeviceSynchronize();
+  checkError("T4D divide scalar elementwise");
 }
 
 __global__ void reduceRows(Matrix *x, Matrix *y) {

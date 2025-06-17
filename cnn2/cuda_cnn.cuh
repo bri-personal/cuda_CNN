@@ -16,8 +16,11 @@ void addConvLayer(ConvolutionalModel *model, int channels, int rows, int cols, c
 void layerForward(ConvolutionalLayer *layer, int batchSize);
 void forward(ConvolutionalModel *model, Tensor4D* input);
 
-void backward(ConvolutionalModel *model, Tensor4D* targets);
 void compileModel(ConvolutionalModel *model);
-int modelAccuracy(ConvolutionalModel *model, float **images, uint8_t *labels);
+void layerBackward(ConvolutionalLayer* layer);
+void layerUpdate(ConvolutionalLayer* layer, int batchSize);
+void backward(ConvolutionalModel *model, Tensor4D* targets);
+
+int modelAccuracy(ConvolutionalModel *model, Tensor4D* images, uint8_t *labels);
 
 #endif

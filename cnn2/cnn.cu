@@ -150,10 +150,13 @@ void compileModel(ConvolutionalModel *model) {
     }
 }
 
-void layerBackward(ConvolutionalLayer* layer, ConvolutionalModel* model) {
+void layerBackward(ConvolutionalLayer* layer) {
     int outputSize = layer->outputRows * layer->outputCols;
     
+    /* gradient of y^ wrt z */
     deviceTensor4DSigmoidOutputDerivative(layer->outputs, layer->gradient, outputSize);
+
+    /* gradient of L wrt z */
     deviceTensor4DHadamardProd(layer->gradient, layer->error, layer->gradient, outputSize);
     
     // TODO: continue
@@ -165,30 +168,26 @@ void layerUpdate(ConvolutionalLayer* layer, int batchSize) {
 }
 
 // TODO: make for Tensor4D
-// void backward(ConvolutionalModel* model, Tensor4D* targets) {
-//     ConvolutionalNetwork* net = model->network;
-//     int batchSize = model->batchSize;
-//     ConvolutionalLayer* curr = net->output;
-//     int outputSize = curr->outputRows * curr->outputCols;
+void backward(ConvolutionalModel* model, Tensor4D* targets) {
+    ConvolutionalNetwork* net = model->network;
+    int batchSize = model->batchSize;
+    ConvolutionalLayer* curr = net->output;
+    int outputSize = curr->outputRows * curr->outputCols;
 
-//     int i, j;
-//     for (i = 0; i < batchSize; ++i) {
-//         for (j = 0; j < curr->outChannels; ++j) {
-//             setDeviceMatrixData(curr->error[i][j], targets[i][j], outputSize);
-//             deviceMatrixSub(curr->outputs[i][j], curr->error[i][j], curr->error[i][j], outputSize);
-//             deviceMatrixDivideScalarElementwise(curr->error[i][j], curr->error[i][j], outputSize, outputSize);
-//         } 
-//     }
+    /* get gradient of MSE loss wrt predicted output */
+    setDeviceTensor4DData(curr->error, targets, outputSize);
+    deviceTensor4DSub(curr->outputs, curr->error, curr->error, outputSize);
+    deviceTensor4DDivideScalarElementwise(curr->error, curr->error, outputSize, outputSize);
 
-//     for (int i = 0; i < net->numLayers; ++i) {
-//         if (!curr->prev) break;
-//         layerBackward(curr, model);
-//         curr = curr->prev;
-//       }
-//       curr = net->output;
-//       for (int i = 0; i < net->numLayers; ++i) {
-//         if (!curr->prev) break;
-//         layerUpdate(curr, batchSize);
-//         curr = curr->prev;
-//       }
-// }
+    /* backprop to calc gradients and update params */
+    while (curr != NULL) {
+        layerBackward(curr, model);
+        layerUpdate(curr, batchSize);
+        curr = curr->prev;
+    }
+}
+
+int modelAccuracy(ConvolutionalModel *model, Tensor4D* images, uint8_t *labels) {
+    // TODO
+    return 0;
+}
