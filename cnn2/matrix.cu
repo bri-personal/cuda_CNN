@@ -192,6 +192,9 @@ void getDeviceVectorData(float *dest, Vector *source, int n) {
 __device__ int size(Matrix *mat) {
   return mat->height * mat->width;
 }
+__device__ int tensor4DSize(Tensor4D *t) {
+  return t->dim4*t->depth*t->height*t->width;
+}
 
 
 
@@ -332,6 +335,19 @@ void deviceHadamardProd(Matrix *a, Matrix *b, Matrix *c, int N) {
   checkError("Hadamard");
 }
 
+__global__ void tensor4DHadamardProd(Tensor4D *a, Tensor4D *b, Tensor4D *c, int N) {
+  int i = threadIdx.x + blockIdx.x * blockDim.x;
+  while (i < N) {
+    c->data[i] = a->data[i] * b->data[i];
+    i += gridDim.x * blockDim.x;
+  }
+}
+void deviceTensor4DHadamardProd(Tensor4D *a, Tensor4D *b, Tensor4D *c, int N) {
+  tensor4DHadamardProd<<<BLOCKS(N, BLOCKDIM), BLOCKDIM>>>(a, b, c, N);
+  cudaDeviceSynchronize();
+  checkError("Hadamard 4d");
+}
+
 __global__ void sigmoid(Matrix *a, Matrix *b) {
   int i = threadIdx.x + blockIdx.x * blockDim.x;
   if (i < size(b))
@@ -356,15 +372,16 @@ void deviceSigmoidOutputDerivative(Matrix *a, Matrix *b, int N) {
   checkError("Derivative");
 }
 
-__global__ void tensor4DSigmoidOutputDerivative(Tensor4D *a, Tensor4D *b) {
+__global__ void tensor4DSigmoidOutputDerivative(Tensor4D *src, Tensor4D *dest, int N) {
   int i = threadIdx.x + blockIdx.x * blockDim.x;
-  if (i < size(b)) {
-    float x = a->data[i];
-    b->data[i] = x * (1 - x);
+  while (i < N) {
+    elem_t x = src->data[i];
+    dest->data[i] = x * (1 - x);
+    i += gridDim.x*blockDim.x;
   }
 }
-void deviceTensor4DSigmoidOutputDerivative(Tensor4D *a, Tensor4D *b, int N) {
-  tensor4DSigmoidOutputDerivative<<<BLOCKS(N, BLOCKDIM), BLOCKDIM>>>(a, b);
+void deviceTensor4DSigmoidOutputDerivative(Tensor4D *src, Tensor4D *dest, int N) {
+  tensor4DSigmoidOutputDerivative<<<BLOCKS(N, BLOCKDIM), BLOCKDIM>>>(src, dest, N);
   cudaDeviceSynchronize();
   checkError("Derivative");
 }

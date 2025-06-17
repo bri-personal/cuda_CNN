@@ -42,6 +42,7 @@ void getDeviceVectorData(float *dest, Vector *source, int n);
 
 /** HELPER **/
 __device__ int size(Matrix *mat);
+__device__ int tensor4DSize(Tensor4D *t);
 
 /** MATH **/
 void deviceMatrixMult(Matrix *a, Matrix *b, Matrix *ab, int N);
@@ -52,8 +53,10 @@ void deviceMatrixAddScalarElementwise(Matrix *src, Matrix *dest, float scalar, i
 void deviceMatrixAddScalarColumnwise(Matrix* src, Matrix *dest, Vector* scalars, int rows, int cols);
 void deviceMatrixDivideScalarElementwise(Matrix *src, Matrix *dest, float scalar, int N);
 void deviceHadamardProd(Matrix *a, Matrix *b, Matrix *c, int N);
+void deviceTensor4DHadamardProd(Tensor4D *a, Tensor4D *b, Tensor4D *c, int N);
 void deviceSigmoid(Matrix *a, Matrix *b, int N);
 void deviceSigmoidOutputDerivative(Matrix *a, Matrix *b, int N);
+void deviceTensor4DSigmoidOutputDerivative(Tensor4D *src, Tensor4D *dest, int N);
 void deviceMatrixAddVec(Matrix *a, Matrix *b, Matrix *c, int N);
 void deviceMatrixReduceRows(Matrix *x, Matrix *y, int height, int width);
 
