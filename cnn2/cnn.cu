@@ -174,13 +174,13 @@ void backward(ConvolutionalModel* model, Tensor4D* targets) {
     int outputSize = curr->outputRows * curr->outputCols;
 
     /* get gradient of MSE loss wrt predicted output */
-    setDeviceTensor4DData(curr->error, targets, outputSize);
+    setDeviceTensor4DData(curr->error, targets->data, outputSize);
     deviceTensor4DSub(curr->outputs, curr->error, curr->error, outputSize);
     deviceTensor4DDivideScalarElementwise(curr->error, curr->error, outputSize, outputSize);
 
     /* backprop to calc gradients and update params */
     while (curr != NULL) {
-        layerBackward(curr, model);
+        layerBackward(curr);
         layerUpdate(curr, batchSize);
         curr = curr->prev;
     }
