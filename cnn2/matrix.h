@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#include <math.h>
+
 /* data type used in all tensors */
 typedef float elem_t;
 
