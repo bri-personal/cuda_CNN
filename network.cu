@@ -2,6 +2,7 @@
 #include "util.h"
 #include <stdio.h>
 #include <stdint.h>
+#include <cuda.h>
 
 void addDenseLayer(Model *model, int size) {
   Layer *prev = model->network->output;

@@ -147,6 +147,38 @@ void test_matrixElementWise() {
   freeMatrix(C);
 }
 
+void test_matrix_add_scalar_elementwise() {
+  Matrix *A, *B;
+  float data[6] = {0,1,2,3,4,5};
+
+  initMatrix(&A, 2, 3);
+  initMatrix(&B, 2, 3);
+
+  setDeviceMatrixData(A, data, 6);
+  deviceMatrixAddScalarElementwise(A, B, 10, 6);
+
+  float b[6];
+  getDeviceMatrixData(b, B, 6);
+
+  int offset = 0;
+  char result[64];
+  char expected[64] = "10.00 11.00 12.00 13.00 14.00 15.00";
+  for (int i = 0; i < 6; ++i) {
+    offset += snprintf(result + offset, sizeof(result) - offset, "%.2f ", b[i]);
+  }
+  printf("Testing matrix add scalar elementwise \n");
+  printf("Result: %s\n", result);
+  printf("Expect: %s\n", expected);
+  if (strncmp(result, expected, strlen(expected)) != 0) {
+    printf("FAILED\n");
+    exit(EXIT_FAILURE);
+  }
+  printf("\nPASSED\n\n");
+
+  freeMatrix(A);
+  freeMatrix(B);  
+}
+
 void test_transpose() {
   Matrix *A, *tA, *C;
   float a[8] = {
@@ -214,12 +246,105 @@ void test_acrossRows() {
   printf("\nPASSED\n\n");
 }
 
+void test_unfold() {
+    Matrix *Img, *Kernel, *Unfolded;
+    float img[9] = {
+      0,1,2,
+      3,4,5,
+      6,7,8
+    };
+    initMatrix(&Img, 3, 3);
+    setDeviceMatrixData(Img, img, 9);
+
+    float kernel[4] = {
+        0, 1,
+        2, 3
+    };
+    initMatrix(&Kernel, 2, 2);
+    setDeviceMatrixData(Kernel, kernel, 4);
+
+    int resRows = 3 - 2 + 1;
+    int resCols = 3 - 2 + 1;
+
+    deviceUnfoldMatrix(Img, &Unfolded, 2, 2, resRows, resCols);
+  
+    float unfolded[16];
+    getDeviceMatrixData(unfolded, Unfolded, 16);
+  
+    char result[64];
+    char expected[64] = "0 1 3 4 1 2 4 5 3 4 6 7 4 5 7 8";
+    int offset = 0;
+    for (int i = 0; i < 16; ++i) {
+      offset += snprintf(result + offset, sizeof(result) - offset, "%d ", (int)unfolded[i]);
+    }
+    printf("Testing matrix unfold\n");
+    printf("Result: %s\n", result);
+    printf("Expect: %s\n", expected);
+    if (strncmp(result, expected, strlen(expected)) != 0) {
+      printf("FAILED\n");
+      exit(EXIT_FAILURE);
+    }
+
+    printf("\nPASSED\n\n");
+  
+    freeMatrix(Img);
+    freeMatrix(Kernel);
+    freeMatrix(Unfolded);
+  }
+
+  void test_convolve() {
+    Matrix *Img, *Kernel, *Convolved;
+    float img[9] = {
+      0,1,2,
+      3,4,5,
+      6,7,8
+    };
+    initMatrix(&Img, 3, 3);
+    setDeviceMatrixData(Img, img, 9);
+
+    float kernel[4] = {
+        0, 1,
+        1, 0
+    };
+    initMatrix(&Kernel, 2, 2);
+    setDeviceMatrixData(Kernel, kernel, 4);
+
+    initMatrix(&Convolved, 2, 2);
+    deviceConvolve(Img, 3, 3, Kernel, 2, 2, Convolved, 1, 0);
+  
+    float convolved[4];
+    getDeviceMatrixData(convolved, Convolved, 4);
+  
+    char result[32];
+    char expected[32] = "4 6 10 12";
+    int offset = 0;
+    for (int i = 0; i < 4; ++i) {
+      offset += snprintf(result + offset, sizeof(result) - offset, "%d ", (int)convolved[i]);
+    }
+    printf("Testing matrix convolution\n");
+    printf("Result: %s\n", result);
+    printf("Expect: %s\n", expected);
+    if (strncmp(result, expected, strlen(expected)) != 0) {
+      printf("FAILED\n");
+      exit(EXIT_FAILURE);
+    }
+
+    printf("\nPASSED\n\n");
+  
+    freeMatrix(Img);
+    freeMatrix(Kernel);
+    freeMatrix(Convolved);
+  }
+
 int main() {
 
   test_matrixMult();
   test_matrixElementWise();
+  test_matrix_add_scalar_elementwise();
   test_transpose();
   test_acrossRows();
+  test_unfold();
+  test_convolve();
 
   return 0;
 }
