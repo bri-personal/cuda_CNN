@@ -167,7 +167,6 @@ void layerUpdate(ConvolutionalLayer* layer, int batchSize) {
     return;
 }
 
-// TODO: make for Tensor4D
 void backward(ConvolutionalModel* model, Tensor4D* targets) {
     ConvolutionalNetwork* net = model->network;
     int batchSize = model->batchSize;
