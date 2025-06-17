@@ -162,7 +162,7 @@ void layerBackward(ConvolutionalLayer* layer) {
     // TODO: continue
 }
 
-void layerUpdate(ConvolutionalLayer* layer, int batchSize) {
+void layerUpdate(ConvolutionalLayer* layer, float learningRate, int batchSize) {
     // TODO
     return;
 }
@@ -170,6 +170,7 @@ void layerUpdate(ConvolutionalLayer* layer, int batchSize) {
 void backward(ConvolutionalModel* model, Tensor4D* targets) {
     ConvolutionalNetwork* net = model->network;
     int batchSize = model->batchSize;
+    float learningRate = model->learningRate;
     ConvolutionalLayer* curr = net->output;
     int outputSize = curr->outputRows * curr->outputCols;
 
@@ -181,7 +182,7 @@ void backward(ConvolutionalModel* model, Tensor4D* targets) {
     /* backprop to calc gradients and update params */
     while (curr != NULL) {
         layerBackward(curr);
-        layerUpdate(curr, batchSize);
+        layerUpdate(curr, learningRate, batchSize);
         curr = curr->prev;
     }
 }

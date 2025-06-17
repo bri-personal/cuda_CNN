@@ -18,7 +18,7 @@ void forward(ConvolutionalModel *model, Tensor4D* input);
 
 void compileModel(ConvolutionalModel *model);
 void layerBackward(ConvolutionalLayer* layer);
-void layerUpdate(ConvolutionalLayer* layer, int batchSize);
+void layerUpdate(ConvolutionalLayer* layer, float learningRate, int batchSize);
 void backward(ConvolutionalModel *model, Tensor4D* targets);
 
 int modelAccuracy(ConvolutionalModel *model, Tensor4D* images, uint8_t *labels);
