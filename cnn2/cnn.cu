@@ -151,22 +151,22 @@ void compileModel(ConvolutionalModel *model) {
 }
 
 // TODO: make for Tensor4D
-// void layerBackward(ConvolutionalLayer* layer, ConvolutionalModel* model) {
-//     int batchSize = model->batchSize;
-//     int outChannels = layer->outChannels;
-//     int r = layer->outputRows;
-//     int c = layer->outputCols;
-//     int outputSize = r * c;
-//     int i, j;
+void layerBackward(ConvolutionalLayer* layer, ConvolutionalModel* model) {
+    int batchSize = model->batchSize;
+    int outChannels = layer->outChannels;
+    int r = layer->outputRows;
+    int c = layer->outputCols;
+    int outputSize = r * c;
+    int i, j;
 
-//     for (i = 0; i < batchSize; ++i) {
-//         for (j = 0; j < outChannels; ++j) {
-//             deviceSigmoidOutputDerivative(layer->outputs[i][j], layer->gradient[i][j], outputSize);
-//             deviceHadamardProd(layer->gradient[i][j], layer->error[i][j], layer->gradient[i][j], outputSize);
-//         }
-//     }
+    for (i = 0; i < batchSize; ++i) {
+        for (j = 0; j < outChannels; ++j) {
+            deviceSigmoidOutputDerivative(layer->outputs[i][j], layer->gradient[i][j], outputSize);
+            deviceHadamardProd(layer->gradient[i][j], layer->error[i][j], layer->gradient[i][j], outputSize);
+        }
+    }
     
-// }
+}
 
 void layerUpdate(ConvolutionalLayer* layer, int batchSize) {
     // TODO
